@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>An AI-Enabled Data Pipeline — Matt Geisler</title>
+<title>An AI-Enabled Data Pipeline · Matt Geisler</title>
 <meta name="description" content="A reference architecture for an AI-enabled data pipeline: six physical data-product layers from source to dashboard, with quality and conformance modules plugged in across them.">
 <meta name="color-scheme" content="light">
 
@@ -254,7 +254,7 @@ body[data-view="tech"] .node-panel{ grid-column:1 / -1; grid-row:3; }
 }
 .mgroup-label::after{ content:""; flex:1; height:1px; background:var(--rule); }
 
-/* Business context — a small pipeline of its own */
+/* Business context: a small pipeline of its own */
 .mini-pipe{
   list-style:none; margin:13px 0 0; padding:2px 0 2px 17px; position:relative;
 }
@@ -506,7 +506,7 @@ body[data-view="tech"] .principles h2{ margin-bottom:44px; }
   .node-panel{ padding:18px 18px 20px; }
 }
 
-/* collapsed by default — components open on click */
+/* collapsed by default; components open on click */
 .module-comps{ display:none; }
 .module.is-open .module-comps{ display:flex; }
 
@@ -542,7 +542,7 @@ body[data-view="tech"] .principles h2{ margin-bottom:44px; }
       <div class="eyebrow">Reference Architecture</div>
       <h1>An <em>AI-enabled</em> data pipeline.</h1>
       <p class="hero-lede exec-only"><b>Agents propose. Code executes. Humans decide.</b></p>
-      <p class="hero-lede tech-only">Six physical data products, source to decision. Quality, conformance and semantics are deterministic modules that plug into them, not layers within them — and business context is a small pipeline of its own that feeds discovery.</p>
+      <p class="hero-lede tech-only">Six physical data products, source to decision. Quality, conformance and semantics are deterministic modules that plug into them, not layers within them. Business context is a small pipeline of its own that feeds discovery.</p>
       <div class="hero-meta">
         <span><strong>Matt Geisler</strong></span>
         <span class="dot"></span>
@@ -560,7 +560,7 @@ body[data-view="tech"] .principles h2{ margin-bottom:44px; }
           <h2 class="exec-only">Six data products, source to decision.</h2>
           <h2 class="tech-only">Six data products. Three modules and a context pipeline.</h2>
         </div>
-        <p class="dg-hint exec-only">Data flows up. <strong>Click a layer</strong> to open its components — or switch to <strong>Technical</strong> for all of them at once, plus the modules that plug across them.</p>
+        <p class="dg-hint exec-only">Data flows up. <strong>Click a layer</strong> to open its components. Or switch to <strong>Technical</strong> for all of them at once, plus the modules that plug across them.</p>
         <p class="dg-hint tech-only">Products open into their components. <strong>Click a module</strong> on the left to open it and light up what it plugs into.</p>
       </div>
 
@@ -591,7 +591,7 @@ body[data-view="tech"] .principles h2{ margin-bottom:44px; }
         <div class="prin">
           <span class="n">01</span>
           <h3>Agents propose</h3>
-          <p>Models triage quality failures, draft column mappings, propose entity matches, explain a variance, and write the first version of a transformation. They produce reviewable diffs and evidence — never silent writes to production.</p>
+          <p>Models triage quality failures, draft column mappings, propose entity matches, explain a variance, and write the first version of a transformation. They produce reviewable diffs and evidence, never silent writes to production.</p>
         </div>
         <div class="prin">
           <span class="n">02</span>
@@ -601,7 +601,7 @@ body[data-view="tech"] .principles h2{ margin-bottom:44px; }
         <div class="prin">
           <span class="n">03</span>
           <h3>Humans decide</h3>
-          <p>Metric definitions, contract changes, match thresholds, access, and retention are approvals — not automations. The stack's job is to make the decision fast, evidenced, and reversible.</p>
+          <p>Metric definitions, contract changes, match thresholds, access, and retention are approvals, not automations. The stack's job is to make the decision fast, evidenced, and reversible.</p>
         </div>
       </div>
     </div>
@@ -625,7 +625,7 @@ body[data-view="tech"] .principles h2{ margin-bottom:44px; }
      ============================================================ */
   var SHAPE = {
 
-    /* 06 Dashboard — a screen with a trend on it */
+    /* 06 Dashboard: a screen with a trend on it */
     screen:
       '<rect class="edge" x="16" y="10" width="88" height="50" rx="3"/>' +
       '<path class="dimline" d="M16 21 H104"/>' +
@@ -633,28 +633,28 @@ body[data-view="tech"] .principles h2{ margin-bottom:44px; }
       '<path class="hot" d="M30 48 L48 37 L66 42 L92 29"/>' +
       '<path class="line" d="M60 60 V70 M46 70 H74"/>',
 
-    /* 05 Aggregate — an isometric cube: many rows folded into one number */
+    /* 05 Aggregate: an isometric cube, many rows folded into one number */
     cube:
       '<path class="edge"  d="M20 30 L60 52 L60 78 L20 56 Z"/>' +
       '<path class="edge2" d="M100 30 L60 52 L60 78 L100 56 Z"/>' +
       '<path class="face"  d="M60 8 L100 30 L60 52 L20 30 Z"/>' +
       '<path class="hot"   d="M20 30 L100 30" opacity=".5"/>',
 
-    /* 04 Data Lake — the database cylinder, deep */
+    /* 04 Data Lake: the database cylinder, deep */
     cylinder:
       '<path class="edge" d="M22 20 V62 A38 11 0 0 0 98 62 V20"/>' +
       '<ellipse class="face" cx="60" cy="20" rx="38" ry="11"/>' +
       '<path class="dimline" d="M22 34 A38 11 0 0 0 98 34"/>' +
       '<path class="dimline" d="M22 48 A38 11 0 0 0 98 48"/>',
 
-    /* 03 Data Integration — a manifold: many systems in, one entity out */
+    /* 03 Data Integration: a manifold, many systems in, one entity out */
     manifold:
       '<path class="line" d="M28 80 V62 M60 80 V62 M92 80 V62"/>' +
       '<rect class="edge" x="14" y="36" width="92" height="26" rx="5"/>' +
       '<path class="hot" d="M30 56 C30 47, 60 53, 60 43 M60 56 V43 M90 56 C90 47, 60 53, 60 43"/>' +
       '<path class="hot" d="M60 36 V8 M54 14 L60 8 L66 14"/>',
 
-    /* 02 ODS — a live replica: cylinder with continuous sync */
+    /* 02 ODS: a live replica, cylinder with continuous sync */
     ods:
       '<path class="edge" d="M44 26 V58 A24 8 0 0 0 92 58 V26"/>' +
       '<ellipse class="face" cx="68" cy="26" rx="24" ry="8"/>' +
@@ -662,7 +662,7 @@ body[data-view="tech"] .principles h2{ margin-bottom:44px; }
       '<path class="hot"     d="M16 64 V20 M11 25 L16 20 L21 25"/>' +
       '<path class="dimline" d="M30 20 V64 M25 59 L30 64 L35 59"/>',
 
-    /* 01 Data Source — the systems of origin, three of a kind */
+    /* 01 Data Source: the systems of origin, three of a kind */
     sources:
       '<rect class="edge" x="4"  y="24" width="33" height="36" rx="3"/>' +
       '<rect class="edge" x="43" y="14" width="34" height="54" rx="3"/>' +
@@ -672,7 +672,7 @@ body[data-view="tech"] .principles h2{ margin-bottom:44px; }
       '<path class="hot" d="M50 30 V50 A10 3.5 0 0 0 70 50 V30"/>' +
       '<path class="line" d="M89 36 q5.5 -5 11 0 t11 0 M89 44 q5.5 -5 11 0 t11 0 M89 52 q5.5 -5 11 0 t11 0"/>',
 
-    /* Module — DQ: a mesh funnel, bad data out the side */
+    /* Module, DQ: a mesh funnel, bad data out the side */
     funnel:
       '<circle class="dim" cx="30" cy="7" r="2"/><circle class="dim" cx="60" cy="5" r="2"/><circle class="dim" cx="90" cy="7" r="2"/>' +
       '<path class="edge" d="M12 18 H108 L68 52 V74 H52 V52 Z"/>' +
@@ -680,7 +680,7 @@ body[data-view="tech"] .principles h2{ margin-bottom:44px; }
       '<path class="dimline" d="M104 23 L118 30"/>' +
       '<circle class="dim" cx="118" cy="30" r="2.4"/>',
 
-    /* Module — Semantic Layer: an entity model */
+    /* Module, Semantic Layer: an entity model */
     model:
       '<rect class="edge" x="6"  y="12" width="36" height="24" rx="2"/>' +
       '<rect class="edge" x="78" y="12" width="36" height="24" rx="2"/>' +
@@ -689,7 +689,7 @@ body[data-view="tech"] .principles h2{ margin-bottom:44px; }
       '<path class="hot" d="M24 36 C24 47, 48 45, 54 50 M96 36 C96 47, 72 45, 66 50"/>' +
       '<path class="dimline" d="M48 59 H72 M48 66 H66"/>',
 
-    /* Module — Business Context: an open book of definitions */
+    /* Module, Business Context: an open book of definitions */
     book:
       '<path class="edge"  d="M60 24 C48 15, 30 13, 15 15 V63 C30 61, 48 63, 60 72 Z"/>' +
       '<path class="edge2" d="M60 24 C72 15, 90 13, 105 15 V63 C90 61, 72 63, 60 72 Z"/>' +
@@ -697,7 +697,7 @@ body[data-view="tech"] .principles h2{ margin-bottom:44px; }
       '<path class="dimline" d="M25 30 H50 M25 40 H50 M25 50 H46"/>' +
       '<path class="dimline" d="M70 30 H95 M70 40 H95 M74 50 H95"/>',
 
-    /* Module — Linting: ragged in, aligned out */
+    /* Module, Linting: ragged in, aligned out */
     comb:
       '<path class="dimline" d="M6 21 H42 M16 35 H42 M2 49 H42 M20 63 H42"/>' +
       '<path class="hot" d="M51 12 V72"/>' +
@@ -738,13 +738,13 @@ body[data-view="tech"] .principles h2{ margin-bottom:44px; }
     { g:"ask",   t:"Ad-hoc questions" }
   ];
 
-  /* Physical data products — index 0 is the top of the page (top of the stack) */
+  /* Physical data products: index 0 is the top of the page (top of the stack) */
   var NODES = [
     {
       n:"06", key:"dash", shape:"screen", name:"Discovery &amp; Dashboard Layer", role:"Delivery, discovery and decision surface",
       line:"Governed metrics only. <b>No logic in the tile.</b>",
       out:"Numbers nobody has to argue about.",
-      what:"The only surface most of the business touches, and deliberately the thinnest layer in the stack. Tiles bind to <b>governed metrics</b> rather than writing their own SQL, so nobody quietly rebuilds logic in a chart and ends up disagreeing with everyone else. Discovery — natural-language questions, anomaly narratives, scheduled briefings — runs against those same definitions, which is what makes an AI answer trustworthy rather than plausible.",
+      what:"The only surface most of the business touches, and deliberately the thinnest layer in the stack. Tiles bind to <b>governed metrics</b>. No tile writes its own SQL, so nobody quietly rebuilds logic in a chart and ends up disagreeing with everyone else. Discovery (natural-language questions, anomaly narratives, scheduled briefings) runs against those same definitions, which is what makes an AI answer trustworthy rather than plausible.",
       provides:[
         ["Dashboards and reports","Bound to governed metrics, never ad-hoc SQL"],
         ["Ask-anything discovery","Natural language over the semantic layer"],
@@ -752,7 +752,7 @@ body[data-view="tech"] .principles h2{ margin-bottom:44px; }
         ["Embedded surfaces","The same numbers inside the product"]
       ],
       builtWith:[
-        ["sem","Every tile references a metric name — change a definition once and it propagates here at the same moment."],
+        ["sem","Every tile references a metric name: change a definition once and it propagates here at the same moment."],
         ["ctx","Targets, segments, calendar and glossary: the context that makes an answer mean something to this business."]
       ],
       comps:[
@@ -765,7 +765,7 @@ body[data-view="tech"] .principles h2{ margin-bottom:44px; }
       n:"05", key:"agg", shape:"cube", name:"Aggregate Layer", role:"Business logic and metrics",
       line:"<b>One definition per metric.</b> In one place.",
       out:"A metric set the business agrees on.",
-      what:"Where clean tables become the numbers the business actually names — revenue, churn, margin, retention. Each metric has <b>one definition, one owner and one place</b>, consumed by everything downstream. That makes a change to how a number is counted a reviewed business decision rather than an unnoticed edit in someone's query.",
+      what:"Where clean tables become the numbers the business actually names: revenue, churn, margin, retention. Each metric has <b>one definition, one owner and one place</b>, consumed by everything downstream. That makes a change to how a number is counted a reviewed business decision rather than an unnoticed edit in someone's query.",
       provides:[
         ["A governed metric set","One definition, one owner, one place"],
         ["Reusable marts","Pre-shaped tables other teams build on"],
@@ -773,7 +773,7 @@ body[data-view="tech"] .principles h2{ margin-bottom:44px; }
         ["A written rationale","Why each metric is defined the way it is"]
       ],
       builtWith:[
-        ["dq","Tests run on every model in CI — a failing metric never publishes."],
+        ["dq","Tests run on every model in CI. A failing metric never publishes."],
         ["sem","Metric expressions and entity bindings compiled from the versioned model spec."],
         ["lint","Naming, types and units held to one standard across every mart."]
       ],
@@ -787,7 +787,7 @@ body[data-view="tech"] .principles h2{ margin-bottom:44px; }
       n:"04", key:"lake", shape:"cylinder", name:"Data Lake", role:"Durable, traceable storage",
       line:"Immutable record. <b>Full lineage, back to the row.</b>",
       out:"Any past state, reproducible.",
-      what:"The durable heart of the stack. Raw data is kept immutable and dated beside a conformed zone of <b>clean, functional tables</b> — the facts and dimensions that reports and dashboards actually query, carrying the attributes and dimensions the business asks for. Nothing above it re-derives history; every figure traces back to the row it came from, and any past state can be reproduced rather than reconstructed from memory.",
+      what:"The durable heart of the stack. Raw data is kept immutable and dated beside a conformed zone of <b>clean, functional tables</b>: the facts and dimensions that reports and dashboards actually query, carrying the attributes and dimensions the business asks for. Nothing above it re-derives history; every figure traces back to the row it came from, and any past state can be reproduced rather than reconstructed from memory.",
       provides:[
         ["Clean functional tables","Report-ready facts and dimensions, not raw dumps"],
         ["Attributes and dimensions","The descriptive columns analysis actually needs"],
@@ -795,12 +795,12 @@ body[data-view="tech"] .principles h2{ margin-bottom:44px; }
         ["Full lineage","Every column traceable to its source row"]
       ],
       builtWith:[
-        ["dq","Assertions and freshness checks on every table; failures quarantine rather than propagate."],
+        ["dq","Assertions and freshness checks on every table; a failure quarantines the data and stops there."],
         ["sem","Conformed dimensions, grains and entity definitions the tables are shaped to."],
         ["lint","Naming, types and units brought to one standard before anything is published."]
       ],
       comps:[
-        ["Raw zone — immutable, partitioned","Conformed zone of functional tables","Open table format with time travel","Slowly-changing dimension handling","Automatic lineage capture"],
+        ["Raw zone, immutable and partitioned","Conformed zone of functional tables","Open table format with time travel","Slowly-changing dimension handling","Automatic lineage capture"],
         ["Lineage Q&amp;A over the catalog","Orphan and duplicate detection","Cost and usage scanner"],
         ["Access grants","Retention and deletion calls"]
       ]
@@ -817,7 +817,7 @@ body[data-view="tech"] .principles h2{ margin-bottom:44px; }
         ["Reconciliation","Counts that tie out hop to hop"]
       ],
       builtWith:[
-        ["dq","Reconciliation totals across the hop — a merge that breaks counts is quarantined."],
+        ["dq","Reconciliation totals across the hop. A merge that breaks counts is quarantined."],
         ["sem","The entity and grain definitions the match rules resolve against."],
         ["lint","Canonical keys and formats, so matching compares like with like."]
       ],
@@ -831,7 +831,7 @@ body[data-view="tech"] .principles h2{ margin-bottom:44px; }
       n:"02", key:"ods", shape:"ods", name:"ODS Layer", role:"Operational data store",
       line:"A current, queryable mirror of the source. <b>No business logic.</b>",
       out:"Near-real-time operational truth.",
-      what:"A current, queryable mirror of the source systems — one-to-one, with <b>no business logic applied</b>. It exists so operational questions can be answered against fresh data without touching production systems, and so everything above it starts from a stable, replayable surface rather than a live API.",
+      what:"A current, queryable mirror of the source systems: one-to-one, with <b>no business logic applied</b>. It exists so operational questions can be answered against fresh data without touching production systems, and so everything above it starts from a stable, replayable surface instead of a live API.",
       provides:[
         ["Fresh operational tables","Minutes behind source, not days"],
         ["A safe query surface","Analysts never hit production systems"],
@@ -850,7 +850,7 @@ body[data-view="tech"] .principles h2{ margin-bottom:44px; }
     },
     {
       n:"01", key:"src", shape:"sources", name:"Data Source Layer", role:"Systems of origin",
-      line:"Everything the business already runs on — <b>under contract</b>.",
+      line:"Everything the business already runs on, <b>under contract</b>.",
       out:"A registered, contracted inventory of inputs.",
       what:"The systems the business already runs on: CRM, ERP, billing, product telemetry, the spreadsheets that matter. This layer transforms nothing. It establishes <b>what exists, who owns it, and what shape it is promised to arrive in</b>, so every layer above can depend on it instead of discovering it.",
       provides:[
@@ -870,14 +870,14 @@ body[data-view="tech"] .principles h2{ margin-bottom:44px; }
     }
   ];
 
-  /* Cross-cutting modules — a different axis, plugged into the products above */
+  /* Cross-cutting modules: a different axis, plugged into the products above */
   var MODULES = [
     {
       key:"dq", shape:"funnel", name:"DQ Module", tag:"Deterministic · quality", group:"det",
       line:"Checked against a contract at <b>every boundary</b>, not just the door. Failures quarantine; they do not propagate.",
       plugs:["src","ods","int","lake","agg"],
       comps:[
-        ["Assertion suites — null, range, uniqueness","Freshness SLA checks","Reconciliation counts across hops","Fail-closed quarantine"],
+        ["Assertion suites for null, range and uniqueness","Freshness SLA checks","Reconciliation counts across hops","Fail-closed quarantine"],
         ["Expectation registry per dataset","DQ score as a tracked metric","Versioned data contracts"],
         ["Failure triage and classification","Root-cause traced across lineage","Ticket drafting with evidence"],
         ["Quarantine release approval","Contract change sign-off"],
@@ -898,7 +898,7 @@ body[data-view="tech"] .principles h2{ margin-bottom:44px; }
     },
     {
       key:"ctx", shape:"book", name:"Business Context", tag:"A pipeline of its own", group:"ctx",
-      line:"What the numbers <b>mean to this business</b>. Its own small pipeline — inputs, modelled, stored, served — that plugs into discovery.",
+      line:"What the numbers <b>mean to this business</b>. Its own small pipeline (inputs, modelled, stored, served) that plugs into discovery.",
       plugs:["dash"],
       pipeline:[
         { t:"Grounding service", d:"Serves definitions and context to Q&amp;A, narratives and search." },
@@ -1059,10 +1059,18 @@ body[data-view="tech"] .principles h2{ margin-bottom:44px; }
     var spineRect = dag.querySelector(".spine").getBoundingClientRect();
     dag.style.setProperty("--spine", (sr.left + sr.width / 2 - spineRect.left) + "px");
 
-    /* pull the consumers tier over the spine so the fan is a fan, not a sweep */
+    /* pull the consumers tier over the spine so the fan is a fan, not a sweep,
+       clamped so the row never leaves the diagram at narrow widths */
     var dr = dag.getBoundingClientRect();
+    var tier = tierEl.querySelector(".tier");
+    tier.style.transform = "none";
+    var tRect = tier.getBoundingClientRect();
     var shift = (sr.left + sr.width / 2) - (dr.left + dr.width / 2);
-    tierEl.querySelector(".tier").style.transform = "translateX(" + Math.round(shift) + "px)";
+    var minShift = dr.left - tRect.left;
+    var maxShift = dr.right - tRect.right;
+    if (maxShift < minShift) { minShift = maxShift = 0; }
+    shift = Math.max(minShift, Math.min(maxShift, shift));
+    tier.style.transform = "translateX(" + Math.round(shift) + "px)";
 
     /* fan from the consumers down to the top node */
     var fr = fanEl.getBoundingClientRect();
