@@ -1,0 +1,1208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>An AI-Enabled Data Pipeline — Matt Geisler</title>
+<meta name="description" content="A reference architecture for an AI-enabled data pipeline: six physical data-product layers from source to dashboard, with quality and conformance modules plugged in across them.">
+<meta name="color-scheme" content="light">
+
+<meta property="og:type" content="website">
+<meta property="og:title" content="An AI-Enabled Data Pipeline">
+<meta property="og:description" content="Six data-product layers. Two cross-cutting modules. Agents propose, code executes, humans decide.">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,300;0,6..72,400;0,6..72,500;1,6..72,300;1,6..72,400&family=Inter:wght@400;450;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%23FAF8F5'/%3E%3Cg fill='none' stroke='%232C6E8F' stroke-width='2.4'%3E%3Cellipse cx='16' cy='9' rx='9' ry='3.2'/%3E%3Cpath d='M7 9v14a9 3.2 0 0 0 18 0V9'/%3E%3Cpath d='M7 16a9 3.2 0 0 0 18 0'/%3E%3C/g%3E%3C/svg%3E">
+
+<style>
+/* ============================================================
+   TOKENS
+   ============================================================ */
+:root{
+  --paper:      #FAF8F5;
+  --paper-sunk: #F2EEE7;
+  --paper-card: #FFFDFA;
+  --ink:        #16181C;
+  --ink-2:      #4B4F58;
+  --ink-3:      #8B8F99;
+  --rule:       #E2DCD2;
+  --rule-soft:  #EDE8E0;
+  --accent:     #A0421F;
+
+  /* layer hues */
+  --h-src:  #9A6B3F;  --t-src:  #F5EDE2;
+  --h-ods:  #A0421F;  --t-ods:  #F7EAE3;
+  --h-int:  #8B3A62;  --t-int:  #F6E8EE;
+  --h-lake: #2C6E8F;  --t-lake: #E7F0F5;
+  --h-agg:  #1F6B60;  --t-agg:  #E4EFEC;
+  --h-dash: #4553A0;  --t-dash: #EAECF6;
+  /* cross-cutting modules */
+  --h-dq:   #B45309;  --t-dq:   #F9EEE0;
+  --h-lint: #4D7C2F;  --t-lint: #ECF2E5;
+  --h-ctx:  #7A4B9C;  --t-ctx:  #F0EAF7;
+  --h-sem:  #334E68;  --t-sem:  #E8EDF2;
+
+  /* concern colours */
+  --lane-1: #46505F;
+  --lane-2: #1F6B60;
+  --lane-3: #A0421F;
+  --lane-4: #7A5A17;
+  --lane-5: #2E5B3B;
+
+  --serif: "Newsreader", "Iowan Old Style", Georgia, "Times New Roman", serif;
+  --sans:  "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+  --mono:  "JetBrains Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+
+  --ease: cubic-bezier(.22,.61,.36,1);
+  --spine: 50%;
+  --h: var(--ink-2);
+  --t: var(--paper-card);
+}
+
+*,*::before,*::after{ box-sizing:border-box; }
+html{ -webkit-text-size-adjust:100%; scroll-behavior:smooth; }
+@media (prefers-reduced-motion: reduce){
+  html{ scroll-behavior:auto; }
+  *,*::before,*::after{ animation-duration:.001ms !important; animation-iteration-count:1 !important; transition-duration:.001ms !important; }
+}
+
+body{
+  margin:0; background:var(--paper); color:var(--ink);
+  font-family:var(--sans); font-size:16px; line-height:1.6;
+  -webkit-font-smoothing:antialiased; text-rendering:optimizeLegibility;
+  overflow-x:hidden;
+}
+
+.wrap{ width:100%; max-width:1280px; margin-inline:auto; padding-inline:32px; }
+@media (max-width:720px){ .wrap{ padding-inline:18px; } }
+
+.eyebrow{
+  font-family:var(--mono); font-size:10.5px; letter-spacing:.16em;
+  text-transform:uppercase; color:var(--ink-3); font-weight:500;
+}
+
+body[data-view="exec"] .tech-only{ display:none !important; }
+body[data-view="tech"] .exec-only{ display:none !important; }
+
+/* ============================================================
+   HEADER
+   ============================================================ */
+.site-head{
+  position:sticky; top:0; z-index:60;
+  background:color-mix(in srgb, var(--paper) 88%, transparent);
+  backdrop-filter:saturate(180%) blur(14px);
+  -webkit-backdrop-filter:saturate(180%) blur(14px);
+  border-bottom:1px solid transparent; transition:border-color .3s var(--ease);
+}
+.site-head.is-stuck{ border-bottom-color:var(--rule); }
+.head-inner{ display:flex; align-items:center; justify-content:space-between; gap:20px; height:62px; }
+.brand{ display:flex; align-items:center; gap:10px; min-width:0; }
+.brand-mark{ width:16px; height:16px; flex:none; }
+.brand-name{ font-weight:600; font-size:14px; letter-spacing:-.01em; white-space:nowrap; }
+.brand-sep{ color:var(--rule); }
+.brand-sub{ font-size:13px; color:var(--ink-3); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+@media (max-width:640px){ .brand-sep,.brand-sub{ display:none; } }
+
+.toggle{
+  display:flex; align-items:center; background:var(--paper-sunk);
+  border:1px solid var(--rule); border-radius:999px; padding:3px; position:relative; flex:none;
+}
+.toggle::before{
+  content:""; position:absolute; top:3px; bottom:3px; left:3px; width:calc(50% - 3px);
+  background:var(--paper-card); border-radius:999px;
+  box-shadow:0 1px 2px rgba(22,24,28,.10), 0 0 0 1px rgba(22,24,28,.05);
+  transition:transform .34s var(--ease);
+}
+body[data-view="tech"] .toggle::before{ transform:translateX(100%); }
+.toggle button{
+  position:relative; z-index:1; appearance:none; background:none; border:0; cursor:pointer;
+  font-family:var(--sans); font-size:12.5px; font-weight:500; color:var(--ink-3);
+  padding:6px 15px; border-radius:999px; transition:color .25s var(--ease); white-space:nowrap;
+}
+.toggle button[aria-pressed="true"]{ color:var(--ink); }
+
+/* ============================================================
+   HERO
+   ============================================================ */
+.hero{ padding:78px 0 44px; }
+.hero .eyebrow{ margin-bottom:24px; }
+.hero h1{
+  font-family:var(--serif); font-weight:400;
+  font-size:clamp(40px, 6.2vw, 72px); line-height:1.03; letter-spacing:-.022em;
+  margin:0 0 24px; max-width:16ch;
+}
+.hero h1 em{ font-style:italic; color:var(--accent); }
+.hero-lede{
+  font-family:var(--serif); font-size:clamp(19px,2.2vw,23px); line-height:1.5;
+  color:var(--ink-2); max-width:58ch; margin:0 0 30px; font-weight:300;
+}
+.hero-lede b{ color:var(--ink); font-weight:400; }
+.hero-meta{
+  display:flex; flex-wrap:wrap; align-items:center; gap:8px 16px;
+  padding-top:20px; border-top:1px solid var(--rule); font-size:13px; color:var(--ink-3);
+}
+.hero-meta strong{ color:var(--ink); font-weight:500; }
+.hero-meta .dot{ width:3px;height:3px;border-radius:50%;background:var(--rule); }
+
+/* ============================================================
+   SHAPES
+   ============================================================ */
+.shape{ display:block; width:100%; height:auto; overflow:visible; transition:transform .3s var(--ease); }
+.shape .edge,  .glyph .edge  { fill:var(--paper-card); stroke:var(--ink-2); stroke-width:1.5; stroke-linejoin:round; stroke-linecap:round; }
+.shape .edge2, .glyph .edge2 { fill:var(--t); stroke:var(--ink-2); stroke-width:1.5; stroke-linejoin:round; stroke-linecap:round; }
+.shape .line,  .glyph .line  { fill:none; stroke:var(--ink-2); stroke-width:1.5; stroke-linejoin:round; stroke-linecap:round; }
+.shape .face,  .glyph .face  { fill:var(--t); stroke:var(--h); stroke-width:1.5; stroke-linejoin:round; }
+.shape .hot,   .glyph .hot   { fill:none; stroke:var(--h); stroke-width:1.8; stroke-linecap:round; stroke-linejoin:round; }
+.shape .dimline, .glyph .dimline{ fill:none; stroke:var(--rule); stroke-width:1.5; stroke-linecap:round; }
+.shape .dim,   .glyph .dim   { fill:var(--ink-3); stroke:none; }
+.shape .bar{ fill:none; stroke:var(--h); stroke-width:5; opacity:.30; }
+.glyph{ width:42px; height:auto; display:block; }
+.glyph .edge, .glyph .edge2, .glyph .line, .glyph .dimline{ stroke-width:1.9; }
+.glyph .hot{ stroke-width:2.1; }
+
+/* ============================================================
+   DIAGRAM
+   ============================================================ */
+.diagram{ padding:0 0 80px; }
+.dg-head{ display:flex; align-items:flex-end; justify-content:space-between; gap:24px; margin-bottom:30px; }
+.dg-head h2{
+  font-family:var(--serif); font-weight:400; font-size:clamp(26px,3.4vw,36px);
+  letter-spacing:-.018em; margin:8px 0 0; line-height:1.1;
+}
+.dg-hint{ font-size:12.5px; color:var(--ink-3); text-align:right; max-width:36ch; line-height:1.5; margin:0; }
+@media (max-width:820px){
+  .dg-head{ flex-direction:column; align-items:flex-start; gap:12px; }
+  .dg-hint{ text-align:left; }
+}
+
+.dag{ margin-inline:auto; max-width:880px; transition:max-width .45s var(--ease); }
+body[data-view="tech"] .dag{ max-width:1216px; }
+
+/* Consumers tier */
+.tier-label{
+  display:block; text-align:center; margin-bottom:14px;
+  font-family:var(--mono); font-size:9.5px; letter-spacing:.16em; text-transform:uppercase; color:var(--ink-3);
+}
+.tier{ display:flex; justify-content:center; align-items:flex-end; gap:32px; flex-wrap:wrap; }
+.endpoint{ display:flex; flex-direction:column-reverse; align-items:center; gap:8px; width:96px; }
+.endpoint .cap{ font-size:11.5px; color:var(--ink-3); text-align:center; line-height:1.3; }
+
+.fan{ display:block; width:100%; height:54px; color:var(--rule); }
+.fan path{ fill:none; stroke:currentColor; stroke-width:1; stroke-dasharray:3 4; }
+
+/* Grid: modules | gutter | spine */
+.stack-grid{
+  position:relative;
+  display:grid; grid-template-columns:238px 78px minmax(0,1fr);
+  transition:grid-template-columns .45s var(--ease);
+}
+body[data-view="tech"] .stack-grid{ grid-template-columns:326px 74px minmax(0,1fr); }
+body[data-view="exec"] .stack-grid{ grid-template-columns:minmax(0,1fr); }
+body[data-view="exec"] .modules,
+body[data-view="exec"] .plugs{ display:none; }
+body[data-view="exec"] .spine{ grid-column:1; }
+body[data-view="exec"] .spine .col-label{ display:none; }
+body[data-view="exec"] .node{ grid-template-columns:minmax(0,1fr) 130px minmax(0,1fr); gap:0 26px; }
+body[data-view="exec"] .node{ cursor:pointer; }
+body[data-view="exec"] .node-out{
+  grid-column:1; grid-row:1; justify-content:flex-end; text-align:right; margin:0; flex-wrap:wrap;
+}
+body[data-view="exec"] .node-panel{ display:none; grid-column:1 / -1; grid-row:2; }
+body[data-view="exec"] .node.is-open .node-panel{ display:block; }
+
+/* open / close affordance */
+.node-open{
+  appearance:none; background:none; border:0; padding:6px 0 0; margin:0; cursor:pointer;
+  display:inline-flex; align-items:center; gap:7px; font:inherit; color:var(--h);
+  font-family:var(--mono); font-size:9px; letter-spacing:.13em; text-transform:uppercase; font-weight:500;
+  opacity:.72; transition:opacity .2s var(--ease);
+}
+.node:hover .node-open{ opacity:1; }
+.node-open .tri{
+  width:0; height:0; border-left:5px solid currentColor;
+  border-top:3.5px solid transparent; border-bottom:3.5px solid transparent;
+  transition:transform .28s var(--ease);
+}
+.node.is-open .node-open .tri{ transform:rotate(90deg); }
+body[data-view="tech"] .node-open{ display:none; }
+body[data-view="exec"] .shape-cell{ grid-column:2; grid-row:1; }
+body[data-view="exec"] .node-body{ grid-column:3; grid-row:1; }
+body[data-view="tech"] .shape-cell{ grid-column:1; grid-row:1; }
+body[data-view="tech"] .node-body{ grid-column:2; grid-row:1; }
+body[data-view="tech"] .node-out{ grid-column:2; grid-row:2; margin-top:8px; }
+body[data-view="tech"] .node-panel{ grid-column:1 / -1; grid-row:3; }
+@media (max-width:760px){
+  body[data-view="exec"] .node{ grid-template-columns:82px minmax(0,1fr); gap:0 16px; }
+  body[data-view="exec"] .shape-cell{ grid-column:1; grid-row:1; }
+  body[data-view="exec"] .node-body{ grid-column:2; grid-row:1; }
+  body[data-view="exec"] .node-out{ grid-column:2; grid-row:2; justify-content:flex-start; text-align:left; margin-top:8px; }
+}
+.plugs{ position:absolute; inset:0; width:100%; height:100%; pointer-events:none; z-index:0; overflow:visible; }
+.plugs path{ fill:none; stroke-width:1.25; stroke-dasharray:2 4; opacity:.38; transition:opacity .25s var(--ease), stroke-width .25s var(--ease); }
+.plugs path.on{ opacity:.95; stroke-width:1.7; }
+.plugs circle{ opacity:.4; transition:opacity .25s var(--ease); }
+.plugs circle.on{ opacity:1; }
+.modules{ grid-column:1; display:flex; flex-direction:column; position:relative; z-index:1; }
+.modules-inner{ flex:1; display:flex; flex-direction:column; justify-content:space-between; gap:34px; }
+.mgroup{ display:flex; flex-direction:column; gap:16px; }
+.mgroup-label{
+  font-family:var(--mono); font-size:9px; letter-spacing:.15em; text-transform:uppercase;
+  color:var(--ink-3); display:flex; align-items:center; gap:9px;
+}
+.mgroup-label::after{ content:""; flex:1; height:1px; background:var(--rule); }
+
+/* Business context — a small pipeline of its own */
+.mini-pipe{
+  list-style:none; margin:13px 0 0; padding:2px 0 2px 17px; position:relative;
+}
+.mini-pipe::before{
+  content:""; position:absolute; left:4px; top:9px; bottom:9px; width:1px;
+  background:var(--h); opacity:.32;
+}
+.mini-pipe::after{
+  content:""; position:absolute; left:1.6px; top:6px; width:6px; height:6px;
+  border-left:1.4px solid var(--h); border-top:1.4px solid var(--h);
+  transform:rotate(45deg); opacity:.7;
+}
+.mp-step{ position:relative; padding:8px 0; }
+.mp-step + .mp-step{ border-top:1px dotted var(--rule); }
+.mp-step::before{
+  content:""; position:absolute; left:-16px; top:14px; width:7px; height:7px;
+  border-radius:50%; background:var(--h); opacity:.5;
+  box-shadow:0 0 0 3px var(--paper-card);
+}
+.mp-t{ display:block; font-size:12.5px; font-weight:600; letter-spacing:-.005em; color:var(--ink); line-height:1.3; }
+.mp-d{ display:block; font-size:11px; color:var(--ink-3); line-height:1.42; margin-top:2px; }
+.spine{ grid-column:3; position:relative; z-index:1; }
+.col-label{
+  font-family:var(--mono); font-size:9.5px; letter-spacing:.16em; text-transform:uppercase;
+  color:var(--ink-3); display:block; padding-bottom:9px; margin-bottom:22px;
+  border-bottom:1px solid var(--rule);
+}
+
+/* Cross-cutting module cards */
+.module{
+  background:var(--paper-card); border:1px dashed var(--h); border-radius:4px;
+  padding:15px 17px 16px;
+  box-shadow:0 8px 22px -18px rgba(22,24,28,.35);
+}
+.module-tag{
+  font-family:var(--mono); font-size:8.5px; letter-spacing:.14em; text-transform:uppercase;
+  color:var(--h); font-weight:500; display:block; margin-bottom:4px;
+}
+.module-head{
+  appearance:none; background:none; border:0; padding:0; margin:0; width:100%; cursor:pointer;
+  display:flex; align-items:center; gap:13px; text-align:left; font:inherit; color:inherit;
+}
+.module-head .shape{ width:54px; flex:none; }
+.mh-text{ flex:1; min-width:0; }
+.module-head h3{ font-family:var(--serif); font-weight:400; font-size:19px; letter-spacing:-.014em; margin:0; line-height:1.16; }
+.chev{
+  flex:none; width:9px; height:9px; margin-right:2px;
+  border-right:1.5px solid var(--h); border-bottom:1.5px solid var(--h);
+  transform:rotate(45deg) translate(-2px,-2px); transition:transform .28s var(--ease);
+}
+.module.is-open .chev{ transform:rotate(-135deg) translate(-2px,-2px); }
+.module-comps{ display:none; }
+.module.is-open .module-comps{ display:flex; }
+.module.is-open{ box-shadow:0 10px 30px -20px rgba(22,24,28,.5); }
+.module-hint{
+  font-family:var(--mono); font-size:8.5px; letter-spacing:.12em; text-transform:uppercase;
+  color:var(--ink-3); margin-top:11px; display:block;
+}
+.module.is-open .module-hint{ display:none; }
+.module h3{ font-family:var(--serif); font-weight:400; font-size:20px; letter-spacing:-.014em; margin:0; line-height:1.15; }
+.module .m-line{ font-size:12.5px; line-height:1.5; color:var(--ink-2); margin:11px 0 0; }
+.module .m-line b{ font-weight:600; color:var(--ink); }
+.m-plugs{ margin-top:12px; padding-top:11px; border-top:1px solid var(--rule-soft); }
+.m-plugs .k{ font-family:var(--mono); font-size:8.5px; letter-spacing:.13em; text-transform:uppercase; color:var(--ink-3); display:block; margin-bottom:7px; }
+.m-plugs .chips{ display:flex; flex-wrap:wrap; gap:5px; }
+.m-plugs .chip{
+  font-size:10.5px; line-height:1; padding:5px 8px; border-radius:999px;
+  border:1px solid var(--rule); color:var(--ink-2); background:var(--paper);
+}
+
+/* Spine nodes */
+.node{
+  display:grid; grid-template-columns:130px minmax(0,1fr); gap:0 22px; align-items:center;
+  opacity:0; transform:translateY(12px);
+  transition:opacity .55s var(--ease), transform .55s var(--ease);
+}
+.node.is-in{ opacity:1; transform:none; }
+.node:hover .shape{ transform:translateY(-3px); }
+
+.node-top{ display:flex; align-items:baseline; gap:12px; flex-wrap:wrap; }
+.node-num{ font-family:var(--mono); font-size:10.5px; letter-spacing:.1em; color:var(--h); font-weight:500; }
+.node-name{ font-family:var(--serif); font-weight:400; font-size:25px; letter-spacing:-.016em; margin:0; line-height:1.12; }
+.node-role{ font-size:11.5px; color:var(--ink-3); width:100%; }
+.node-line{
+  font-family:var(--serif); font-weight:300; font-size:18px; line-height:1.42;
+  color:var(--ink-2); margin:9px 0 0; letter-spacing:-.006em;
+}
+.node-line b{ font-weight:500; color:var(--ink); }
+.node-out{ margin:10px 0 0; font-size:12px; color:var(--ink-3); display:flex; gap:8px; align-items:baseline; }
+.node-out .k{
+  font-family:var(--mono); font-size:8.5px; letter-spacing:.13em; text-transform:uppercase;
+  color:var(--lane-5); flex:none;
+}
+
+/* Connector between spine nodes */
+.conn{ position:relative; height:38px; }
+.conn::before{
+  content:""; position:absolute; left:var(--spine); top:0; bottom:0; width:1px;
+  background:var(--rule); transform:translateX(-.5px);
+}
+.conn::after{
+  content:""; position:absolute; left:var(--spine); top:1px; width:7px; height:7px; margin-left:-4px;
+  border-left:1px solid var(--ink-3); border-top:1px solid var(--ink-3); transform:rotate(45deg);
+}
+.conn .pulse{
+  position:absolute; left:var(--spine); margin-left:-2.5px; width:5px; height:5px;
+  border-radius:50%; background:var(--accent); opacity:0; animation:rise 3.6s var(--ease) infinite;
+}
+@keyframes rise{
+  0%,74%{ top:100%; opacity:0; }
+  78%{ opacity:1; }
+  96%{ top:3px; opacity:1; }
+  100%{ top:3px; opacity:0; }
+}
+
+/* Components */
+.node-comps, .module-comps{
+  background:var(--paper-card); border:1px solid var(--rule-soft); border-radius:3px;
+}
+.node-comps{
+  grid-column:1 / -1; margin-top:18px; padding:18px 22px;
+  display:grid; grid-template-columns:repeat(5, minmax(0,1fr)); gap:0 22px;
+  border-left:3px solid var(--h);
+}
+.module-comps{
+  margin-top:13px; padding:15px 16px; display:flex; flex-direction:column; gap:15px;
+  border-left:3px solid var(--h);
+}
+.cgroup .clabel{
+  font-family:var(--mono); font-size:9px; letter-spacing:.12em; text-transform:uppercase;
+  color:var(--c); font-weight:500; display:flex; align-items:center; gap:6px;
+}
+.cgroup .clabel::before{ content:""; width:14px; height:2px; background:var(--c); flex:none; border-radius:1px; }
+.cgroup ul{ list-style:none; margin:9px 0 0; padding:0; display:flex; flex-direction:column; gap:5px; }
+.cgroup li{ position:relative; padding-left:11px; font-size:11.5px; line-height:1.42; color:var(--ink-2); }
+.cgroup li::before{
+  content:""; position:absolute; left:0; top:.5em; width:3px; height:3px;
+  border-radius:50%; background:var(--c); opacity:.6;
+}
+
+@media (max-width:1080px){ .node-comps{ grid-template-columns:repeat(2,minmax(0,1fr)); gap:20px 22px; } }
+@media (max-width:900px){
+  .stack-grid, body[data-view="tech"] .stack-grid{ grid-template-columns:1fr; gap:34px; }
+  .modules{ grid-column:1; gap:20px; }
+  .spine{ grid-column:1; }
+  .plugs{ display:none; }
+}
+@media (max-width:640px){
+  .node{ grid-template-columns:76px minmax(0,1fr); gap:0 16px; }
+  .node-name{ font-size:21px; }
+  .node-line{ font-size:16px; }
+  .node-comps{ grid-template-columns:1fr; gap:18px; padding:16px 18px; }
+  .tier{ gap:16px; }
+  .endpoint{ width:74px; }
+}
+
+/* Legends */
+.legend{ margin-top:44px; padding-top:22px; border-top:1px solid var(--rule); }
+.legend .eyebrow{ display:block; margin-bottom:16px; }
+.legend-row{ display:grid; grid-template-columns:repeat(5,minmax(0,1fr)); gap:22px; }
+.lgd .bar{ height:3px; border-radius:2px; margin-bottom:9px; }
+.lgd .nm{ font-size:12.5px; font-weight:600; letter-spacing:-.005em; line-height:1.3; }
+.lgd .ds{ font-size:11.5px; color:var(--ink-3); line-height:1.45; margin-top:4px; }
+@media (max-width:860px){ .legend-row{ grid-template-columns:repeat(2,1fr); gap:18px; } }
+@media (max-width:480px){ .legend-row{ grid-template-columns:1fr; } }
+
+.legend-inline{
+  margin-top:38px; padding-top:20px; border-top:1px solid var(--rule);
+  display:flex; flex-wrap:wrap; align-items:center; gap:8px 18px; font-size:12.5px; color:var(--ink-3);
+}
+.legend-inline .li{ display:inline-flex; align-items:center; gap:7px; }
+.legend-inline .sw{ width:12px; height:3px; border-radius:2px; flex:none; }
+.legend-inline .lead{ color:var(--ink-2); }
+
+/* ============================================================
+   PRINCIPLES / FOOTER
+   ============================================================ */
+.principles{ background:var(--paper-sunk); border-top:1px solid var(--rule); border-bottom:1px solid var(--rule); padding:70px 0; }
+.principles h2{
+  font-family:var(--serif); font-weight:400; font-size:clamp(30px,4.2vw,46px);
+  letter-spacing:-.022em; margin:10px 0 0; max-width:20ch; line-height:1.1;
+}
+.principles h2 em{ font-style:italic; color:var(--accent); }
+body[data-view="tech"] .principles h2{ margin-bottom:44px; }
+.prin-grid{ display:grid; grid-template-columns:repeat(3,1fr); }
+.prin{ padding-right:34px; }
+.prin + .prin{ padding-left:34px; border-left:1px solid var(--rule); }
+.prin .n{ font-family:var(--mono); font-size:10px; letter-spacing:.14em; color:var(--ink-3); display:block; margin-bottom:12px; }
+.prin h3{ font-family:var(--serif); font-weight:400; font-size:24px; letter-spacing:-.015em; margin:0 0 9px; }
+.prin p{ margin:0; font-size:14px; line-height:1.6; color:var(--ink-2); }
+@media (max-width:860px){
+  .prin-grid{ grid-template-columns:1fr; }
+  .prin{ padding:22px 0; }
+  .prin + .prin{ padding-left:0; border-left:0; border-top:1px solid var(--rule); }
+}
+
+.site-foot{ padding:44px 0 60px; }
+.foot-inner{ display:flex; flex-wrap:wrap; gap:16px; justify-content:space-between; align-items:center; }
+.foot-inner p{ margin:0; font-size:13.5px; color:var(--ink-3); }
+.foot-inner a{ color:var(--ink); text-decoration:none; border-bottom:1px solid var(--rule); }
+.foot-inner a:hover{ border-bottom-color:var(--accent); color:var(--accent); }
+.kbd{ font-family:var(--mono); font-size:10.5px; border:1px solid var(--rule); border-radius:4px; padding:2px 6px; background:var(--paper-card); }
+
+/* ============================================================
+   EXPANSION PANEL
+   ============================================================ */
+.node-panel{
+  margin-top:20px; padding:24px 26px 26px;
+  background:var(--paper-card); border:1px solid var(--rule-soft);
+  border-left:3px solid var(--h); border-radius:3px;
+  cursor:default;
+}
+.panel-sec + .panel-sec{ margin-top:22px; padding-top:20px; border-top:1px solid var(--rule-soft); }
+.sec-k{
+  display:block; margin-bottom:13px;
+  font-family:var(--mono); font-size:9px; letter-spacing:.14em; text-transform:uppercase;
+  color:var(--ink-3); font-weight:500;
+}
+
+.p-top{ display:grid; grid-template-columns:minmax(0,1.12fr) minmax(0,1fr); gap:26px 34px; }
+.p-what p{
+  margin:0; font-family:var(--serif); font-weight:300; font-size:16.5px; line-height:1.56;
+  color:var(--ink-2); letter-spacing:-.003em;
+}
+.p-what p b{ color:var(--ink); font-weight:500; }
+
+.provides{ display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:14px 18px; }
+.prov{ border-top:2px solid var(--h); padding-top:9px; }
+.prov .t{ display:block; font-size:12.5px; font-weight:600; letter-spacing:-.005em; line-height:1.3; color:var(--ink); }
+.prov .d{ display:block; font-size:11px; color:var(--ink-3); line-height:1.42; margin-top:3px; }
+
+.builtwith{ display:grid; grid-template-columns:repeat(auto-fit,minmax(210px,1fr)); gap:13px; }
+.bw{
+  display:flex; gap:11px; align-items:flex-start;
+  border:1px dashed var(--h); border-radius:4px; padding:11px 13px; background:var(--t);
+}
+.bw .shape{ width:34px; flex:none; margin-top:2px; }
+.bw .n{ display:block; font-size:11.5px; font-weight:600; color:var(--h); letter-spacing:-.005em; line-height:1.25; }
+.bw .d{ display:block; font-size:11px; color:var(--ink-2); line-height:1.45; margin-top:4px; }
+
+.built-from{ display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:26px; }
+
+@media (max-width:900px){
+  .p-top{ grid-template-columns:1fr; gap:22px; }
+  .built-from{ grid-template-columns:1fr; gap:20px; }
+}
+@media (max-width:560px){
+  .provides{ grid-template-columns:1fr; }
+  .node-panel{ padding:18px 18px 20px; }
+}
+
+/* collapsed by default — components open on click */
+.module-comps{ display:none; }
+.module.is-open .module-comps{ display:flex; }
+
+::selection{ background:#F7ECE5; }
+:focus-visible{ outline:2px solid var(--accent); outline-offset:3px; border-radius:2px; }
+</style>
+</head>
+<body data-view="exec">
+
+<header class="site-head" id="head">
+  <div class="wrap head-inner">
+    <div class="brand">
+      <svg class="brand-mark" viewBox="0 0 32 32" aria-hidden="true" fill="none" stroke="#2C6E8F" stroke-width="2.4">
+        <ellipse cx="16" cy="9" rx="9" ry="3.2"/>
+        <path d="M7 9v14a9 3.2 0 0 0 18 0V9"/>
+        <path d="M7 16a9 3.2 0 0 0 18 0"/>
+      </svg>
+      <span class="brand-name">Matt Geisler</span>
+      <span class="brand-sep">/</span>
+      <span class="brand-sub">AI-Enabled Data Pipeline</span>
+    </div>
+    <div class="toggle" role="group" aria-label="Level of detail">
+      <button type="button" id="btn-exec" aria-pressed="true">Executive</button>
+      <button type="button" id="btn-tech" aria-pressed="false">Technical</button>
+    </div>
+  </div>
+</header>
+
+<main>
+
+  <section class="hero">
+    <div class="wrap">
+      <div class="eyebrow">Reference Architecture</div>
+      <h1>An <em>AI-enabled</em> data pipeline.</h1>
+      <p class="hero-lede exec-only"><b>Agents propose. Code executes. Humans decide.</b></p>
+      <p class="hero-lede tech-only">Six physical data products, source to decision. Quality, conformance and semantics are deterministic modules that plug into them, not layers within them — and business context is a small pipeline of its own that feeds discovery.</p>
+      <div class="hero-meta">
+        <span><strong>Matt Geisler</strong></span>
+        <span class="dot"></span>
+        <span>Data platform architecture</span>
+      </div>
+    </div>
+  </section>
+
+  <section class="diagram">
+    <div class="wrap">
+
+      <div class="dg-head">
+        <div>
+          <div class="eyebrow">The Stack</div>
+          <h2 class="exec-only">Six data products, source to decision.</h2>
+          <h2 class="tech-only">Six data products. Three modules and a context pipeline.</h2>
+        </div>
+        <p class="dg-hint exec-only">Data flows up. <strong>Click a layer</strong> to open its components — or switch to <strong>Technical</strong> for all of them at once, plus the modules that plug across them.</p>
+        <p class="dg-hint tech-only">Products open into their components. <strong>Click a module</strong> on the left to open it and light up what it plugs into.</p>
+      </div>
+
+      <div class="dag" id="dag"></div>
+
+      <div class="legend-inline exec-only">
+        <span class="lead">Every box runs across:</span>
+        <span class="li"><span class="sw" style="background:var(--lane-1)"></span>Deterministic code</span>
+        <span class="li"><span class="sw" style="background:var(--lane-2)"></span>Semantic &amp; DQ</span>
+        <span class="li"><span class="sw" style="background:var(--lane-3)"></span>Agentic</span>
+        <span class="li"><span class="sw" style="background:var(--lane-4)"></span>Human decision</span>
+        <span class="li"><span class="sw" style="background:var(--lane-5)"></span>Product output</span>
+      </div>
+
+      <div class="legend tech-only">
+        <span class="eyebrow">The five concerns, in every box</span>
+        <div class="legend-row" id="legend-row"></div>
+      </div>
+
+    </div>
+  </section>
+
+  <section class="principles">
+    <div class="wrap">
+      <div class="eyebrow">Operating Rule</div>
+      <h2>Agents propose. Code executes. <em>Humans decide.</em></h2>
+      <div class="prin-grid tech-only">
+        <div class="prin">
+          <span class="n">01</span>
+          <h3>Agents propose</h3>
+          <p>Models triage quality failures, draft column mappings, propose entity matches, explain a variance, and write the first version of a transformation. They produce reviewable diffs and evidence — never silent writes to production.</p>
+        </div>
+        <div class="prin">
+          <span class="n">02</span>
+          <h3>Code executes</h3>
+          <p>Every number that reaches a dashboard is produced by versioned, tested, deterministic transformation. Same input, same output, every run. An accepted suggestion becomes code and is held to the same bar.</p>
+        </div>
+        <div class="prin">
+          <span class="n">03</span>
+          <h3>Humans decide</h3>
+          <p>Metric definitions, contract changes, match thresholds, access, and retention are approvals — not automations. The stack's job is to make the decision fast, evidenced, and reversible.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer class="site-foot">
+  <div class="wrap foot-inner">
+    <p><a href="mailto:matt.geisler15@gmail.com">matt.geisler15@gmail.com</a></p>
+    <p>Press <span class="kbd">T</span> to switch levels.</p>
+  </div>
+</footer>
+
+<script>
+(function () {
+  "use strict";
+
+  /* ============================================================
+     SHAPES
+     ============================================================ */
+  var SHAPE = {
+
+    /* 06 Dashboard — a screen with a trend on it */
+    screen:
+      '<rect class="edge" x="16" y="10" width="88" height="50" rx="3"/>' +
+      '<path class="dimline" d="M16 21 H104"/>' +
+      '<path class="bar" d="M36 53 V44 M56 53 V36 M76 53 V41"/>' +
+      '<path class="hot" d="M30 48 L48 37 L66 42 L92 29"/>' +
+      '<path class="line" d="M60 60 V70 M46 70 H74"/>',
+
+    /* 05 Aggregate — an isometric cube: many rows folded into one number */
+    cube:
+      '<path class="edge"  d="M20 30 L60 52 L60 78 L20 56 Z"/>' +
+      '<path class="edge2" d="M100 30 L60 52 L60 78 L100 56 Z"/>' +
+      '<path class="face"  d="M60 8 L100 30 L60 52 L20 30 Z"/>' +
+      '<path class="hot"   d="M20 30 L100 30" opacity=".5"/>',
+
+    /* 04 Data Lake — the database cylinder, deep */
+    cylinder:
+      '<path class="edge" d="M22 20 V62 A38 11 0 0 0 98 62 V20"/>' +
+      '<ellipse class="face" cx="60" cy="20" rx="38" ry="11"/>' +
+      '<path class="dimline" d="M22 34 A38 11 0 0 0 98 34"/>' +
+      '<path class="dimline" d="M22 48 A38 11 0 0 0 98 48"/>',
+
+    /* 03 Data Integration — a manifold: many systems in, one entity out */
+    manifold:
+      '<path class="line" d="M28 80 V62 M60 80 V62 M92 80 V62"/>' +
+      '<rect class="edge" x="14" y="36" width="92" height="26" rx="5"/>' +
+      '<path class="hot" d="M30 56 C30 47, 60 53, 60 43 M60 56 V43 M90 56 C90 47, 60 53, 60 43"/>' +
+      '<path class="hot" d="M60 36 V8 M54 14 L60 8 L66 14"/>',
+
+    /* 02 ODS — a live replica: cylinder with continuous sync */
+    ods:
+      '<path class="edge" d="M44 26 V58 A24 8 0 0 0 92 58 V26"/>' +
+      '<ellipse class="face" cx="68" cy="26" rx="24" ry="8"/>' +
+      '<path class="dimline" d="M44 42 A24 8 0 0 0 92 42"/>' +
+      '<path class="hot"     d="M16 64 V20 M11 25 L16 20 L21 25"/>' +
+      '<path class="dimline" d="M30 20 V64 M25 59 L30 64 L35 59"/>',
+
+    /* 01 Data Source — the systems of origin, three of a kind */
+    sources:
+      '<rect class="edge" x="4"  y="24" width="33" height="36" rx="3"/>' +
+      '<rect class="edge" x="43" y="14" width="34" height="54" rx="3"/>' +
+      '<rect class="edge" x="83" y="24" width="33" height="36" rx="3"/>' +
+      '<path class="dimline" d="M11 35 H30 M11 42 H26 M11 49 H30"/>' +
+      '<ellipse class="face" cx="60" cy="30" rx="10" ry="3.5"/>' +
+      '<path class="hot" d="M50 30 V50 A10 3.5 0 0 0 70 50 V30"/>' +
+      '<path class="line" d="M89 36 q5.5 -5 11 0 t11 0 M89 44 q5.5 -5 11 0 t11 0 M89 52 q5.5 -5 11 0 t11 0"/>',
+
+    /* Module — DQ: a mesh funnel, bad data out the side */
+    funnel:
+      '<circle class="dim" cx="30" cy="7" r="2"/><circle class="dim" cx="60" cy="5" r="2"/><circle class="dim" cx="90" cy="7" r="2"/>' +
+      '<path class="edge" d="M12 18 H108 L68 52 V74 H52 V52 Z"/>' +
+      '<path class="hot" d="M26 28 H94 M36 37 H84 M46 46 H74"/>' +
+      '<path class="dimline" d="M104 23 L118 30"/>' +
+      '<circle class="dim" cx="118" cy="30" r="2.4"/>',
+
+    /* Module — Semantic Layer: an entity model */
+    model:
+      '<rect class="edge" x="6"  y="12" width="36" height="24" rx="2"/>' +
+      '<rect class="edge" x="78" y="12" width="36" height="24" rx="2"/>' +
+      '<rect class="face" x="42" y="50" width="36" height="24" rx="2"/>' +
+      '<path class="dimline" d="M12 21 H36 M12 28 H30 M84 21 H108 M84 28 H102"/>' +
+      '<path class="hot" d="M24 36 C24 47, 48 45, 54 50 M96 36 C96 47, 72 45, 66 50"/>' +
+      '<path class="dimline" d="M48 59 H72 M48 66 H66"/>',
+
+    /* Module — Business Context: an open book of definitions */
+    book:
+      '<path class="edge"  d="M60 24 C48 15, 30 13, 15 15 V63 C30 61, 48 63, 60 72 Z"/>' +
+      '<path class="edge2" d="M60 24 C72 15, 90 13, 105 15 V63 C90 61, 72 63, 60 72 Z"/>' +
+      '<path class="hot"   d="M60 24 V72"/>' +
+      '<path class="dimline" d="M25 30 H50 M25 40 H50 M25 50 H46"/>' +
+      '<path class="dimline" d="M70 30 H95 M70 40 H95 M74 50 H95"/>',
+
+    /* Module — Linting: ragged in, aligned out */
+    comb:
+      '<path class="dimline" d="M6 21 H42 M16 35 H42 M2 49 H42 M20 63 H42"/>' +
+      '<path class="hot" d="M51 12 V72"/>' +
+      '<path class="line" d="M60 21 H114 M60 35 H114 M60 49 H114 M60 63 H114"/>'
+  };
+
+  var GLYPH = {
+    dash:  '<rect class="edge" x="12" y="6" width="40" height="26" rx="2"/>' +
+           '<path class="dimline" d="M12 13 H52"/>' +
+           '<path class="hot" d="M18 27 L27 20 L35 24 L47 15"/>' +
+           '<path class="line" d="M32 32 V39 M22 39 H42"/>',
+    bell:  '<path class="edge" d="M32 7 a11 11 0 0 1 11 11 v8 l4 6 H17 l4 -6 v-8 A11 11 0 0 1 32 7 Z"/>' +
+           '<path class="line" d="M27 32 a5 5 0 0 0 10 0"/>',
+    embed: '<rect class="edge" x="12" y="9" width="40" height="28" rx="3"/>' +
+           '<path class="hot" d="M26 18 L20 23 L26 28 M38 18 L44 23 L38 28"/>',
+    ask:   '<path class="edge" d="M14 8 h36 a4 4 0 0 1 4 4 v15 a4 4 0 0 1 -4 4 H30 l-9 7 v-7 h-7 a4 4 0 0 1 -4 -4 V12 a4 4 0 0 1 4 -4 Z"/>' +
+           '<circle class="dim" cx="24" cy="20" r="2"/><circle class="dim" cx="32" cy="20" r="2"/><circle class="dim" cx="40" cy="20" r="2"/>'
+  };
+
+  function shapeSVG(k) { return '<svg class="shape" viewBox="0 0 120 84" aria-hidden="true">' + SHAPE[k] + "</svg>"; }
+  function glyphSVG(k) { return '<svg class="glyph" viewBox="0 0 64 44" aria-hidden="true">' + GLYPH[k] + "</svg>"; }
+
+  /* ============================================================
+     CONTENT
+     ============================================================ */
+  var LANES = [
+    { key:"Deterministic Code",        ds:"Built from · reproducible by definition", c:"var(--lane-1)" },
+    { key:"Semantic &amp; DQ Tooling", ds:"Produced with · the modules",             c:"var(--lane-2)" },
+    { key:"Agentic Layer",             ds:"Built from · where the AI does work",     c:"var(--lane-3)" },
+    { key:"Human Decision",            ds:"Built from · where a person owns it",     c:"var(--lane-4)" },
+    { key:"Product Output",            ds:"What it provides",                        c:"var(--lane-5)" }
+  ];
+
+  var CONSUMERS = [
+    { g:"dash",  t:"Dashboards" },
+    { g:"bell",  t:"Alerts &amp; briefings" },
+    { g:"embed", t:"Embedded product" },
+    { g:"ask",   t:"Ad-hoc questions" }
+  ];
+
+  /* Physical data products — index 0 is the top of the page (top of the stack) */
+  var NODES = [
+    {
+      n:"06", key:"dash", shape:"screen", name:"Discovery &amp; Dashboard Layer", role:"Delivery, discovery and decision surface",
+      line:"Governed metrics only. <b>No logic in the tile.</b>",
+      out:"Numbers nobody has to argue about.",
+      what:"The only surface most of the business touches, and deliberately the thinnest layer in the stack. Tiles bind to <b>governed metrics</b> rather than writing their own SQL, so nobody quietly rebuilds logic in a chart and ends up disagreeing with everyone else. Discovery — natural-language questions, anomaly narratives, scheduled briefings — runs against those same definitions, which is what makes an AI answer trustworthy rather than plausible.",
+      provides:[
+        ["Dashboards and reports","Bound to governed metrics, never ad-hoc SQL"],
+        ["Ask-anything discovery","Natural language over the semantic layer"],
+        ["Alerts and briefings","Written from the actual deltas, not templates"],
+        ["Embedded surfaces","The same numbers inside the product"]
+      ],
+      builtWith:[
+        ["sem","Every tile references a metric name — change a definition once and it propagates here at the same moment."],
+        ["ctx","Targets, segments, calendar and glossary: the context that makes an answer mean something to this business."]
+      ],
+      comps:[
+        ["Metric-bound rendering","Cached serving layer","Row-level access at query time","Usage instrumentation"],
+        ["Natural-language Q&amp;A","Anomaly narratives","Scheduled briefings","Follow-up drill-downs"],
+        ["The decision itself","Threshold and target setting"]
+      ]
+    },
+    {
+      n:"05", key:"agg", shape:"cube", name:"Aggregate Layer", role:"Business logic and metrics",
+      line:"<b>One definition per metric.</b> In one place.",
+      out:"A metric set the business agrees on.",
+      what:"Where clean tables become the numbers the business actually names — revenue, churn, margin, retention. Each metric has <b>one definition, one owner and one place</b>, consumed by everything downstream. That makes a change to how a number is counted a reviewed business decision rather than an unnoticed edit in someone's query.",
+      provides:[
+        ["A governed metric set","One definition, one owner, one place"],
+        ["Reusable marts","Pre-shaped tables other teams build on"],
+        ["Consistent numbers","The same answer in every tool"],
+        ["A written rationale","Why each metric is defined the way it is"]
+      ],
+      builtWith:[
+        ["dq","Tests run on every model in CI — a failing metric never publishes."],
+        ["sem","Metric expressions and entity bindings compiled from the versioned model spec."],
+        ["lint","Naming, types and units held to one standard across every mart."]
+      ],
+      comps:[
+        ["Staging → intermediate → marts","Unit and data tests in CI","Incremental materialization","Orchestration and backfill"],
+        ["Model drafter from plain language","Variance explainer","Missing-test suggester"],
+        ["Metric definition review","Business logic sign-off"]
+      ]
+    },
+    {
+      n:"04", key:"lake", shape:"cylinder", name:"Data Lake", role:"Durable, traceable storage",
+      line:"Immutable record. <b>Full lineage, back to the row.</b>",
+      out:"Any past state, reproducible.",
+      what:"The durable heart of the stack. Raw data is kept immutable and dated beside a conformed zone of <b>clean, functional tables</b> — the facts and dimensions that reports and dashboards actually query, carrying the attributes and dimensions the business asks for. Nothing above it re-derives history; every figure traces back to the row it came from, and any past state can be reproduced rather than reconstructed from memory.",
+      provides:[
+        ["Clean functional tables","Report-ready facts and dimensions, not raw dumps"],
+        ["Attributes and dimensions","The descriptive columns analysis actually needs"],
+        ["Point-in-time history","Any past state reproducible on demand"],
+        ["Full lineage","Every column traceable to its source row"]
+      ],
+      builtWith:[
+        ["dq","Assertions and freshness checks on every table; failures quarantine rather than propagate."],
+        ["sem","Conformed dimensions, grains and entity definitions the tables are shaped to."],
+        ["lint","Naming, types and units brought to one standard before anything is published."]
+      ],
+      comps:[
+        ["Raw zone — immutable, partitioned","Conformed zone of functional tables","Open table format with time travel","Slowly-changing dimension handling","Automatic lineage capture"],
+        ["Lineage Q&amp;A over the catalog","Orphan and duplicate detection","Cost and usage scanner"],
+        ["Access grants","Retention and deletion calls"]
+      ]
+    },
+    {
+      n:"03", key:"int", shape:"manifold", name:"Data Integration Layer", role:"Joining and reconciling",
+      line:"Many systems, <b>one entity</b>. Conflicts resolved on purpose.",
+      out:"A single reconciled view per entity.",
+      what:"Where many systems become one entity. The same customer exists in five places with three spellings and two identifiers; this layer decides <b>which record wins and which field comes from where</b>, then holds a stable key so nothing downstream has to guess. Conflicts are resolved by written rule, not by whichever join ran last.",
+      provides:[
+        ["Golden records","One row per real-world entity"],
+        ["Stable cross-system keys","Joins that hold as systems change"],
+        ["Declared precedence","Written rules for which source wins, per field"],
+        ["Reconciliation","Counts that tie out hop to hop"]
+      ],
+      builtWith:[
+        ["dq","Reconciliation totals across the hop — a merge that breaks counts is quarantined."],
+        ["sem","The entity and grain definitions the match rules resolve against."],
+        ["lint","Canonical keys and formats, so matching compares like with like."]
+      ],
+      comps:[
+        ["Entity resolution and match rules","Survivorship / precedence logic","Cross-system key mapping","Reconciliation totals per hop"],
+        ["Candidate match proposals","Conflict explanation with evidence","Precedence rule suggestions"],
+        ["Match threshold approval","Adjudication of ambiguous merges"]
+      ]
+    },
+    {
+      n:"02", key:"ods", shape:"ods", name:"ODS Layer", role:"Operational data store",
+      line:"A current, queryable mirror of the source. <b>No business logic.</b>",
+      out:"Near-real-time operational truth.",
+      what:"A current, queryable mirror of the source systems — one-to-one, with <b>no business logic applied</b>. It exists so operational questions can be answered against fresh data without touching production systems, and so everything above it starts from a stable, replayable surface rather than a live API.",
+      provides:[
+        ["Fresh operational tables","Minutes behind source, not days"],
+        ["A safe query surface","Analysts never hit production systems"],
+        ["Replayable history","The change log means any state can be rebuilt"],
+        ["Declared grain and keys","Every table states its primary key"]
+      ],
+      builtWith:[
+        ["dq","Freshness and replication-lag checks on every replicated table."],
+        ["lint","Types, timezones and key formats normalized as the data lands."]
+      ],
+      comps:[
+        ["1:1 replica tables","CDC apply with ordering guarantees","Soft-delete and tombstone handling","Replication lag monitoring"],
+        ["Lag anomaly detection","Replay and backfill planning","Drift watch against the source"],
+        ["Lag SLA setting","Cutover and re-sync approval"]
+      ]
+    },
+    {
+      n:"01", key:"src", shape:"sources", name:"Data Source Layer", role:"Systems of origin",
+      line:"Everything the business already runs on — <b>under contract</b>.",
+      out:"A registered, contracted inventory of inputs.",
+      what:"The systems the business already runs on: CRM, ERP, billing, product telemetry, the spreadsheets that matter. This layer transforms nothing. It establishes <b>what exists, who owns it, and what shape it is promised to arrive in</b>, so every layer above can depend on it instead of discovering it.",
+      provides:[
+        ["A registered inventory","Every feed named, owned and discoverable"],
+        ["Signed data contracts","Agreed schema, grain and delivery cadence"],
+        ["Reliable extraction","CDC and scheduled pulls, idempotent and replayable"],
+        ["Change visibility","Drift at the source surfaces before it lands"]
+      ],
+      builtWith:[
+        ["dq","Validates each feed against its contract before a single row is allowed to land."]
+      ],
+      comps:[
+        ["Change-data-capture connectors","Extract schedules and watermarks","Idempotent landing writes","Source system registry","Credential and secret rotation"],
+        ["New-source discovery","Connector config drafting","Schema-drift watch at the source"],
+        ["Onboarding approval for a new source","Access request sign-off"]
+      ]
+    }
+  ];
+
+  /* Cross-cutting modules — a different axis, plugged into the products above */
+  var MODULES = [
+    {
+      key:"dq", shape:"funnel", name:"DQ Module", tag:"Deterministic · quality", group:"det",
+      line:"Checked against a contract at <b>every boundary</b>, not just the door. Failures quarantine; they do not propagate.",
+      plugs:["src","ods","int","lake","agg"],
+      comps:[
+        ["Assertion suites — null, range, uniqueness","Freshness SLA checks","Reconciliation counts across hops","Fail-closed quarantine"],
+        ["Expectation registry per dataset","DQ score as a tracked metric","Versioned data contracts"],
+        ["Failure triage and classification","Root-cause traced across lineage","Ticket drafting with evidence"],
+        ["Quarantine release approval","Contract change sign-off"],
+        ["Trust score and freshness state on every dataset"]
+      ]
+    },
+    {
+      key:"sem", shape:"model", name:"Semantic Layer", tag:"Deterministic · definitions", group:"det",
+      line:"Where a table becomes a concept. Entities, grains and metrics <b>defined once</b> and reused everywhere.",
+      plugs:["int","lake","agg","dash"],
+      comps:[
+        ["Entity and grain definitions","Conformed dimensions and hierarchies","Metric expressions compiled to SQL","Version-controlled model spec"],
+        ["One name per concept","Metric bound to its entity","Certified vs. draft state","Change log per definition"],
+        ["Definition drafting from a description","Overlapping-metric detection","Impact analysis before a change"],
+        ["Definition review and certification","Ownership assignment"],
+        ["A single vocabulary every tool queries against"]
+      ]
+    },
+    {
+      key:"ctx", shape:"book", name:"Business Context", tag:"A pipeline of its own", group:"ctx",
+      line:"What the numbers <b>mean to this business</b>. Its own small pipeline — inputs, modelled, stored, served — that plugs into discovery.",
+      plugs:["dash"],
+      pipeline:[
+        { t:"Grounding service", d:"Serves definitions and context to Q&amp;A, narratives and search." },
+        { t:"Context store",     d:"Versioned, indexed, retrievable." },
+        { t:"Context modelling", d:"Glossary, KPI definitions, segments, hierarchies." },
+        { t:"Business inputs",   d:"Plans, targets, org structure, calendars, policy docs." }
+      ],
+      comps:[
+        ["Target and budget tables","Fiscal calendar and period logic","Segment and hierarchy definitions","Entitlement mapped to org structure"],
+        ["Business glossary","KPI definitions with named owners","Catalogue of common questions","Narrative context per metric"],
+        ["Grounding for natural-language Q&amp;A","Suggested next questions","Context-aware anomaly narratives","Self-serve onboarding explainers"],
+        ["Target setting and sign-off","Glossary ownership and review"],
+        ["A shared vocabulary","Discovery that answers in business terms"]
+      ]
+    },
+    {
+      key:"lint", shape:"comb", name:"Linting Model", tag:"Deterministic · conformance", group:"det",
+      line:"Naming, types and units held to <b>one standard</b>, wherever data lands.",
+      plugs:["ods","int","lake","agg"],
+      comps:[
+        ["Type and unit coercion","Timezone normalization","Canonical key formatting","Deterministic dedup rules"],
+        ["Naming standard","Column glossary","Conformance check in CI"],
+        ["Column mapping proposer","Rename and drift detection","Standard-name suggestion"],
+        ["Steward review queue","Mapping accept or reject"],
+        ["Conformed, self-describing tables","Field dictionary"]
+      ]
+    }
+  ];
+
+  var MODULE_BY_KEY = {};
+  MODULES.forEach(function (m) { MODULE_BY_KEY[m.key] = m; });
+
+  var NAME_BY_KEY = {};
+  NODES.forEach(function (n) { NAME_BY_KEY[n.key] = n.name.replace(/ Layer$/, ""); });
+
+  /* ============================================================
+     BUILD
+     ============================================================ */
+  function compsHTML(comps) {
+    return comps.map(function (list, i) {
+      return '<div class="cgroup" style="--c:' + LANES[i].c + '">' +
+        '<div class="clabel">' + LANES[i].key + "</div><ul>" +
+        list.map(function (c) { return "<li>" + c + "</li>"; }).join("") + "</ul></div>";
+    }).join("");
+  }
+
+  var BUILT_LANES = [
+    { key:"Deterministic code", c:"var(--lane-1)" },
+    { key:"Agentic layer",      c:"var(--lane-3)" },
+    { key:"Human decision",     c:"var(--lane-4)" }
+  ];
+
+  function panelHTML(nd) {
+    var provides = nd.provides.map(function (pv) {
+      return '<div class="prov"><span class="t">' + pv[0] + '</span><span class="d">' + pv[1] + "</span></div>";
+    }).join("");
+
+    var built = nd.builtWith.map(function (bw) {
+      var m = MODULE_BY_KEY[bw[0]];
+      return '<div class="bw" style="--h:var(--h-' + bw[0] + ');--t:var(--t-' + bw[0] + ')">' +
+          shapeSVG(m.shape) +
+          '<div><span class="n">' + m.name + '</span><span class="d">' + bw[1] + "</span></div>" +
+        "</div>";
+    }).join("");
+
+    var from = nd.comps.map(function (list, i) {
+      return '<div class="cgroup" style="--c:' + BUILT_LANES[i].c + '">' +
+        '<div class="clabel">' + BUILT_LANES[i].key + "</div><ul>" +
+        list.map(function (c) { return "<li>" + c + "</li>"; }).join("") + "</ul></div>";
+    }).join("");
+
+    return '<div class="node-panel">' +
+        '<div class="panel-sec p-top">' +
+          '<div class="p-what"><span class="sec-k">What this layer is</span><p>' + nd.what + "</p></div>" +
+          '<div class="p-prov"><span class="sec-k">What it provides</span><div class="provides">' + provides + "</div></div>" +
+        "</div>" +
+        '<div class="panel-sec"><span class="sec-k">Produced with</span><div class="builtwith">' + built + "</div></div>" +
+        '<div class="panel-sec"><span class="sec-k">Built from</span><div class="built-from">' + from + "</div></div>" +
+      "</div>";
+  }
+
+  function nodeHTML(nd) {
+    return '<article class="node" data-key="' + nd.key + '" style="--h:var(--h-' + nd.key + ');--t:var(--t-' + nd.key + ')">' +
+        '<div class="shape-cell">' + shapeSVG(nd.shape) + "</div>" +
+        '<div class="node-body">' +
+          '<div class="node-top"><span class="node-num">' + nd.n + '</span><h3 class="node-name">' + nd.name + "</h3>" +
+          '<span class="node-role">' + nd.role + "</span></div>" +
+          '<p class="node-line">' + nd.line + "</p>" +
+          '<button type="button" class="node-open" aria-expanded="false">' +
+            '<span class="tri" aria-hidden="true"></span><span class="lbl">Components</span></button>' +
+        "</div>" +
+        '<p class="node-out"><span class="k">Output</span><span>' + nd.out + "</span></p>" +
+        panelHTML(nd) +
+      "</article>";
+  }
+
+  function moduleHTML(m) {
+    var chips = m.plugs.map(function (k) { return '<span class="chip">' + NAME_BY_KEY[k] + "</span>"; }).join("");
+    return '<section class="module" data-key="' + m.key + '" style="--h:var(--h-' + m.key + ');--t:var(--t-' + m.key + ')">' +
+        '<button type="button" class="module-head" aria-expanded="false">' +
+          shapeSVG(m.shape) +
+          '<span class="mh-text"><span class="module-tag">' + m.tag + '</span><h3>' + m.name + "</h3></span>" +
+          '<span class="chev" aria-hidden="true"></span>' +
+        "</button>" +
+        '<p class="m-line">' + m.line + "</p>" +
+        (m.pipeline
+          ? '<ol class="mini-pipe">' + m.pipeline.map(function (st) {
+              return '<li class="mp-step"><span class="mp-t">' + st.t + '</span><span class="mp-d">' + st.d + "</span></li>";
+            }).join("") + "</ol>"
+          : "") +
+        '<div class="m-plugs"><span class="k">Plugs into</span><div class="chips">' + chips + "</div></div>" +
+        '<span class="module-hint">Click to open components</span>' +
+        '<div class="module-comps">' + compsHTML(m.comps) + "</div>" +
+      "</section>";
+  }
+
+  var spineHTML = NODES.map(function (nd, i) {
+    return nodeHTML(nd) + (i < NODES.length - 1 ? '<div class="conn" aria-hidden="true"><span class="pulse"></span></div>' : "");
+  }).join("");
+
+  var html =
+    '<div class="tier-wrap"><span class="tier-label">Consumers</span><div class="tier">' +
+      CONSUMERS.map(function (it) {
+        return '<div class="endpoint">' + glyphSVG(it.g) + '<span class="cap">' + it.t + "</span></div>";
+      }).join("") +
+    "</div></div>" +
+    '<svg class="fan" data-dir="out" aria-hidden="true"></svg>' +
+    '<div class="stack-grid">' +
+      '<svg class="plugs" aria-hidden="true"></svg>' +
+      '<aside class="modules"><span class="col-label">Plugs into the stack</span>' +
+        '<div class="modules-inner">' +
+          '<div class="mgroup"><span class="mgroup-label">Context pipeline</span>' +
+            MODULES.filter(function (m) { return m.group === "ctx"; }).map(moduleHTML).join("") + "</div>" +
+          '<div class="mgroup"><span class="mgroup-label">Deterministic modules</span>' +
+            MODULES.filter(function (m) { return m.group === "det"; }).map(moduleHTML).join("") + "</div>" +
+        "</div></aside>" +
+      '<div class="spine"><span class="col-label">Physical data products &nbsp;·&nbsp; data flows up</span>' + spineHTML + "</div>" +
+    "</div>";
+
+  var dag = document.getElementById("dag");
+  dag.innerHTML = html;
+
+  /* ============================================================
+     GEOMETRY
+     ============================================================ */
+  var grid   = dag.querySelector(".stack-grid");
+  var plugs  = dag.querySelector(".plugs");
+  var fanEl  = dag.querySelector(".fan");
+  var tierEl = dag.querySelector(".tier-wrap");
+
+  function measure() {
+    var gr = grid.getBoundingClientRect();
+    var firstShape = dag.querySelector(".spine .shape-cell");
+    if (!firstShape || !gr.width) return;
+
+    /* spine centre, expressed relative to the whole dag (the .conn rules live in .spine) */
+    var sr = firstShape.getBoundingClientRect();
+    var spineRect = dag.querySelector(".spine").getBoundingClientRect();
+    dag.style.setProperty("--spine", (sr.left + sr.width / 2 - spineRect.left) + "px");
+
+    /* pull the consumers tier over the spine so the fan is a fan, not a sweep */
+    var dr = dag.getBoundingClientRect();
+    var shift = (sr.left + sr.width / 2) - (dr.left + dr.width / 2);
+    tierEl.querySelector(".tier").style.transform = "translateX(" + Math.round(shift) + "px)";
+
+    /* fan from the consumers down to the top node */
+    var fr = fanEl.getBoundingClientRect();
+    var W = Math.round(fr.width), H = Math.round(fr.height);
+    if (W && H) {
+      fanEl.setAttribute("viewBox", "0 0 " + W + " " + H);
+      var cx = Math.round(sr.left + sr.width / 2 - fr.left);
+      fanEl.innerHTML = Array.prototype.map.call(tierEl.querySelectorAll(".glyph"), function (g) {
+        var r = g.getBoundingClientRect();
+        var x = Math.round(r.left + r.width / 2 - fr.left);
+        return '<path d="M' + cx + " " + H + " C" + cx + " " + (H * 0.4) + ", " + x + " " + (H * 0.6) + ", " + x + ' 0"/>';
+      }).join("");
+    }
+
+    /* plug curves: module → each product it attaches to */
+    if (getComputedStyle(plugs).display === "none") return;
+    plugs.setAttribute("viewBox", "0 0 " + Math.round(gr.width) + " " + Math.round(gr.height));
+    var d = "";
+    MODULES.forEach(function (m, mi) {
+      var card = grid.querySelector('.module[data-key="' + m.key + '"]');
+      if (!card) return;
+      var cr = card.getBoundingClientRect();
+      var x1 = cr.right - gr.left;
+      var band = Math.min(cr.height - 36, 132);
+      var top = cr.top + cr.height / 2 - gr.top - band / 2;
+      var step = m.plugs.length > 1 ? band / (m.plugs.length - 1) : 0;
+      m.plugs.forEach(function (k, pi) {
+        var cell = grid.querySelector('.node[data-key="' + k + '"] .shape-cell');
+        if (!cell) return;
+        var nr = cell.getBoundingClientRect();
+        var y1 = top + pi * step;
+        var x2 = nr.left - gr.left - 7, y2 = nr.top + nr.height / 2 - gr.top;
+        var mid = x1 + (x2 - x1) * [0.36, 0.56, 0.76][mi % 3];
+        d += '<circle data-m="' + m.key + '" cx="' + x1 + '" cy="' + y1 + '" r="1.8" fill="var(--h-' + m.key + ')" stroke="none"/>' +
+             '<path data-m="' + m.key + '" d="M' + x1 + " " + y1 + " C" + mid + " " + y1 + ", " + mid + " " + y2 + ", " + x2 + " " + y2 +
+             '" stroke="var(--h-' + m.key + ')"/>' +
+             '<circle data-m="' + m.key + '" cx="' + x2 + '" cy="' + y2 + '" r="2.6" fill="var(--h-' + m.key + ')" stroke="none"/>';
+      });
+    });
+    plugs.innerHTML = d;
+    syncHighlight();
+  }
+
+  function syncHighlight() {
+    var open = {};
+    grid.querySelectorAll(".module.is-open").forEach(function (el) { open[el.dataset.key] = 1; });
+    plugs.querySelectorAll("[data-m]").forEach(function (el) {
+      el.classList.toggle("on", !!open[el.getAttribute("data-m")]);
+    });
+  }
+
+  function toggleNode(node) {
+    var open = node.classList.toggle("is-open");
+    var btn = node.querySelector(".node-open");
+    if (btn) {
+      btn.setAttribute("aria-expanded", String(open));
+      btn.querySelector(".lbl").textContent = open ? "Hide components" : "Components";
+    }
+    remeasure();
+  }
+
+  grid.querySelectorAll(".node").forEach(function (node) {
+    node.addEventListener("click", function (e) {
+      if (document.body.dataset.view !== "exec") return;
+      if (window.getSelection && String(window.getSelection()).length) return;
+      if (e.target.closest("a")) return;
+      e.preventDefault();
+      toggleNode(node);
+    });
+  });
+
+  grid.querySelectorAll(".module-head").forEach(function (btn) {
+    btn.addEventListener("click", function () {
+      var card = btn.closest(".module");
+      var open = card.classList.toggle("is-open");
+      btn.setAttribute("aria-expanded", String(open));
+      remeasure();
+    });
+  });
+
+  var raf;
+  function remeasure() { cancelAnimationFrame(raf); raf = requestAnimationFrame(function () { measure(); syncHighlight(); }); }
+  measure();
+  window.addEventListener("resize", remeasure, { passive: true });
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(measure);
+  if (window.ResizeObserver) new ResizeObserver(remeasure).observe(grid);
+
+  /* Legend */
+  var lr = document.getElementById("legend-row");
+  LANES.forEach(function (l) {
+    var d = document.createElement("div");
+    d.className = "lgd";
+    d.innerHTML = '<div class="bar" style="background:' + l.c + '"></div>' +
+      '<div class="nm">' + l.key + '</div><div class="ds">' + l.ds + "</div>";
+    lr.appendChild(d);
+  });
+
+  /* View toggle */
+  var bExec = document.getElementById("btn-exec");
+  var bTech = document.getElementById("btn-tech");
+  function setView(v, persist) {
+    if (document.body.dataset.view === v) return;
+    document.body.dataset.view = v;
+    bExec.setAttribute("aria-pressed", String(v === "exec"));
+    bTech.setAttribute("aria-pressed", String(v === "tech"));
+    measure(); setTimeout(measure, 260); setTimeout(measure, 540);
+    if (persist !== false) { try { localStorage.setItem("pipeline-view", v); } catch (e) {} }
+  }
+  bExec.addEventListener("click", function () { setView("exec"); });
+  bTech.addEventListener("click", function () { setView("tech"); });
+  document.addEventListener("keydown", function (e) {
+    if ((e.key !== "t" && e.key !== "T") || e.metaKey || e.ctrlKey || e.altKey) return;
+    var t = e.target;
+    if (t && (t.tagName === "INPUT" || t.tagName === "TEXTAREA" || t.isContentEditable)) return;
+    setView(document.body.dataset.view === "exec" ? "tech" : "exec");
+  });
+  try { if (localStorage.getItem("pipeline-view") === "tech") setView("tech", false); } catch (e) {}
+
+  /* Reveal */
+  var nodes = dag.querySelectorAll(".node");
+  if ("IntersectionObserver" in window) {
+    var io = new IntersectionObserver(function (es) {
+      es.forEach(function (en) {
+        if (en.isIntersecting) { en.target.classList.add("is-in"); io.unobserve(en.target); remeasure(); }
+      });
+    }, { rootMargin: "0px 0px -6% 0px", threshold: 0.05 });
+    nodes.forEach(function (n, i) { n.style.transitionDelay = Math.min(i * 55, 220) + "ms"; io.observe(n); });
+  } else {
+    nodes.forEach(function (n) { n.classList.add("is-in"); });
+  }
+
+  var pulses = dag.querySelectorAll(".conn .pulse");
+  pulses.forEach(function (p, i) { p.style.animationDelay = ((pulses.length - 1 - i) * 0.3) + "s"; });
+
+  /* Sticky header rule */
+  var head = document.getElementById("head");
+  var onScroll = function () { head.classList.toggle("is-stuck", window.scrollY > 8); };
+  window.addEventListener("scroll", onScroll, { passive: true });
+  onScroll();
+})();
+</script>
+</body>
+</html>
