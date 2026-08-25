@@ -512,6 +512,119 @@ body[data-view="tech"] .principles h2{ margin-bottom:44px; }
 
 ::selection{ background:#F7ECE5; }
 :focus-visible{ outline:2px solid var(--accent); outline-offset:3px; border-radius:2px; }
+
+/* ============================================================
+   COMPONENT DETAIL
+   ============================================================ */
+.comp-link{
+  color:inherit; text-decoration:none; display:inline-flex; align-items:baseline; gap:5px;
+  border-bottom:1px solid var(--rule); transition:color .2s var(--ease), border-color .2s var(--ease);
+}
+.comp-link::after{
+  content:"›"; font-family:var(--mono); font-size:11px; color:var(--ink-3);
+  transform:translateY(-1px); transition:transform .2s var(--ease), color .2s var(--ease);
+}
+.comp-link:hover{ color:var(--c, var(--ink)); border-bottom-color:currentColor; }
+.comp-link:hover::after{ color:inherit; transform:translate(2px,-1px); }
+.comp-link:focus-visible{ outline:2px solid var(--accent); outline-offset:3px; border-radius:2px; }
+
+body[data-route="detail"] main,
+body[data-route="detail"] .toggle{ display:none; }
+body[data-route="detail"] .site-foot{ border-top:1px solid var(--rule); }
+
+.detail{ display:none; padding:44px 0 88px; }
+body[data-route="detail"] .detail{ display:block; }
+
+.detail-back{
+  display:inline-flex; align-items:center; gap:7px; margin-bottom:38px;
+  font-family:var(--mono); font-size:10.5px; letter-spacing:.14em; text-transform:uppercase;
+  color:var(--ink-3); text-decoration:none; transition:color .2s var(--ease);
+}
+.detail-back::before{ content:"‹"; font-size:14px; transform:translateY(-1px); }
+.detail-back:hover{ color:var(--ink); }
+
+.detail-head{ max-width:none; }
+.detail-kicker{ display:flex; align-items:center; gap:9px; margin-bottom:18px; flex-wrap:wrap; }
+.detail-kicker .dk-parent{
+  font-family:var(--mono); font-size:10.5px; letter-spacing:.14em; text-transform:uppercase;
+  color:var(--h); text-decoration:none; border-bottom:1px solid transparent;
+}
+.detail-kicker .dk-parent:hover{ border-bottom-color:currentColor; }
+.detail-kicker .dk-dot{ width:3px; height:3px; border-radius:50%; background:var(--rule); }
+.detail-kicker .dk-lane{
+  font-family:var(--mono); font-size:10.5px; letter-spacing:.14em; text-transform:uppercase; color:var(--ink-3);
+}
+.detail h1{
+  font-family:var(--serif); font-weight:400; font-size:clamp(32px,4.6vw,50px);
+  line-height:1.08; letter-spacing:-.02em; margin:0 0 20px; max-width:24ch;
+}
+.detail h1:focus{ outline:none; }
+.detail-lead{
+  font-family:var(--serif); font-weight:300; font-size:clamp(18px,2vw,21px); line-height:1.5;
+  color:var(--ink-2); margin:0 0 44px; padding-bottom:30px; border-bottom:1px solid var(--rule);
+}
+.detail-lead > span{ display:block; max-width:58ch; }
+
+.detail-body{ display:grid; grid-template-columns:minmax(0,1fr) minmax(0,340px); gap:56px 64px; align-items:start; }
+@media (max-width:900px){ .detail-body{ grid-template-columns:1fr; gap:44px; } }
+
+.d-main{ min-width:0; }
+.d-sec{ margin-bottom:44px; }
+.d-sec:last-child{ margin-bottom:0; }
+.d-sec .sec-k{
+  display:block; margin-bottom:16px;
+  font-family:var(--mono); font-size:10px; letter-spacing:.16em; text-transform:uppercase; color:var(--ink-3);
+}
+.d-what{ font-family:var(--serif); font-size:19px; line-height:1.62; color:var(--ink-2); margin:0; max-width:62ch; }
+.d-what b{ color:var(--ink); font-weight:500; }
+
+.d-steps{ list-style:none; margin:0; padding:0; counter-reset:st; }
+.d-steps li{
+  counter-increment:st; position:relative; padding:0 0 22px 42px; margin-bottom:22px;
+  border-bottom:1px solid var(--rule-soft);
+}
+.d-steps li:last-child{ border-bottom:0; padding-bottom:0; margin-bottom:0; }
+.d-steps li::before{
+  content:counter(st,decimal-leading-zero); position:absolute; left:0; top:2px;
+  font-family:var(--mono); font-size:10.5px; color:var(--h); letter-spacing:.06em;
+}
+.d-steps .st-t{ display:block; font-size:15px; font-weight:600; letter-spacing:-.005em; margin-bottom:5px; }
+.d-steps .st-d{ display:block; font-size:14.5px; line-height:1.6; color:var(--ink-2); }
+
+.d-side{ min-width:0; position:sticky; top:86px; }
+.d-side .d-sec{ margin-bottom:0; }
+@media (max-width:900px){ .d-side{ position:static; } }
+.d-breaks{
+  list-style:none; margin:0; padding:22px 24px; background:var(--paper-sunk);
+  border:1px solid var(--rule); border-radius:3px;
+}
+.d-breaks li{ position:relative; padding-left:18px; font-size:14.5px; line-height:1.58; color:var(--ink-2); }
+.d-breaks li + li{ margin-top:14px; padding-top:14px; border-top:1px solid var(--rule); }
+.d-breaks li::before{
+  content:""; position:absolute; left:0; top:8px; width:6px; height:6px; border-radius:50%;
+  background:var(--accent); opacity:.55;
+}
+
+.detail-nav{
+  display:flex; justify-content:space-between; gap:24px; flex-wrap:wrap;
+  margin-top:64px; padding-top:26px; border-top:1px solid var(--rule);
+}
+.detail-nav a{
+  display:block; max-width:46%; text-decoration:none; color:var(--ink-2);
+  transition:color .2s var(--ease);
+}
+.detail-nav a:hover{ color:var(--ink); }
+.detail-nav a:last-child{ text-align:right; margin-left:auto; }
+.detail-nav .dn-k{
+  display:block; font-family:var(--mono); font-size:10px; letter-spacing:.14em;
+  text-transform:uppercase; color:var(--ink-3); margin-bottom:6px;
+}
+.detail-nav .dn-t{ font-family:var(--serif); font-size:17px; line-height:1.35; }
+@media (max-width:560px){
+  .detail-nav a{ max-width:100%; }
+  .detail-nav a:last-child{ text-align:left; margin-left:0; }
+}
+
 </style>
 </head>
 <body data-view="exec">
@@ -608,6 +721,40 @@ body[data-view="tech"] .principles h2{ margin-bottom:44px; }
   </section>
 
 </main>
+
+<section class="detail" id="detail" aria-labelledby="detail-title">
+  <div class="wrap">
+    <a class="detail-back" href="#" id="detail-back">Back to the stack</a>
+    <div class="detail-head">
+      <div class="detail-kicker">
+        <a class="dk-parent" id="detail-parent" href="#"></a>
+        <span class="dk-dot"></span>
+        <span class="dk-lane" id="detail-lane"></span>
+      </div>
+      <h1 id="detail-title" tabindex="-1"></h1>
+      <p class="detail-lead" id="detail-lead"></p>
+    </div>
+    <div class="detail-body">
+      <div class="d-main">
+        <section class="d-sec">
+          <span class="sec-k">What it is</span>
+          <p class="d-what" id="detail-what"></p>
+        </section>
+        <section class="d-sec">
+          <span class="sec-k">How it works</span>
+          <ol class="d-steps" id="detail-steps"></ol>
+        </section>
+      </div>
+      <aside class="d-side">
+        <section class="d-sec">
+          <span class="sec-k">What breaks without it</span>
+          <ul class="d-breaks" id="detail-breaks"></ul>
+        </section>
+      </aside>
+    </div>
+    <nav class="detail-nav" id="detail-nav"></nav>
+  </div>
+</section>
 
 <footer class="site-foot">
   <div class="wrap foot-inner">
@@ -928,6 +1075,194 @@ body[data-view="tech"] .principles h2{ margin-bottom:44px; }
     }
   ];
 
+  /* ============================================================
+     COMPONENT DETAIL PAGES
+     Each entry is one leaf component. `parent` is the node or module
+     key it belongs to, `label` matches its text in that comps array.
+     ============================================================ */
+  var DETAIL = [
+    {
+      parent:"lake", slug:"raw-zone", lane:"Deterministic code",
+      label:"Raw zone, immutable and partitioned",
+      lead:"Landed bytes, written once, never edited.",
+      what:"The raw zone holds source data exactly as it arrived, with the load time and the source system recorded beside it. Nothing here is updated or corrected in place. A correction lands as a new file with a later timestamp, and the original stays where it is.",
+      how:[
+        ["Write once","Each extract lands as new files under a partition path keyed by source, table and load date. Existing files are never reopened for writing."],
+        ["Partition on load date","A query for a window reads only the partitions in that window, and a backfill rewrites one partition without touching the rest."],
+        ["Keep the arrival metadata","Load timestamp, source system, extract watermark and file checksum travel with the data, so any row ties back to the run that produced it."],
+        ["Correct forward","A fix is a later file, never an edit. What the source actually said stays intact."]
+      ],
+      breaks:[
+        "You cannot answer what a report said last quarter, because the numbers behind it were quietly overwritten.",
+        "A bad transformation becomes unrecoverable. With raw kept immutable you rebuild from it; without it you go back to the source system and hope it still holds the data.",
+        "Every query scans the whole table, because there is no partition to prune."
+      ]
+    },
+    {
+      parent:"lake", slug:"conformed-zone", lane:"Deterministic code",
+      label:"Conformed zone of functional tables",
+      lead:"Facts and dimensions shaped the way analysis asks for them.",
+      what:"The conformed zone is where raw data becomes tables people query without knowing which system it came from. Names, types, units and grains are settled here, and every table declares its key. This is the layer reports and dashboards read.",
+      how:[
+        ["Declare the grain","Each table states what one row means: one order line, one customer per day. The grain is tested, not assumed."],
+        ["Conform the dimensions","Shared entities like customer, product and region resolve to one definition, so a join across two facts lines up."],
+        ["Normalize types and units","Currencies, timezones and units are converted once here, not repeatedly in downstream queries."],
+        ["Publish behind tests","A table enters the zone only when its key, grain and referential checks pass."]
+      ],
+      breaks:[
+        "Every downstream query reimplements the same cleanup, and the copies drift apart.",
+        "Joins silently fan out because two tables disagree about grain.",
+        "Answering one question requires knowing the quirks of five source systems."
+      ]
+    },
+    {
+      parent:"lake", slug:"open-table-format", lane:"Deterministic code",
+      label:"Open table format with time travel",
+      lead:"Snapshots and schema changes without rewriting the table.",
+      what:"An open table format such as Iceberg, Delta or Hudi puts a transaction log over the files in object storage. Readers see a consistent snapshot, writers commit atomically, and earlier snapshots stay queryable.",
+      how:[
+        ["Metadata over files","The format keeps a manifest of which files belong to which snapshot, so a commit is a metadata write and not a data rewrite."],
+        ["Atomic commits","A reader sees the whole write or none of it. Half-written partitions stop being a class of bug."],
+        ["Time travel","Query the table as of a timestamp or a snapshot id to reproduce what a job saw on a given day."],
+        ["Schema and partition evolution","Add or rename a column, or change the partition scheme, without rewriting history."]
+      ],
+      breaks:[
+        "Readers hit partially written data during a load and get wrong answers with no error raised.",
+        "Reproducing last month's number means restoring a backup.",
+        "A schema change turns into a full table rewrite and a scheduling exercise."
+      ]
+    },
+    {
+      parent:"lake", slug:"scd-handling", lane:"Deterministic code",
+      label:"Slowly-changing dimension handling",
+      lead:"Attributes that change over time, without losing what they used to be.",
+      what:"Customers move, products get recategorized, sales reps change territory. Slowly-changing dimension handling records when each attribute value was true, so a historical fact joins to the attributes that applied at the time.",
+      how:[
+        ["Version the row","A change closes the current row with an end date and opens a new one, with a surrogate key per version."],
+        ["Carry valid-from and valid-to","Every version records the window it was true for, plus a current flag for the common case."],
+        ["Join on the effective date","Facts join to the dimension version whose window contains the event date, not to today's version."],
+        ["Decide what is tracked","Not every column deserves history. The ones that do are declared; the rest overwrite."]
+      ],
+      breaks:[
+        "Last year's revenue moves when a customer changes segment this year.",
+        "Territory and commission reports cannot be reproduced after a reorg.",
+        "Nobody can say what the categorization was on the day of the sale."
+      ]
+    },
+    {
+      parent:"lake", slug:"lineage-capture", lane:"Deterministic code",
+      label:"Automatic lineage capture",
+      lead:"Every column traced to the query and the run that produced it.",
+      what:"Lineage is captured by the pipeline itself, from query plans and job metadata, and not maintained by hand in a spreadsheet. It records which inputs produced which outputs, at column level wherever the engine exposes it.",
+      how:[
+        ["Emit at run time","Each transformation reports its inputs, outputs and run id as it executes, so lineage reflects what ran and not what was documented."],
+        ["Column level where possible","Query plans give column-to-column edges for SQL transformations. Opaque steps record table level and say so."],
+        ["Store as a graph","Edges land in the catalog, queryable in both directions: upstream to find causes, downstream to find blast radius."],
+        ["Attach the run","Each edge carries the job, the commit and the timestamp, so a wrong number leads to one specific execution."]
+      ],
+      breaks:[
+        "Impact analysis before a schema change becomes guesswork and a long chat thread.",
+        "A quality failure takes hours to trace instead of one query.",
+        "Hand-written documentation drifts from reality within weeks and stops being trusted."
+      ]
+    },
+    {
+      parent:"lake", slug:"lineage-qa", lane:"Agentic layer",
+      label:"Lineage Q&amp;A over the catalog",
+      lead:"Ask where a number came from and get the path, with evidence attached.",
+      what:"A model reads the lineage graph and the catalog, then answers questions in plain language. It proposes an answer and shows the path it walked, so the reader checks the work instead of trusting the sentence.",
+      how:[
+        ["Ground on the graph","The model queries lineage and catalog metadata for every answer. It never answers from a memorized schema."],
+        ["Return the path, not the claim alone","Each answer cites the tables, columns and jobs it traversed, linked back into the catalog."],
+        ["Cover the questions people actually ask","What feeds this column, what breaks if I drop it, which dashboards read this table, when did it last load."],
+        ["Stop at the edge of the graph","Where lineage is table level or missing, the answer says so and does not fill the gap."]
+      ],
+      breaks:[
+        "The graph exists, but only a few people know how to query it, so it goes unused.",
+        "Impact questions get answered from memory, and the answer is confidently wrong."
+      ]
+    },
+    {
+      parent:"lake", slug:"orphan-duplicate-detection", lane:"Agentic layer",
+      label:"Orphan and duplicate detection",
+      lead:"Finds rows that point at nothing and rows that exist twice.",
+      what:"A scanner walks the conformed zone looking for referential orphans and duplicate keys, ranks what it finds by how much downstream work depends on it, and drafts the ticket. It proposes; it does not delete.",
+      how:[
+        ["Scan on a schedule","Foreign keys, declared uniqueness and near-duplicate matching run across the whole zone, not only the tables someone remembered to test."],
+        ["Rank by blast radius","Lineage says which marts and dashboards read the affected table, so the list is ordered by consequence and not by row count."],
+        ["Explain the likely cause","The proposal names the load or the merge rule that produced the orphan, with the run id."],
+        ["Hand it to a person","Output is a reviewable ticket with evidence. Deletion and merge stay human decisions."]
+      ],
+      breaks:[
+        "Duplicates inflate counts quietly, and the error surfaces in a board deck.",
+        "Orphans break joins in ways that look like missing data, then get patched downstream with a filter."
+      ]
+    },
+    {
+      parent:"lake", slug:"cost-usage-scanner", lane:"Agentic layer",
+      label:"Cost and usage scanner",
+      lead:"What storage and compute is actually being read, and what is not.",
+      what:"The scanner joins query history against storage metrics to show which tables earn their cost. It surfaces unread tables, expensive recurring queries and partitions nobody touches, then proposes changes for a person to approve.",
+      how:[
+        ["Join usage to cost","Query logs give reads per table and per column. Storage metrics give bytes and growth. Together they give cost per useful read."],
+        ["Flag the tails","Tables with no reads in ninety days, queries that scan far more than they return, partitions that never get pruned."],
+        ["Propose a change","Archive, compact, repartition or drop, each with the saving and the affected consumers named."],
+        ["Approve before acting","Nothing moves or drops without a human decision, and the retention rules still apply."]
+      ],
+      breaks:[
+        "Storage grows steadily and nobody can say which part of it matters.",
+        "A handful of unnoticed queries come to dominate the bill."
+      ]
+    },
+    {
+      parent:"lake", slug:"access-grants", lane:"Human decision",
+      label:"Access grants",
+      lead:"Who can read what, decided by a person and written down.",
+      what:"Access to lake data is granted by a named owner against a stated purpose, and the grant is recorded where it can be reviewed. The platform enforces the decision; it does not make it.",
+      how:[
+        ["Grant to roles","Access attaches to a role tied to a job function, so joiners and leavers are handled by the role and not by memory."],
+        ["Record purpose and scope","Each grant captures who asked, who approved, which tables or columns, and why."],
+        ["Enforce at query time","Row and column policies apply inside the engine, so the same rules hold whichever tool connects."],
+        ["Review on a cadence","Grants expire or come up for review, and unused access is removed."]
+      ],
+      breaks:[
+        "Access accumulates until nobody can say who can see salary or customer contact data.",
+        "A leaver keeps read access because it was granted to a person and not a role.",
+        "Sensitive columns leak through a tool that connected around the policy layer."
+      ]
+    },
+    {
+      parent:"lake", slug:"retention-deletion", lane:"Human decision",
+      label:"Retention and deletion calls",
+      lead:"How long data is kept, and what happens when someone asks to be forgotten.",
+      what:"Retention is a business and legal decision recorded per dataset, then enforced by the platform. Deletion requests are handled against that same record, including inside the immutable raw zone.",
+      how:[
+        ["Set a period per dataset","Each dataset carries a retention period and the reason behind it: legal, contractual or operational."],
+        ["Expire automatically","Expiry runs on schedule against the recorded period. Exceptions are granted explicitly and dated."],
+        ["Handle subject deletion","A deletion request rewrites the affected partitions and records that it happened, so an immutable zone and a right to erasure can both hold."],
+        ["Keep the proof","What was deleted, when, and under whose approval is retained after the data itself is gone."]
+      ],
+      breaks:[
+        "Personal data sits in the lake past its lawful period.",
+        "A deletion request is honoured in the warehouse but not in raw, so the data returns on the next rebuild.",
+        "You cannot demonstrate compliance, because nothing recorded the decision."
+      ]
+    }
+  ];
+
+  var DETAIL_BY_ROUTE = {};
+  var DETAIL_BY_LABEL = {};
+  DETAIL.forEach(function (d) {
+    DETAIL_BY_ROUTE[d.parent + "/" + d.slug] = d;
+    (DETAIL_BY_LABEL[d.parent] || (DETAIL_BY_LABEL[d.parent] = {}))[d.label] = d;
+  });
+
+  function compLabelHTML(label, parentKey) {
+    var d = DETAIL_BY_LABEL[parentKey] && DETAIL_BY_LABEL[parentKey][label];
+    if (!d) return label;
+    return '<a class="comp-link" href="#/' + d.parent + "/" + d.slug + '">' + label + "</a>";
+  }
+
   var MODULE_BY_KEY = {};
   MODULES.forEach(function (m) { MODULE_BY_KEY[m.key] = m; });
 
@@ -937,11 +1272,11 @@ body[data-view="tech"] .principles h2{ margin-bottom:44px; }
   /* ============================================================
      BUILD
      ============================================================ */
-  function compsHTML(comps) {
+  function compsHTML(comps, parentKey) {
     return comps.map(function (list, i) {
       return '<div class="cgroup" style="--c:' + LANES[i].c + '">' +
         '<div class="clabel">' + LANES[i].key + "</div><ul>" +
-        list.map(function (c) { return "<li>" + c + "</li>"; }).join("") + "</ul></div>";
+        list.map(function (c) { return "<li>" + compLabelHTML(c, parentKey) + "</li>"; }).join("") + "</ul></div>";
     }).join("");
   }
 
@@ -967,7 +1302,7 @@ body[data-view="tech"] .principles h2{ margin-bottom:44px; }
     var from = nd.comps.map(function (list, i) {
       return '<div class="cgroup" style="--c:' + BUILT_LANES[i].c + '">' +
         '<div class="clabel">' + BUILT_LANES[i].key + "</div><ul>" +
-        list.map(function (c) { return "<li>" + c + "</li>"; }).join("") + "</ul></div>";
+        list.map(function (c) { return "<li>" + compLabelHTML(c, nd.key) + "</li>"; }).join("") + "</ul></div>";
     }).join("");
 
     return '<div class="node-panel">' +
@@ -1011,7 +1346,7 @@ body[data-view="tech"] .principles h2{ margin-bottom:44px; }
           : "") +
         '<div class="m-plugs"><span class="k">Plugs into</span><div class="chips">' + chips + "</div></div>" +
         '<span class="module-hint">Click to open components</span>' +
-        '<div class="module-comps">' + compsHTML(m.comps) + "</div>" +
+        '<div class="module-comps">' + compsHTML(m.comps, m.key) + "</div>" +
       "</section>";
   }
 
@@ -1185,6 +1520,7 @@ body[data-view="tech"] .principles h2{ margin-bottom:44px; }
     if ((e.key !== "t" && e.key !== "T") || e.metaKey || e.ctrlKey || e.altKey) return;
     var t = e.target;
     if (t && (t.tagName === "INPUT" || t.tagName === "TEXTAREA" || t.isContentEditable)) return;
+    if (document.body.dataset.route === "detail") return;
     setView(document.body.dataset.view === "exec" ? "tech" : "exec");
   });
   try { if (localStorage.getItem("pipeline-view") === "tech") setView("tech", false); } catch (e) {}
@@ -1210,6 +1546,123 @@ body[data-view="tech"] .principles h2{ margin-bottom:44px; }
   var onScroll = function () { head.classList.toggle("is-stuck", window.scrollY > 8); };
   window.addEventListener("scroll", onScroll, { passive: true });
   onScroll();
+
+  /* ============================================================
+     ROUTER, component detail pages
+     ============================================================ */
+  var PARENT_INFO = {};
+  NODES.forEach(function (n) { PARENT_INFO[n.key] = { label: n.n + " " + n.name, kind: "node" }; });
+  MODULES.forEach(function (m) { PARENT_INFO[m.key] = { label: m.name, kind: "module" }; });
+
+  var detailEl   = document.getElementById("detail");
+  var dTitle     = document.getElementById("detail-title");
+  var dLead      = document.getElementById("detail-lead");
+  var dWhat      = document.getElementById("detail-what");
+  var dSteps     = document.getElementById("detail-steps");
+  var dBreaks    = document.getElementById("detail-breaks");
+  var dLane      = document.getElementById("detail-lane");
+  var dParent    = document.getElementById("detail-parent");
+  var dNav       = document.getElementById("detail-nav");
+  var dBack      = document.getElementById("detail-back");
+  var baseTitle  = document.title;
+  var indexScroll = 0;
+  var cameFromIndex = false;
+  if ("scrollRestoration" in history) history.scrollRestoration = "manual";
+
+  function routeKey() {
+    var h = location.hash.replace(/^#\/?/, "");
+    return DETAIL_BY_ROUTE[h] ? h : null;
+  }
+
+  function siblings(parent) {
+    return DETAIL.filter(function (d) { return d.parent === parent; });
+  }
+
+  function renderDetail(d) {
+    var info = PARENT_INFO[d.parent] || { label: d.parent };
+    detailEl.style.setProperty("--h", "var(--h-" + d.parent + ")");
+    detailEl.style.setProperty("--t", "var(--t-" + d.parent + ")");
+
+    dParent.innerHTML = info.label;
+    dParent.setAttribute("data-parent", d.parent);
+    dLane.textContent = d.lane;
+    dTitle.innerHTML = d.label;
+    dLead.innerHTML = "<span></span>";
+    dLead.firstChild.textContent = d.lead;
+    dWhat.innerHTML = d.what;
+
+    dSteps.innerHTML = d.how.map(function (st) {
+      return '<li><span class="st-t">' + st[0] + '</span><span class="st-d">' + st[1] + "</span></li>";
+    }).join("");
+
+    dBreaks.innerHTML = d.breaks.map(function (b) { return "<li>" + b + "</li>"; }).join("");
+
+    var sib = siblings(d.parent);
+    var i = sib.indexOf(d);
+    var prev = sib[i - 1], next = sib[i + 1];
+    dNav.innerHTML =
+      (prev ? '<a href="#/' + prev.parent + "/" + prev.slug + '"><span class="dn-k">Previous</span><span class="dn-t">' + prev.label + "</span></a>" : "") +
+      (next ? '<a href="#/' + next.parent + "/" + next.slug + '"><span class="dn-k">Next</span><span class="dn-t">' + next.label + "</span></a>" : "");
+
+    document.title = d.label.replace(/&amp;/g, "&") + " · " + info.label.replace(/&amp;/g, "&") + " · " + baseTitle;
+  }
+
+  function openNode(key) {
+    var node = grid.querySelector('.node[data-key="' + key + '"]');
+    if (!node) return null;
+    if (document.body.dataset.view === "exec" && !node.classList.contains("is-open")) toggleNode(node);
+    return node;
+  }
+
+  function route(opts) {
+    var key = routeKey();
+    if (key) {
+      if (document.body.dataset.route !== "detail") indexScroll = window.scrollY;
+      document.body.dataset.route = "detail";
+      renderDetail(DETAIL_BY_ROUTE[key]);
+      window.scrollTo(0, 0);
+      if (!opts || opts.focus !== false) dTitle.focus({ preventScroll: true });
+    } else {
+      var was = document.body.dataset.route === "detail";
+      document.body.dataset.route = "index";
+      document.title = baseTitle;
+      remeasure();
+      if (was) {
+        if (opts && opts.focusKey) {
+          var node = openNode(opts.focusKey);
+          remeasure();
+          if (node) { node.scrollIntoView({ block: "center" }); return; }
+        }
+        var y = indexScroll;
+        window.scrollTo(0, y);
+        requestAnimationFrame(function () { window.scrollTo(0, y); });
+      }
+    }
+  }
+
+  function leaveDetail(focusKey) {
+    if (cameFromIndex && history.length > 1 && !focusKey) { history.back(); return; }
+    if (history.replaceState) history.replaceState(null, "", location.pathname + location.search);
+    else location.hash = "";
+    route({ focusKey: focusKey });
+  }
+
+  dBack.addEventListener("click", function (e) { e.preventDefault(); leaveDetail(); });
+  dParent.addEventListener("click", function (e) {
+    e.preventDefault();
+    var key = dParent.getAttribute("data-parent");
+    if (history.replaceState) history.replaceState(null, "", location.pathname + location.search);
+    else location.hash = "";
+    route({ focusKey: key });
+  });
+
+  document.addEventListener("click", function (e) {
+    var a = e.target.closest && e.target.closest("a.comp-link");
+    if (a) cameFromIndex = document.body.dataset.route !== "detail";
+  });
+
+  window.addEventListener("hashchange", function () { route(); });
+  route({ focus: false });
 })();
 </script>
 </body>

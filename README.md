@@ -46,6 +46,22 @@ output each, with no cross-cutting clutter.
 The Technical toggle (top right, or press `T`) opens every product into its
 attributed components and brings in the module rail.
 
+## Component pages
+
+Every leaf component in a "Built from" column, and in an opened module, can have
+its own page. Clicking one routes to `#/<parent>/<slug>`, for example
+`#/lake/lineage-capture`. The page is rendered from the `DETAIL` array in
+`index.html`, so it stays one file with no build step, and the URL is
+linkable and works with the back button.
+
+Each page has three parts: what it is, how it works (numbered steps), and what
+breaks without it.
+
+Written so far: the ten components of `04 Data Lake`. The other 104 render as
+plain text until an entry is added for them. To add one, append to `DETAIL` with
+`parent`, `slug`, `lane`, `label` matching the text in that comps array, `lead`,
+`what`, `how` and `breaks`.
+
 ## Publishing
 
 GitHub Pages, source `main` at root. `.nojekyll` is committed so Pages serves the
