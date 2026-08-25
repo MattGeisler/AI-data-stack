@@ -12,11 +12,16 @@ manifold, the lake cylinder, an aggregate cube, a screen.
 
 ## The other axis: modules that plug into the spine
 
-Deterministic modules (quality, semantics and conformance, enforced against the products):
+Logical modules (quality, semantics and conformance, enforced against the products):
 
 - DQ Module: plugs into Data Source, ODS, Integration, Lake, Aggregate
 - Semantic Layer: plugs into Integration, Lake, Aggregate, Discovery & Dashboard
 - Linting Model: plugs into ODS, Integration, Lake, Aggregate
+
+Agent:
+
+- Agent Runtime: plugs into all six products. Model endpoints, tool scope,
+  evaluation suites, guardrails, prompts and worked examples.
 
 Context pipeline (a small pipeline of its own):
 
@@ -27,12 +32,24 @@ These are not data products. They attach to the products and do not sit in the
 flow. They appear only in the Technical view, collapsed. Click one to open its
 components and light up what it plugs into.
 
-## Inside every box: the five concerns
+## Inside every box: the four components
 
-Deterministic Code, Semantic Layer & DQ Tooling, Agentic Layer, Human Decision,
-Product Output.
+Every dataset in the stack is made of four things, named in the same order
+everywhere on the page:
 
-Operating rule: agents propose, deterministic code executes, humans decide.
+- Physical: the tables, files and systems that hold the bytes
+- Logical: the declared rules, SQL, semantics, conformance and quality
+- Agent: the models that propose work against it
+- Context: what it means to this business, and what the agent is told
+
+The spine is the physical axis. The cross axis carries one module group per
+non-physical type: logical (DQ, Semantic Layer, Linting Model), agent (Agent
+Runtime) and context (Business Context).
+
+Human decisions are not a fifth type. They arrive as PRs and requirements
+against the four, and the operating rule states the pattern: agents propose,
+deterministic code executes, humans decide. The per-layer decision items are
+kept in a `decisions` field in the data, unrendered, so they can come back.
 
 ## The two views
 

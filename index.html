@@ -4,12 +4,12 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>An AI-Enabled Data Pipeline · Matt Geisler</title>
-<meta name="description" content="A reference architecture for an AI-enabled data pipeline: six physical data-product layers from source to dashboard, with quality and conformance modules plugged in across them.">
+<meta name="description" content="A reference architecture for an AI-enabled data pipeline: six data-product layers from source to dashboard, each made of four components: physical, logical, agent and context.">
 <meta name="color-scheme" content="light">
 
 <meta property="og:type" content="website">
 <meta property="og:title" content="An AI-Enabled Data Pipeline">
-<meta property="og:description" content="Six data-product layers. Two cross-cutting modules. Agents propose, code executes, humans decide.">
+<meta property="og:description" content="Every dataset is made of four things: physical, logical, agent, context. Six data-product layers, source to decision.">
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -44,13 +44,16 @@
   --h-lint: #4D7C2F;  --t-lint: #ECF2E5;
   --h-ctx:  #7A4B9C;  --t-ctx:  #F0EAF7;
   --h-sem:  #334E68;  --t-sem:  #E8EDF2;
+  --h-agt:  #B4533A;  --t-agt:  #F8EDE7;
 
-  /* concern colours */
-  --lane-1: #46505F;
-  --lane-2: #1F6B60;
-  --lane-3: #A0421F;
-  --lane-4: #7A5A17;
-  --lane-5: #2E5B3B;
+  /* the four component types */
+  --ty-phys:  #46505F;
+  --ty-logic: #1F6B60;
+  --ty-agent: #B4533A;
+  --ty-ctx:   #7A4B9C;
+
+  /* the OUTPUT label on each product */
+  --out-k: #2E5B3B;
 
   --serif: "Newsreader", "Iowan Old Style", Georgia, "Times New Roman", serif;
   --sans:  "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
@@ -346,7 +349,7 @@ body[data-view="tech"] .node-panel{ grid-column:1 / -1; grid-row:3; }
 .node-out{ margin:10px 0 0; font-size:12px; color:var(--ink-3); display:flex; gap:8px; align-items:baseline; }
 .node-out .k{
   font-family:var(--mono); font-size:8.5px; letter-spacing:.13em; text-transform:uppercase;
-  color:var(--lane-5); flex:none;
+  color:var(--out-k); flex:none;
 }
 
 /* Connector between spine nodes */
@@ -376,9 +379,11 @@ body[data-view="tech"] .node-panel{ grid-column:1 / -1; grid-row:3; }
 }
 .node-comps{
   grid-column:1 / -1; margin-top:18px; padding:18px 22px;
-  display:grid; grid-template-columns:repeat(5, minmax(0,1fr)); gap:0 22px;
+  display:grid; grid-template-columns:repeat(4, minmax(0,1fr)); gap:0 22px;
   border-left:3px solid var(--h);
 }
+.m-out{ margin:2px 0 0; display:flex; gap:8px; align-items:baseline; font-size:11.5px; color:var(--ink-2); line-height:1.45; }
+.m-out .k{ font-family:var(--mono); font-size:9px; letter-spacing:.14em; text-transform:uppercase; color:var(--ink-3); flex:none; }
 .module-comps{
   margin-top:13px; padding:15px 16px; display:flex; flex-direction:column; gap:15px;
   border-left:3px solid var(--h);
@@ -396,6 +401,7 @@ body[data-view="tech"] .node-panel{ grid-column:1 / -1; grid-row:3; }
 }
 
 @media (max-width:1080px){ .node-comps{ grid-template-columns:repeat(2,minmax(0,1fr)); gap:20px 22px; } }
+@media (max-width:1180px){ .built-from{ grid-template-columns:repeat(2,minmax(0,1fr)); gap:24px; } }
 @media (max-width:900px){
   .stack-grid, body[data-view="tech"] .stack-grid{ grid-template-columns:1fr; gap:34px; }
   .modules{ grid-column:1; gap:20px; }
@@ -414,7 +420,7 @@ body[data-view="tech"] .node-panel{ grid-column:1 / -1; grid-row:3; }
 /* Legends */
 .legend{ margin-top:44px; padding-top:22px; border-top:1px solid var(--rule); }
 .legend .eyebrow{ display:block; margin-bottom:16px; }
-.legend-row{ display:grid; grid-template-columns:repeat(5,minmax(0,1fr)); gap:22px; }
+.legend-row{ display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:22px; }
 .lgd .bar{ height:3px; border-radius:2px; margin-bottom:9px; }
 .lgd .nm{ font-size:12.5px; font-weight:600; letter-spacing:-.005em; line-height:1.3; }
 .lgd .ds{ font-size:11.5px; color:var(--ink-3); line-height:1.45; margin-top:4px; }
@@ -495,7 +501,7 @@ body[data-view="tech"] .principles h2{ margin-bottom:44px; }
 .bw .n{ display:block; font-size:11.5px; font-weight:600; color:var(--h); letter-spacing:-.005em; line-height:1.25; }
 .bw .d{ display:block; font-size:11px; color:var(--ink-2); line-height:1.45; margin-top:4px; }
 
-.built-from{ display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:26px; }
+.built-from{ display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:26px; }
 
 @media (max-width:900px){
   .p-top{ grid-template-columns:1fr; gap:22px; }
@@ -655,7 +661,7 @@ body[data-route="detail"] .detail{ display:block; }
       <div class="eyebrow">Reference Architecture</div>
       <h1>An <em>AI-enabled</em> data pipeline.</h1>
       <p class="hero-lede exec-only"><b>Agents propose. Code executes. Humans decide.</b></p>
-      <p class="hero-lede tech-only">Six physical data products, source to decision. Quality, conformance and semantics are deterministic modules that plug into them, not layers within them. Business context is a small pipeline of its own that feeds discovery.</p>
+      <p class="hero-lede tech-only">Every dataset in the stack is made of four things: the <b>physical</b> tables that hold the bytes, the <b>logical</b> rules that shape them, the <b>agents</b> that propose work against them, and the <b>context</b> that says what any of it means. Six data products, source to decision, each built from those four.</p>
       <div class="hero-meta">
         <span><strong>Matt Geisler</strong></span>
         <span class="dot"></span>
@@ -671,7 +677,7 @@ body[data-route="detail"] .detail{ display:block; }
         <div>
           <div class="eyebrow">The Stack</div>
           <h2 class="exec-only">Six data products, source to decision.</h2>
-          <h2 class="tech-only">Six data products. Three modules and a context pipeline.</h2>
+          <h2 class="tech-only">Six data products. Four components in each.</h2>
         </div>
         <p class="dg-hint exec-only">Data flows up. <strong>Click a layer</strong> to open its components. Or switch to <strong>Technical</strong> for all of them at once, plus the modules that plug across them.</p>
         <p class="dg-hint tech-only">Products open into their components. <strong>Click a module</strong> on the left to open it and light up what it plugs into.</p>
@@ -680,16 +686,15 @@ body[data-route="detail"] .detail{ display:block; }
       <div class="dag" id="dag"></div>
 
       <div class="legend-inline exec-only">
-        <span class="lead">Every box runs across:</span>
-        <span class="li"><span class="sw" style="background:var(--lane-1)"></span>Deterministic code</span>
-        <span class="li"><span class="sw" style="background:var(--lane-2)"></span>Semantic &amp; DQ</span>
-        <span class="li"><span class="sw" style="background:var(--lane-3)"></span>Agentic</span>
-        <span class="li"><span class="sw" style="background:var(--lane-4)"></span>Human decision</span>
-        <span class="li"><span class="sw" style="background:var(--lane-5)"></span>Product output</span>
+        <span class="lead">Every dataset is made of four things:</span>
+        <span class="li"><span class="sw" style="background:var(--ty-phys)"></span>Physical</span>
+        <span class="li"><span class="sw" style="background:var(--ty-logic)"></span>Logical</span>
+        <span class="li"><span class="sw" style="background:var(--ty-agent)"></span>Agent</span>
+        <span class="li"><span class="sw" style="background:var(--ty-ctx)"></span>Context</span>
       </div>
 
       <div class="legend tech-only">
-        <span class="eyebrow">The five concerns, in every box</span>
+        <span class="eyebrow">The four components, in every dataset</span>
         <div class="legend-row" id="legend-row"></div>
       </div>
 
@@ -844,6 +849,16 @@ body[data-route="detail"] .detail{ display:block; }
       '<path class="dimline" d="M25 30 H50 M25 40 H50 M25 50 H46"/>' +
       '<path class="dimline" d="M70 30 H95 M70 40 H95 M74 50 H95"/>',
 
+    /* Module, Agent Runtime: a model proposes, a diff comes back for review */
+    agent:
+      '<rect class="edge" x="4" y="26" width="42" height="34" rx="4"/>' +
+      '<circle class="dim" cx="16" cy="38" r="2"/><circle class="dim" cx="25" cy="38" r="2"/><circle class="dim" cx="34" cy="38" r="2"/>' +
+      '<path class="dimline" d="M12 49 H38"/>' +
+      '<rect class="face" x="74" y="14" width="42" height="46" rx="3"/>' +
+      '<path class="hot" d="M81 26 H101 M81 36 H109 M81 46 H95"/>' +
+      '<path class="hot" d="M46 37 H68 M62 31 L68 37 L62 43"/>' +
+      '<path class="dimline" d="M95 60 C95 74, 40 76, 25 66 M31 64 L25 66 L26 72"/>',
+
     /* Module, Linting: ragged in, aligned out */
     comb:
       '<path class="dimline" d="M6 21 H42 M16 35 H42 M2 49 H42 M20 63 H42"/>' +
@@ -870,12 +885,13 @@ body[data-route="detail"] .detail{ display:block; }
   /* ============================================================
      CONTENT
      ============================================================ */
-  var LANES = [
-    { key:"Deterministic Code",        ds:"Built from · reproducible by definition", c:"var(--lane-1)" },
-    { key:"Semantic &amp; DQ Tooling", ds:"Produced with · the modules",             c:"var(--lane-2)" },
-    { key:"Agentic Layer",             ds:"Built from · where the AI does work",     c:"var(--lane-3)" },
-    { key:"Human Decision",            ds:"Built from · where a person owns it",     c:"var(--lane-4)" },
-    { key:"Product Output",            ds:"What it provides",                        c:"var(--lane-5)" }
+  /* The four components of any dataset. Order is fixed everywhere:
+     physical, logical, agent, context. */
+  var TYPES = [
+    { key:"Physical", ds:"The tables, files and systems that hold the bytes", c:"var(--ty-phys)" },
+    { key:"Logical",  ds:"The declared rules: SQL, semantics, conformance, quality", c:"var(--ty-logic)" },
+    { key:"Agent",    ds:"The models that propose work against it", c:"var(--ty-agent)" },
+    { key:"Context",  ds:"What it means to this business, and what the agent is told", c:"var(--ty-ctx)" }
   ];
 
   var CONSUMERS = [
@@ -888,131 +904,396 @@ body[data-route="detail"] .detail{ display:block; }
   /* Physical data products: index 0 is the top of the page (top of the stack) */
   var NODES = [
     {
-      n:"06", key:"dash", shape:"screen", name:"Discovery &amp; Dashboard Layer", role:"Delivery, discovery and decision surface",
-      line:"Governed metrics only. <b>No logic in the tile.</b>",
-      out:"Numbers nobody has to argue about.",
-      what:"The only surface most of the business touches, and deliberately the thinnest layer in the stack. Tiles bind to <b>governed metrics</b>. No tile writes its own SQL, so nobody quietly rebuilds logic in a chart and ends up disagreeing with everyone else. Discovery (natural-language questions, anomaly narratives, scheduled briefings) runs against those same definitions, which is what makes an AI answer trustworthy rather than plausible.",
-      provides:[
-        ["Dashboards and reports","Bound to governed metrics, never ad-hoc SQL"],
-        ["Ask-anything discovery","Natural language over the semantic layer"],
-        ["Alerts and briefings","Written from the actual deltas, not templates"],
-        ["Embedded surfaces","The same numbers inside the product"]
+      "n": "06",
+      "key": "dash",
+      "shape": "screen",
+      "name": "Discovery &amp; Dashboard Layer",
+      "role": "Delivery, discovery and decision surface",
+      "line": "Governed metrics only. <b>No logic in the tile.</b>",
+      "out": "Numbers nobody has to argue about.",
+      "what": "The only surface most of the business touches, and deliberately the thinnest layer in the stack. Tiles bind to <b>governed metrics</b>. No tile writes its own SQL, so nobody quietly rebuilds logic in a chart and ends up disagreeing with everyone else. Discovery (natural-language questions, anomaly narratives, scheduled briefings) runs against those same definitions, which is what makes an AI answer trustworthy rather than plausible.",
+      "provides": [
+        [
+          "Dashboards and reports",
+          "Bound to governed metrics, never ad-hoc SQL"
+        ],
+        [
+          "Ask-anything discovery",
+          "Natural language over the semantic layer"
+        ],
+        [
+          "Alerts and briefings",
+          "Written from the actual deltas, not templates"
+        ],
+        [
+          "Embedded surfaces",
+          "The same numbers inside the product"
+        ]
       ],
-      builtWith:[
-        ["sem","Every tile references a metric name: change a definition once and it propagates here at the same moment."],
-        ["ctx","Targets, segments, calendar and glossary: the context that makes an answer mean something to this business."]
+      "builtWith": [
+        [
+          "sem",
+          "Every tile references a metric name: change a definition once and it propagates here at the same moment."
+        ],
+        [
+          "ctx",
+          "Targets, segments, calendar and glossary: the context that makes an answer mean something to this business."
+        ]
       ],
-      comps:[
-        ["Metric-bound rendering","Cached serving layer","Row-level access at query time","Usage instrumentation"],
-        ["Natural-language Q&amp;A","Anomaly narratives","Scheduled briefings","Follow-up drill-downs"],
-        ["The decision itself","Threshold and target setting"]
+      "comps": [
+        [
+          "Cached serving layer",
+          "Rendered dashboards and reports",
+          "Usage instrumentation"
+        ],
+        [
+          "Metric-bound rendering, no ad-hoc SQL",
+          "Row-level access at query time"
+        ],
+        [
+          "Natural-language Q&amp;A",
+          "Anomaly narratives",
+          "Scheduled briefings",
+          "Follow-up drill-downs"
+        ],
+        [
+          "Business glossary and KPI definitions",
+          "Fiscal calendar, segments and hierarchies",
+          "Grounding served to the agent at query time"
+        ]
+      ],
+      "decisions": [
+        "The decision itself",
+        "Threshold and target setting"
       ]
     },
     {
-      n:"05", key:"agg", shape:"cube", name:"Aggregate Layer", role:"Business logic and metrics",
-      line:"<b>One definition per metric.</b> In one place.",
-      out:"A metric set the business agrees on.",
-      what:"Where clean tables become the numbers the business actually names: revenue, churn, margin, retention. Each metric has <b>one definition, one owner and one place</b>, consumed by everything downstream. That makes a change to how a number is counted a reviewed business decision rather than an unnoticed edit in someone's query.",
-      provides:[
-        ["A governed metric set","One definition, one owner, one place"],
-        ["Reusable marts","Pre-shaped tables other teams build on"],
-        ["Consistent numbers","The same answer in every tool"],
-        ["A written rationale","Why each metric is defined the way it is"]
+      "n": "05",
+      "key": "agg",
+      "shape": "cube",
+      "name": "Aggregate Layer",
+      "role": "Business logic and metrics",
+      "line": "<b>One definition per metric.</b> In one place.",
+      "out": "A metric set the business agrees on.",
+      "what": "Where clean tables become the numbers the business actually names: revenue, churn, margin, retention. Each metric has <b>one definition, one owner and one place</b>, consumed by everything downstream. That makes a change to how a number is counted a reviewed business decision rather than an unnoticed edit in someone's query.",
+      "provides": [
+        [
+          "A governed metric set",
+          "One definition, one owner, one place"
+        ],
+        [
+          "Reusable marts",
+          "Pre-shaped tables other teams build on"
+        ],
+        [
+          "Consistent numbers",
+          "The same answer in every tool"
+        ],
+        [
+          "A written rationale",
+          "Why each metric is defined the way it is"
+        ]
       ],
-      builtWith:[
-        ["dq","Tests run on every model in CI. A failing metric never publishes."],
-        ["sem","Metric expressions and entity bindings compiled from the versioned model spec."],
-        ["lint","Naming, types and units held to one standard across every mart."]
+      "builtWith": [
+        [
+          "dq",
+          "Tests run on every model in CI. A failing metric never publishes."
+        ],
+        [
+          "sem",
+          "Metric expressions and entity bindings compiled from the versioned model spec."
+        ],
+        [
+          "lint",
+          "Naming, types and units held to one standard across every mart."
+        ]
       ],
-      comps:[
-        ["Staging → intermediate → marts","Unit and data tests in CI","Incremental materialization","Orchestration and backfill"],
-        ["Model drafter from plain language","Variance explainer","Missing-test suggester"],
-        ["Metric definition review","Business logic sign-off"]
+      "comps": [
+        [
+          "Staging, intermediate and mart tables",
+          "Incremental materializations",
+          "Orchestration runs and backfills"
+        ],
+        [
+          "One definition per metric, compiled to SQL",
+          "Unit and data tests in CI",
+          "Metric ownership recorded in the spec"
+        ],
+        [
+          "Model drafter from plain language",
+          "Variance explainer",
+          "Missing-test suggester"
+        ],
+        [
+          "Why each metric is defined the way it is",
+          "Targets and thresholds it is read against"
+        ]
+      ],
+      "decisions": [
+        "Metric definition review",
+        "Business logic sign-off"
       ]
     },
     {
-      n:"04", key:"lake", shape:"cylinder", name:"Data Lake", role:"Durable, traceable storage",
-      line:"Immutable record. <b>Full lineage, back to the row.</b>",
-      out:"Any past state, reproducible.",
-      what:"The durable heart of the stack. Raw data is kept immutable and dated beside a conformed zone of <b>clean, functional tables</b>: the facts and dimensions that reports and dashboards actually query, carrying the attributes and dimensions the business asks for. Nothing above it re-derives history; every figure traces back to the row it came from, and any past state can be reproduced rather than reconstructed from memory.",
-      provides:[
-        ["Clean functional tables","Report-ready facts and dimensions, not raw dumps"],
-        ["Attributes and dimensions","The descriptive columns analysis actually needs"],
-        ["Point-in-time history","Any past state reproducible on demand"],
-        ["Full lineage","Every column traceable to its source row"]
+      "n": "04",
+      "key": "lake",
+      "shape": "cylinder",
+      "name": "Data Lake",
+      "role": "Durable, traceable storage",
+      "line": "Immutable record. <b>Full lineage, back to the row.</b>",
+      "out": "Any past state, reproducible.",
+      "what": "The durable heart of the stack. Raw data is kept immutable and dated beside a conformed zone of <b>clean, functional tables</b>: the facts and dimensions that reports and dashboards actually query, carrying the attributes and dimensions the business asks for. Nothing above it re-derives history; every figure traces back to the row it came from, and any past state can be reproduced rather than reconstructed from memory.",
+      "provides": [
+        [
+          "Clean functional tables",
+          "Report-ready facts and dimensions, not raw dumps"
+        ],
+        [
+          "Attributes and dimensions",
+          "The descriptive columns analysis actually needs"
+        ],
+        [
+          "Point-in-time history",
+          "Any past state reproducible on demand"
+        ],
+        [
+          "Full lineage",
+          "Every column traceable to its source row"
+        ]
       ],
-      builtWith:[
-        ["dq","Assertions and freshness checks on every table; a failure quarantines the data and stops there."],
-        ["sem","Conformed dimensions, grains and entity definitions the tables are shaped to."],
-        ["lint","Naming, types and units brought to one standard before anything is published."]
+      "builtWith": [
+        [
+          "dq",
+          "Assertions and freshness checks on every table; a failure quarantines the data and stops there."
+        ],
+        [
+          "sem",
+          "Conformed dimensions, grains and entity definitions the tables are shaped to."
+        ],
+        [
+          "lint",
+          "Naming, types and units brought to one standard before anything is published."
+        ]
       ],
-      comps:[
-        ["Raw zone, immutable and partitioned","Conformed zone of functional tables","Open table format with time travel","Slowly-changing dimension handling","Automatic lineage capture"],
-        ["Lineage Q&amp;A over the catalog","Orphan and duplicate detection","Cost and usage scanner"],
-        ["Access grants","Retention and deletion calls"]
+      "comps": [
+        [
+          "Raw zone, immutable and partitioned",
+          "Conformed zone of functional tables",
+          "Open table format with time travel",
+          "Automatic lineage capture"
+        ],
+        [
+          "Declared grain and keys per table",
+          "Slowly-changing dimension handling",
+          "Access policy, row and column level",
+          "Retention and deletion policy"
+        ],
+        [
+          "Lineage Q&amp;A over the catalog",
+          "Orphan and duplicate detection",
+          "Cost and usage scanner"
+        ],
+        [
+          "What each table is for, and who depends on it",
+          "Sensitivity class per dataset"
+        ]
+      ],
+      "decisions": [
+        "Access grants",
+        "Retention calls"
       ]
     },
     {
-      n:"03", key:"int", shape:"manifold", name:"Data Integration Layer", role:"Joining and reconciling",
-      line:"Many systems, <b>one entity</b>. Conflicts resolved on purpose.",
-      out:"A single reconciled view per entity.",
-      what:"Where many systems become one entity. The same customer exists in five places with three spellings and two identifiers; this layer decides <b>which record wins and which field comes from where</b>, then holds a stable key so nothing downstream has to guess. Conflicts are resolved by written rule, not by whichever join ran last.",
-      provides:[
-        ["Golden records","One row per real-world entity"],
-        ["Stable cross-system keys","Joins that hold as systems change"],
-        ["Declared precedence","Written rules for which source wins, per field"],
-        ["Reconciliation","Counts that tie out hop to hop"]
+      "n": "03",
+      "key": "int",
+      "shape": "manifold",
+      "name": "Data Integration Layer",
+      "role": "Joining and reconciling",
+      "line": "Many systems, <b>one entity</b>. Conflicts resolved on purpose.",
+      "out": "A single reconciled view per entity.",
+      "what": "Where many systems become one entity. The same customer exists in five places with three spellings and two identifiers; this layer decides <b>which record wins and which field comes from where</b>, then holds a stable key so nothing downstream has to guess. Conflicts are resolved by written rule, not by whichever join ran last.",
+      "provides": [
+        [
+          "Golden records",
+          "One row per real-world entity"
+        ],
+        [
+          "Stable cross-system keys",
+          "Joins that hold as systems change"
+        ],
+        [
+          "Declared precedence",
+          "Written rules for which source wins, per field"
+        ],
+        [
+          "Reconciliation",
+          "Counts that tie out hop to hop"
+        ]
       ],
-      builtWith:[
-        ["dq","Reconciliation totals across the hop. A merge that breaks counts is quarantined."],
-        ["sem","The entity and grain definitions the match rules resolve against."],
-        ["lint","Canonical keys and formats, so matching compares like with like."]
+      "builtWith": [
+        [
+          "dq",
+          "Reconciliation totals across the hop. A merge that breaks counts is quarantined."
+        ],
+        [
+          "sem",
+          "The entity and grain definitions the match rules resolve against."
+        ],
+        [
+          "lint",
+          "Canonical keys and formats, so matching compares like with like."
+        ]
       ],
-      comps:[
-        ["Entity resolution and match rules","Survivorship / precedence logic","Cross-system key mapping","Reconciliation totals per hop"],
-        ["Candidate match proposals","Conflict explanation with evidence","Precedence rule suggestions"],
-        ["Match threshold approval","Adjudication of ambiguous merges"]
+      "comps": [
+        [
+          "Cross-system key map tables",
+          "Match candidate and merge audit tables",
+          "Reconciliation totals per hop"
+        ],
+        [
+          "Entity resolution and match rules",
+          "Survivorship and precedence logic",
+          "Entity and grain definitions"
+        ],
+        [
+          "Candidate match proposals",
+          "Conflict explanation with evidence",
+          "Precedence rule suggestions"
+        ],
+        [
+          "Which system is authoritative for which field, and why",
+          "What one customer means to this business"
+        ]
+      ],
+      "decisions": [
+        "Match threshold approval",
+        "Adjudication of ambiguous merges"
       ]
     },
     {
-      n:"02", key:"ods", shape:"ods", name:"ODS Layer", role:"Operational data store",
-      line:"A current, queryable mirror of the source. <b>No business logic.</b>",
-      out:"Near-real-time operational truth.",
-      what:"A current, queryable mirror of the source systems: one-to-one, with <b>no business logic applied</b>. It exists so operational questions can be answered against fresh data without touching production systems, and so everything above it starts from a stable, replayable surface instead of a live API.",
-      provides:[
-        ["Fresh operational tables","Minutes behind source, not days"],
-        ["A safe query surface","Analysts never hit production systems"],
-        ["Replayable history","The change log means any state can be rebuilt"],
-        ["Declared grain and keys","Every table states its primary key"]
+      "n": "02",
+      "key": "ods",
+      "shape": "ods",
+      "name": "ODS Layer",
+      "role": "Operational data store",
+      "line": "A current, queryable mirror of the source. <b>No business logic.</b>",
+      "out": "Near-real-time operational truth.",
+      "what": "A current, queryable mirror of the source systems: one-to-one, with <b>no business logic applied</b>. It exists so operational questions can be answered against fresh data without touching production systems, and so everything above it starts from a stable, replayable surface instead of a live API.",
+      "provides": [
+        [
+          "Fresh operational tables",
+          "Minutes behind source, not days"
+        ],
+        [
+          "A safe query surface",
+          "Analysts never hit production systems"
+        ],
+        [
+          "Replayable history",
+          "The change log means any state can be rebuilt"
+        ],
+        [
+          "Declared grain and keys",
+          "Every table states its primary key"
+        ]
       ],
-      builtWith:[
-        ["dq","Freshness and replication-lag checks on every replicated table."],
-        ["lint","Types, timezones and key formats normalized as the data lands."]
+      "builtWith": [
+        [
+          "dq",
+          "Freshness and replication-lag checks on every replicated table."
+        ],
+        [
+          "lint",
+          "Types, timezones and key formats normalized as the data lands."
+        ]
       ],
-      comps:[
-        ["1:1 replica tables","CDC apply with ordering guarantees","Soft-delete and tombstone handling","Replication lag monitoring"],
-        ["Lag anomaly detection","Replay and backfill planning","Drift watch against the source"],
-        ["Lag SLA setting","Cutover and re-sync approval"]
+      "comps": [
+        [
+          "1:1 replica tables",
+          "Change log and tombstones",
+          "Replication lag metrics"
+        ],
+        [
+          "CDC apply order and idempotency rules",
+          "Declared primary key per table",
+          "Soft-delete semantics",
+          "Freshness SLA per table"
+        ],
+        [
+          "Lag anomaly detection",
+          "Replay and backfill planning",
+          "Drift watch against the source"
+        ],
+        [
+          "What current means for each domain",
+          "Which operational questions this layer answers"
+        ]
+      ],
+      "decisions": [
+        "Lag SLA setting",
+        "Cutover and re-sync approval"
       ]
     },
     {
-      n:"01", key:"src", shape:"sources", name:"Data Source Layer", role:"Systems of origin",
-      line:"Everything the business already runs on, <b>under contract</b>.",
-      out:"A registered, contracted inventory of inputs.",
-      what:"The systems the business already runs on: CRM, ERP, billing, product telemetry, the spreadsheets that matter. This layer transforms nothing. It establishes <b>what exists, who owns it, and what shape it is promised to arrive in</b>, so every layer above can depend on it instead of discovering it.",
-      provides:[
-        ["A registered inventory","Every feed named, owned and discoverable"],
-        ["Signed data contracts","Agreed schema, grain and delivery cadence"],
-        ["Reliable extraction","CDC and scheduled pulls, idempotent and replayable"],
-        ["Change visibility","Drift at the source surfaces before it lands"]
+      "n": "01",
+      "key": "src",
+      "shape": "sources",
+      "name": "Data Source Layer",
+      "role": "Systems of origin",
+      "line": "Everything the business already runs on, <b>under contract</b>.",
+      "out": "A registered, contracted inventory of inputs.",
+      "what": "The systems the business already runs on: CRM, ERP, billing, product telemetry, the spreadsheets that matter. This layer transforms nothing. It establishes <b>what exists, who owns it, and what shape it is promised to arrive in</b>, so every layer above can depend on it instead of discovering it.",
+      "provides": [
+        [
+          "A registered inventory",
+          "Every feed named, owned and discoverable"
+        ],
+        [
+          "Signed data contracts",
+          "Agreed schema, grain and delivery cadence"
+        ],
+        [
+          "Reliable extraction",
+          "CDC and scheduled pulls, idempotent and replayable"
+        ],
+        [
+          "Change visibility",
+          "Drift at the source surfaces before it lands"
+        ]
       ],
-      builtWith:[
-        ["dq","Validates each feed against its contract before a single row is allowed to land."]
+      "builtWith": [
+        [
+          "dq",
+          "Validates each feed against its contract before a single row is allowed to land."
+        ]
       ],
-      comps:[
-        ["Change-data-capture connectors","Extract schedules and watermarks","Idempotent landing writes","Source system registry","Credential and secret rotation"],
-        ["New-source discovery","Connector config drafting","Schema-drift watch at the source"],
-        ["Onboarding approval for a new source","Access request sign-off"]
+      "comps": [
+        [
+          "Source systems of record: CRM, ERP, billing, telemetry",
+          "Change-data-capture connectors",
+          "Landing objects in raw storage",
+          "Credential and secret store"
+        ],
+        [
+          "Signed data contracts: schema, grain, cadence",
+          "Extract schedules and watermarks",
+          "Idempotent landing rules",
+          "Source system registry"
+        ],
+        [
+          "New-source discovery",
+          "Connector config drafting",
+          "Schema-drift watch at the source"
+        ],
+        [
+          "Who owns each feed, and who to call when it breaks",
+          "What the source system is actually used for",
+          "What an agent is allowed to read from it"
+        ]
+      ],
+      "decisions": [
+        "Onboarding approval for a new source",
+        "Access request sign-off"
       ]
     }
   ];
@@ -1020,57 +1301,236 @@ body[data-route="detail"] .detail{ display:block; }
   /* Cross-cutting modules: a different axis, plugged into the products above */
   var MODULES = [
     {
-      key:"dq", shape:"funnel", name:"DQ Module", tag:"Deterministic · quality", group:"det",
-      line:"Checked against a contract at <b>every boundary</b>, not just the door. Failures quarantine; they do not propagate.",
-      plugs:["src","ods","int","lake","agg"],
-      comps:[
-        ["Assertion suites for null, range and uniqueness","Freshness SLA checks","Reconciliation counts across hops","Fail-closed quarantine"],
-        ["Expectation registry per dataset","DQ score as a tracked metric","Versioned data contracts"],
-        ["Failure triage and classification","Root-cause traced across lineage","Ticket drafting with evidence"],
-        ["Quarantine release approval","Contract change sign-off"],
-        ["Trust score and freshness state on every dataset"]
-      ]
-    },
-    {
-      key:"sem", shape:"model", name:"Semantic Layer", tag:"Deterministic · definitions", group:"det",
-      line:"Where a table becomes a concept. Entities, grains and metrics <b>defined once</b> and reused everywhere.",
-      plugs:["int","lake","agg","dash"],
-      comps:[
-        ["Entity and grain definitions","Conformed dimensions and hierarchies","Metric expressions compiled to SQL","Version-controlled model spec"],
-        ["One name per concept","Metric bound to its entity","Certified vs. draft state","Change log per definition"],
-        ["Definition drafting from a description","Overlapping-metric detection","Impact analysis before a change"],
-        ["Definition review and certification","Ownership assignment"],
-        ["A single vocabulary every tool queries against"]
-      ]
-    },
-    {
-      key:"ctx", shape:"book", name:"Business Context", tag:"A pipeline of its own", group:"ctx",
-      line:"What the numbers <b>mean to this business</b>. Its own small pipeline (inputs, modelled, stored, served) that plugs into discovery.",
-      plugs:["dash"],
-      pipeline:[
-        { t:"Grounding service", d:"Serves definitions and context to Q&amp;A, narratives and search." },
-        { t:"Context store",     d:"Versioned, indexed, retrievable." },
-        { t:"Context modelling", d:"Glossary, KPI definitions, segments, hierarchies." },
-        { t:"Business inputs",   d:"Plans, targets, org structure, calendars, policy docs." }
+      "key": "dq",
+      "shape": "funnel",
+      "name": "DQ Module",
+      "tag": "Deterministic · quality",
+      "group": "log",
+      "line": "Checked against a contract at <b>every boundary</b>, not just the door. Failures quarantine; they do not propagate.",
+      "plugs": [
+        "src",
+        "ods",
+        "int",
+        "lake",
+        "agg"
       ],
-      comps:[
-        ["Target and budget tables","Fiscal calendar and period logic","Segment and hierarchy definitions","Entitlement mapped to org structure"],
-        ["Business glossary","KPI definitions with named owners","Catalogue of common questions","Narrative context per metric"],
-        ["Grounding for natural-language Q&amp;A","Suggested next questions","Context-aware anomaly narratives","Self-serve onboarding explainers"],
-        ["Target setting and sign-off","Glossary ownership and review"],
-        ["A shared vocabulary","Discovery that answers in business terms"]
+      "comps": [
+        [
+          "Quarantine tables for failed rows",
+          "Check results and run history"
+        ],
+        [
+          "Assertion suites for null, range and uniqueness",
+          "Freshness SLA checks",
+          "Reconciliation counts across hops",
+          "Versioned data contracts",
+          "Fail-closed quarantine rule"
+        ],
+        [
+          "Failure triage and classification",
+          "Root cause traced across lineage",
+          "Ticket drafting with evidence"
+        ],
+        [
+          "What a failure means for the process behind the data",
+          "Which datasets matter most, and to whom"
+        ]
+      ],
+      "decisions": [
+        "Quarantine release approval",
+        "Contract change sign-off"
+      ],
+      "out": [
+        "Trust score and freshness state on every dataset"
       ]
     },
     {
-      key:"lint", shape:"comb", name:"Linting Model", tag:"Deterministic · conformance", group:"det",
-      line:"Naming, types and units held to <b>one standard</b>, wherever data lands.",
-      plugs:["ods","int","lake","agg"],
-      comps:[
-        ["Type and unit coercion","Timezone normalization","Canonical key formatting","Deterministic dedup rules"],
-        ["Naming standard","Column glossary","Conformance check in CI"],
-        ["Column mapping proposer","Rename and drift detection","Standard-name suggestion"],
-        ["Steward review queue","Mapping accept or reject"],
-        ["Conformed, self-describing tables","Field dictionary"]
+      "key": "sem",
+      "shape": "model",
+      "name": "Semantic Layer",
+      "tag": "Deterministic · definitions",
+      "group": "log",
+      "line": "Where a table becomes a concept. Entities, grains and metrics <b>defined once</b> and reused everywhere.",
+      "plugs": [
+        "int",
+        "lake",
+        "agg",
+        "dash"
+      ],
+      "comps": [
+        [
+          "Compiled views and materializations the definitions produce"
+        ],
+        [
+          "Entity and grain definitions",
+          "Conformed dimensions and hierarchies",
+          "Metric expressions compiled to SQL",
+          "Version-controlled model spec",
+          "One name per concept"
+        ],
+        [
+          "Definition drafting from a description",
+          "Overlapping-metric detection",
+          "Impact analysis before a change"
+        ],
+        [
+          "What each concept means to this business",
+          "Certified or draft, and who owns it"
+        ]
+      ],
+      "decisions": [
+        "Definition review and certification",
+        "Ownership assignment"
+      ],
+      "out": [
+        "A single vocabulary every tool queries against"
+      ]
+    },
+    {
+      "key": "ctx",
+      "shape": "book",
+      "name": "Business Context",
+      "tag": "A pipeline of its own",
+      "group": "ctx",
+      "line": "What the numbers <b>mean to this business</b>. Its own small pipeline (inputs, modelled, stored, served) that plugs into discovery.",
+      "plugs": [
+        "dash"
+      ],
+      "pipeline": [
+        {
+          "t": "Grounding service",
+          "d": "Serves definitions and context to Q&amp;A, narratives and search."
+        },
+        {
+          "t": "Context store",
+          "d": "Versioned, indexed, retrievable."
+        },
+        {
+          "t": "Context modelling",
+          "d": "Glossary, KPI definitions, segments, hierarchies."
+        },
+        {
+          "t": "Business inputs",
+          "d": "Plans, targets, org structure, calendars, policy docs."
+        }
+      ],
+      "comps": [
+        [
+          "Target and budget tables",
+          "Fiscal calendar tables",
+          "Context store, versioned and indexed"
+        ],
+        [
+          "Segment and hierarchy definitions",
+          "Entitlement mapped to org structure",
+          "KPI definitions with named owners"
+        ],
+        [
+          "Grounding for natural-language Q&amp;A",
+          "Suggested next questions",
+          "Context-aware anomaly narratives",
+          "Self-serve onboarding explainers"
+        ],
+        [
+          "Business glossary",
+          "Plans, targets and policy documents",
+          "Catalogue of the questions people actually ask"
+        ]
+      ],
+      "decisions": [
+        "Target setting and sign-off",
+        "Glossary ownership and review"
+      ],
+      "out": [
+        "A shared vocabulary",
+        "Discovery that answers in business terms"
+      ]
+    },
+    {
+      "key": "lint",
+      "shape": "comb",
+      "name": "Linting Model",
+      "tag": "Deterministic · conformance",
+      "group": "log",
+      "line": "Naming, types and units held to <b>one standard</b>, wherever data lands.",
+      "plugs": [
+        "ods",
+        "int",
+        "lake",
+        "agg"
+      ],
+      "comps": [
+        [
+          "Conformed, self-describing tables",
+          "Field dictionary"
+        ],
+        [
+          "Type and unit coercion",
+          "Timezone normalization",
+          "Canonical key formatting",
+          "Deterministic dedup rules",
+          "Naming standard enforced in CI"
+        ],
+        [
+          "Column mapping proposer",
+          "Rename and drift detection",
+          "Standard-name suggestion"
+        ],
+        [
+          "House naming conventions and why they exist",
+          "Column glossary in business terms"
+        ]
+      ],
+      "decisions": [
+        "Steward review queue",
+        "Mapping accept or reject"
+      ],
+      "out": [
+        "Conformed tables that describe themselves"
+      ]
+    },
+    {
+      "key": "agt",
+      "shape": "agent",
+      "name": "Agent Runtime",
+      "tag": "Agent · models and loops",
+      "group": "agt",
+      "line": "The models that propose work, and the runtime they execute in. Every proposal arrives as a reviewable diff with its evidence attached.",
+      "plugs": [
+        "src",
+        "ods",
+        "int",
+        "lake",
+        "agg",
+        "dash"
+      ],
+      "comps": [
+        [
+          "Model endpoints and their versions",
+          "Proposal and evaluation logs"
+        ],
+        [
+          "Tool definitions and their permitted scope",
+          "Evaluation suites per task",
+          "Guardrails: what an agent may never write"
+        ],
+        [
+          "Task routing across models",
+          "Retrieval over catalog, lineage and context",
+          "Multi-step plans with checkpoints"
+        ],
+        [
+          "System prompts and task instructions",
+          "What the agent is told about this business",
+          "Worked examples of a good proposal"
+        ]
+      ],
+      "decisions": [
+        "Which proposals are accepted",
+        "Where an agent is allowed to act"
+      ],
+      "out": [
+        "Reviewable diffs with evidence, never a silent write"
       ]
     }
   ];
@@ -1082,170 +1542,310 @@ body[data-route="detail"] .detail{ display:block; }
      ============================================================ */
   var DETAIL = [
     {
-      parent:"lake", slug:"raw-zone", lane:"Deterministic code",
-      label:"Raw zone, immutable and partitioned",
-      lead:"Landed bytes, written once, never edited.",
-      what:"The raw zone holds source data exactly as it arrived, with the load time and the source system recorded beside it. Nothing here is updated or corrected in place. A correction lands as a new file with a later timestamp, and the original stays where it is.",
-      how:[
-        ["Write once","Each extract lands as new files under a partition path keyed by source, table and load date. Existing files are never reopened for writing."],
-        ["Partition on load date","A query for a window reads only the partitions in that window, and a backfill rewrites one partition without touching the rest."],
-        ["Keep the arrival metadata","Load timestamp, source system, extract watermark and file checksum travel with the data, so any row ties back to the run that produced it."],
-        ["Correct forward","A fix is a later file, never an edit. What the source actually said stays intact."]
+      "parent": "lake",
+      "slug": "raw-zone",
+      "lane": "Physical",
+      "label": "Raw zone, immutable and partitioned",
+      "lead": "Landed bytes, written once, never edited.",
+      "what": "The raw zone holds source data exactly as it arrived, with the load time and the source system recorded beside it. Nothing here is updated or corrected in place. A correction lands as a new file with a later timestamp, and the original stays where it is.",
+      "how": [
+        [
+          "Write once",
+          "Each extract lands as new files under a partition path keyed by source, table and load date. Existing files are never reopened for writing."
+        ],
+        [
+          "Partition on load date",
+          "A query for a window reads only the partitions in that window, and a backfill rewrites one partition without touching the rest."
+        ],
+        [
+          "Keep the arrival metadata",
+          "Load timestamp, source system, extract watermark and file checksum travel with the data, so any row ties back to the run that produced it."
+        ],
+        [
+          "Correct forward",
+          "A fix is a later file, never an edit. What the source actually said stays intact."
+        ]
       ],
-      breaks:[
+      "breaks": [
         "You cannot answer what a report said last quarter, because the numbers behind it were quietly overwritten.",
         "A bad transformation becomes unrecoverable. With raw kept immutable you rebuild from it; without it you go back to the source system and hope it still holds the data.",
         "Every query scans the whole table, because there is no partition to prune."
       ]
     },
     {
-      parent:"lake", slug:"conformed-zone", lane:"Deterministic code",
-      label:"Conformed zone of functional tables",
-      lead:"Facts and dimensions shaped the way analysis asks for them.",
-      what:"The conformed zone is where raw data becomes tables people query without knowing which system it came from. Names, types, units and grains are settled here, and every table declares its key. This is the layer reports and dashboards read.",
-      how:[
-        ["Declare the grain","Each table states what one row means: one order line, one customer per day. The grain is tested, not assumed."],
-        ["Conform the dimensions","Shared entities like customer, product and region resolve to one definition, so a join across two facts lines up."],
-        ["Normalize types and units","Currencies, timezones and units are converted once here, not repeatedly in downstream queries."],
-        ["Publish behind tests","A table enters the zone only when its key, grain and referential checks pass."]
+      "parent": "lake",
+      "slug": "conformed-zone",
+      "lane": "Physical",
+      "label": "Conformed zone of functional tables",
+      "lead": "Facts and dimensions shaped the way analysis asks for them.",
+      "what": "The conformed zone is where raw data becomes tables people query without knowing which system it came from. Names, types, units and grains are settled here, and every table declares its key. This is the layer reports and dashboards read.",
+      "how": [
+        [
+          "Declare the grain",
+          "Each table states what one row means: one order line, one customer per day. The grain is tested, not assumed."
+        ],
+        [
+          "Conform the dimensions",
+          "Shared entities like customer, product and region resolve to one definition, so a join across two facts lines up."
+        ],
+        [
+          "Normalize types and units",
+          "Currencies, timezones and units are converted once here, not repeatedly in downstream queries."
+        ],
+        [
+          "Publish behind tests",
+          "A table enters the zone only when its key, grain and referential checks pass."
+        ]
       ],
-      breaks:[
+      "breaks": [
         "Every downstream query reimplements the same cleanup, and the copies drift apart.",
         "Joins silently fan out because two tables disagree about grain.",
         "Answering one question requires knowing the quirks of five source systems."
       ]
     },
     {
-      parent:"lake", slug:"open-table-format", lane:"Deterministic code",
-      label:"Open table format with time travel",
-      lead:"Snapshots and schema changes without rewriting the table.",
-      what:"An open table format such as Iceberg, Delta or Hudi puts a transaction log over the files in object storage. Readers see a consistent snapshot, writers commit atomically, and earlier snapshots stay queryable.",
-      how:[
-        ["Metadata over files","The format keeps a manifest of which files belong to which snapshot, so a commit is a metadata write and not a data rewrite."],
-        ["Atomic commits","A reader sees the whole write or none of it. Half-written partitions stop being a class of bug."],
-        ["Time travel","Query the table as of a timestamp or a snapshot id to reproduce what a job saw on a given day."],
-        ["Schema and partition evolution","Add or rename a column, or change the partition scheme, without rewriting history."]
+      "parent": "lake",
+      "slug": "open-table-format",
+      "lane": "Physical",
+      "label": "Open table format with time travel",
+      "lead": "Snapshots and schema changes without rewriting the table.",
+      "what": "An open table format such as Iceberg, Delta or Hudi puts a transaction log over the files in object storage. Readers see a consistent snapshot, writers commit atomically, and earlier snapshots stay queryable.",
+      "how": [
+        [
+          "Metadata over files",
+          "The format keeps a manifest of which files belong to which snapshot, so a commit is a metadata write and not a data rewrite."
+        ],
+        [
+          "Atomic commits",
+          "A reader sees the whole write or none of it. Half-written partitions stop being a class of bug."
+        ],
+        [
+          "Time travel",
+          "Query the table as of a timestamp or a snapshot id to reproduce what a job saw on a given day."
+        ],
+        [
+          "Schema and partition evolution",
+          "Add or rename a column, or change the partition scheme, without rewriting history."
+        ]
       ],
-      breaks:[
+      "breaks": [
         "Readers hit partially written data during a load and get wrong answers with no error raised.",
         "Reproducing last month's number means restoring a backup.",
         "A schema change turns into a full table rewrite and a scheduling exercise."
       ]
     },
     {
-      parent:"lake", slug:"scd-handling", lane:"Deterministic code",
-      label:"Slowly-changing dimension handling",
-      lead:"Attributes that change over time, without losing what they used to be.",
-      what:"Customers move, products get recategorized, sales reps change territory. Slowly-changing dimension handling records when each attribute value was true, so a historical fact joins to the attributes that applied at the time.",
-      how:[
-        ["Version the row","A change closes the current row with an end date and opens a new one, with a surrogate key per version."],
-        ["Carry valid-from and valid-to","Every version records the window it was true for, plus a current flag for the common case."],
-        ["Join on the effective date","Facts join to the dimension version whose window contains the event date, not to today's version."],
-        ["Decide what is tracked","Not every column deserves history. The ones that do are declared; the rest overwrite."]
+      "parent": "lake",
+      "slug": "lineage-capture",
+      "lane": "Physical",
+      "label": "Automatic lineage capture",
+      "lead": "Every column traced to the query and the run that produced it.",
+      "what": "Lineage is captured by the pipeline itself, from query plans and job metadata, and not maintained by hand in a spreadsheet. It records which inputs produced which outputs, at column level wherever the engine exposes it.",
+      "how": [
+        [
+          "Emit at run time",
+          "Each transformation reports its inputs, outputs and run id as it executes, so lineage reflects what ran and not what was documented."
+        ],
+        [
+          "Column level where possible",
+          "Query plans give column-to-column edges for SQL transformations. Opaque steps record table level and say so."
+        ],
+        [
+          "Store as a graph",
+          "Edges land in the catalog, queryable in both directions: upstream to find causes, downstream to find blast radius."
+        ],
+        [
+          "Attach the run",
+          "Each edge carries the job, the commit and the timestamp, so a wrong number leads to one specific execution."
+        ]
       ],
-      breaks:[
-        "Last year's revenue moves when a customer changes segment this year.",
-        "Territory and commission reports cannot be reproduced after a reorg.",
-        "Nobody can say what the categorization was on the day of the sale."
-      ]
-    },
-    {
-      parent:"lake", slug:"lineage-capture", lane:"Deterministic code",
-      label:"Automatic lineage capture",
-      lead:"Every column traced to the query and the run that produced it.",
-      what:"Lineage is captured by the pipeline itself, from query plans and job metadata, and not maintained by hand in a spreadsheet. It records which inputs produced which outputs, at column level wherever the engine exposes it.",
-      how:[
-        ["Emit at run time","Each transformation reports its inputs, outputs and run id as it executes, so lineage reflects what ran and not what was documented."],
-        ["Column level where possible","Query plans give column-to-column edges for SQL transformations. Opaque steps record table level and say so."],
-        ["Store as a graph","Edges land in the catalog, queryable in both directions: upstream to find causes, downstream to find blast radius."],
-        ["Attach the run","Each edge carries the job, the commit and the timestamp, so a wrong number leads to one specific execution."]
-      ],
-      breaks:[
+      "breaks": [
         "Impact analysis before a schema change becomes guesswork and a long chat thread.",
         "A quality failure takes hours to trace instead of one query.",
         "Hand-written documentation drifts from reality within weeks and stops being trusted."
       ]
     },
     {
-      parent:"lake", slug:"lineage-qa", lane:"Agentic layer",
-      label:"Lineage Q&amp;A over the catalog",
-      lead:"Ask where a number came from and get the path, with evidence attached.",
-      what:"A model reads the lineage graph and the catalog, then answers questions in plain language. It proposes an answer and shows the path it walked, so the reader checks the work instead of trusting the sentence.",
-      how:[
-        ["Ground on the graph","The model queries lineage and catalog metadata for every answer. It never answers from a memorized schema."],
-        ["Return the path, not the claim alone","Each answer cites the tables, columns and jobs it traversed, linked back into the catalog."],
-        ["Cover the questions people actually ask","What feeds this column, what breaks if I drop it, which dashboards read this table, when did it last load."],
-        ["Stop at the edge of the graph","Where lineage is table level or missing, the answer says so and does not fill the gap."]
+      "parent": "lake",
+      "slug": "scd-handling",
+      "lane": "Logical",
+      "label": "Slowly-changing dimension handling",
+      "lead": "Attributes that change over time, without losing what they used to be.",
+      "what": "Customers move, products get recategorized, sales reps change territory. Slowly-changing dimension handling records when each attribute value was true, so a historical fact joins to the attributes that applied at the time.",
+      "how": [
+        [
+          "Version the row",
+          "A change closes the current row with an end date and opens a new one, with a surrogate key per version."
+        ],
+        [
+          "Carry valid-from and valid-to",
+          "Every version records the window it was true for, plus a current flag for the common case."
+        ],
+        [
+          "Join on the effective date",
+          "Facts join to the dimension version whose window contains the event date, not to today's version."
+        ],
+        [
+          "Decide what is tracked",
+          "Not every column deserves history. The ones that do are declared; the rest overwrite."
+        ]
       ],
-      breaks:[
-        "The graph exists, but only a few people know how to query it, so it goes unused.",
-        "Impact questions get answered from memory, and the answer is confidently wrong."
+      "breaks": [
+        "Last year's revenue moves when a customer changes segment this year.",
+        "Territory and commission reports cannot be reproduced after a reorg.",
+        "Nobody can say what the categorization was on the day of the sale."
       ]
     },
     {
-      parent:"lake", slug:"orphan-duplicate-detection", lane:"Agentic layer",
-      label:"Orphan and duplicate detection",
-      lead:"Finds rows that point at nothing and rows that exist twice.",
-      what:"A scanner walks the conformed zone looking for referential orphans and duplicate keys, ranks what it finds by how much downstream work depends on it, and drafts the ticket. It proposes; it does not delete.",
-      how:[
-        ["Scan on a schedule","Foreign keys, declared uniqueness and near-duplicate matching run across the whole zone, not only the tables someone remembered to test."],
-        ["Rank by blast radius","Lineage says which marts and dashboards read the affected table, so the list is ordered by consequence and not by row count."],
-        ["Explain the likely cause","The proposal names the load or the merge rule that produced the orphan, with the run id."],
-        ["Hand it to a person","Output is a reviewable ticket with evidence. Deletion and merge stay human decisions."]
+      "parent": "lake",
+      "slug": "access-policy",
+      "lane": "Logical",
+      "label": "Access policy, row and column level",
+      "lead": "Who can read what, enforced in the engine.",
+      "what": "Access to lake data is expressed as policy: roles, and the rows and columns each role may read. A named owner sets it against a stated purpose, and the grant is recorded where it can be reviewed. The engine enforces it, so the same rules hold whichever tool connects.",
+      "how": [
+        [
+          "Grant to roles",
+          "Access attaches to a role tied to a job function, so joiners and leavers are handled by the role and not by memory."
+        ],
+        [
+          "Record purpose and scope",
+          "Each grant captures who asked, who approved, which tables or columns, and why."
+        ],
+        [
+          "Enforce at query time",
+          "Row and column policies apply inside the engine, so the same rules hold whichever tool connects."
+        ],
+        [
+          "Review on a cadence",
+          "Grants expire or come up for review, and unused access is removed."
+        ]
       ],
-      breaks:[
-        "Duplicates inflate counts quietly, and the error surfaces in a board deck.",
-        "Orphans break joins in ways that look like missing data, then get patched downstream with a filter."
-      ]
-    },
-    {
-      parent:"lake", slug:"cost-usage-scanner", lane:"Agentic layer",
-      label:"Cost and usage scanner",
-      lead:"What storage and compute is actually being read, and what is not.",
-      what:"The scanner joins query history against storage metrics to show which tables earn their cost. It surfaces unread tables, expensive recurring queries and partitions nobody touches, then proposes changes for a person to approve.",
-      how:[
-        ["Join usage to cost","Query logs give reads per table and per column. Storage metrics give bytes and growth. Together they give cost per useful read."],
-        ["Flag the tails","Tables with no reads in ninety days, queries that scan far more than they return, partitions that never get pruned."],
-        ["Propose a change","Archive, compact, repartition or drop, each with the saving and the affected consumers named."],
-        ["Approve before acting","Nothing moves or drops without a human decision, and the retention rules still apply."]
-      ],
-      breaks:[
-        "Storage grows steadily and nobody can say which part of it matters.",
-        "A handful of unnoticed queries come to dominate the bill."
-      ]
-    },
-    {
-      parent:"lake", slug:"access-grants", lane:"Human decision",
-      label:"Access grants",
-      lead:"Who can read what, decided by a person and written down.",
-      what:"Access to lake data is granted by a named owner against a stated purpose, and the grant is recorded where it can be reviewed. The platform enforces the decision; it does not make it.",
-      how:[
-        ["Grant to roles","Access attaches to a role tied to a job function, so joiners and leavers are handled by the role and not by memory."],
-        ["Record purpose and scope","Each grant captures who asked, who approved, which tables or columns, and why."],
-        ["Enforce at query time","Row and column policies apply inside the engine, so the same rules hold whichever tool connects."],
-        ["Review on a cadence","Grants expire or come up for review, and unused access is removed."]
-      ],
-      breaks:[
+      "breaks": [
         "Access accumulates until nobody can say who can see salary or customer contact data.",
         "A leaver keeps read access because it was granted to a person and not a role.",
         "Sensitive columns leak through a tool that connected around the policy layer."
       ]
     },
     {
-      parent:"lake", slug:"retention-deletion", lane:"Human decision",
-      label:"Retention and deletion calls",
-      lead:"How long data is kept, and what happens when someone asks to be forgotten.",
-      what:"Retention is a business and legal decision recorded per dataset, then enforced by the platform. Deletion requests are handled against that same record, including inside the immutable raw zone.",
-      how:[
-        ["Set a period per dataset","Each dataset carries a retention period and the reason behind it: legal, contractual or operational."],
-        ["Expire automatically","Expiry runs on schedule against the recorded period. Exceptions are granted explicitly and dated."],
-        ["Handle subject deletion","A deletion request rewrites the affected partitions and records that it happened, so an immutable zone and a right to erasure can both hold."],
-        ["Keep the proof","What was deleted, when, and under whose approval is retained after the data itself is gone."]
+      "parent": "lake",
+      "slug": "retention-deletion",
+      "lane": "Logical",
+      "label": "Retention and deletion policy",
+      "lead": "How long data is kept, and what happens when someone asks to be forgotten.",
+      "what": "Retention is a business and legal decision recorded per dataset, then enforced by the platform. Deletion requests are handled against that same record, including inside the immutable raw zone.",
+      "how": [
+        [
+          "Set a period per dataset",
+          "Each dataset carries a retention period and the reason behind it: legal, contractual or operational."
+        ],
+        [
+          "Expire automatically",
+          "Expiry runs on schedule against the recorded period. Exceptions are granted explicitly and dated."
+        ],
+        [
+          "Handle subject deletion",
+          "A deletion request rewrites the affected partitions and records that it happened, so an immutable zone and a right to erasure can both hold."
+        ],
+        [
+          "Keep the proof",
+          "What was deleted, when, and under whose approval is retained after the data itself is gone."
+        ]
       ],
-      breaks:[
+      "breaks": [
         "Personal data sits in the lake past its lawful period.",
         "A deletion request is honoured in the warehouse but not in raw, so the data returns on the next rebuild.",
         "You cannot demonstrate compliance, because nothing recorded the decision."
+      ]
+    },
+    {
+      "parent": "lake",
+      "slug": "lineage-qa",
+      "lane": "Agent",
+      "label": "Lineage Q&amp;A over the catalog",
+      "lead": "Ask where a number came from and get the path, with evidence attached.",
+      "what": "A model reads the lineage graph and the catalog, then answers questions in plain language. It proposes an answer and shows the path it walked, so the reader checks the work instead of trusting the sentence.",
+      "how": [
+        [
+          "Ground on the graph",
+          "The model queries lineage and catalog metadata for every answer. It never answers from a memorized schema."
+        ],
+        [
+          "Return the path, not the claim alone",
+          "Each answer cites the tables, columns and jobs it traversed, linked back into the catalog."
+        ],
+        [
+          "Cover the questions people actually ask",
+          "What feeds this column, what breaks if I drop it, which dashboards read this table, when did it last load."
+        ],
+        [
+          "Stop at the edge of the graph",
+          "Where lineage is table level or missing, the answer says so and does not fill the gap."
+        ]
+      ],
+      "breaks": [
+        "The graph exists, but only a few people know how to query it, so it goes unused.",
+        "Impact questions get answered from memory, and the answer is confidently wrong."
+      ]
+    },
+    {
+      "parent": "lake",
+      "slug": "orphan-duplicate-detection",
+      "lane": "Agent",
+      "label": "Orphan and duplicate detection",
+      "lead": "Finds rows that point at nothing and rows that exist twice.",
+      "what": "A scanner walks the conformed zone looking for referential orphans and duplicate keys, ranks what it finds by how much downstream work depends on it, and drafts the ticket. It proposes; it does not delete.",
+      "how": [
+        [
+          "Scan on a schedule",
+          "Foreign keys, declared uniqueness and near-duplicate matching run across the whole zone, not only the tables someone remembered to test."
+        ],
+        [
+          "Rank by blast radius",
+          "Lineage says which marts and dashboards read the affected table, so the list is ordered by consequence and not by row count."
+        ],
+        [
+          "Explain the likely cause",
+          "The proposal names the load or the merge rule that produced the orphan, with the run id."
+        ],
+        [
+          "Hand it to a person",
+          "Output is a reviewable ticket with evidence. Deletion and merge stay human decisions."
+        ]
+      ],
+      "breaks": [
+        "Duplicates inflate counts quietly, and the error surfaces in a board deck.",
+        "Orphans break joins in ways that look like missing data, then get patched downstream with a filter."
+      ]
+    },
+    {
+      "parent": "lake",
+      "slug": "cost-usage-scanner",
+      "lane": "Agent",
+      "label": "Cost and usage scanner",
+      "lead": "What storage and compute is actually being read, and what is not.",
+      "what": "The scanner joins query history against storage metrics to show which tables earn their cost. It surfaces unread tables, expensive recurring queries and partitions nobody touches, then proposes changes for a person to approve.",
+      "how": [
+        [
+          "Join usage to cost",
+          "Query logs give reads per table and per column. Storage metrics give bytes and growth. Together they give cost per useful read."
+        ],
+        [
+          "Flag the tails",
+          "Tables with no reads in ninety days, queries that scan far more than they return, partitions that never get pruned."
+        ],
+        [
+          "Propose a change",
+          "Archive, compact, repartition or drop, each with the saving and the affected consumers named."
+        ],
+        [
+          "Approve before acting",
+          "Nothing moves or drops without a human decision, and the retention rules still apply."
+        ]
+      ],
+      "breaks": [
+        "Storage grows steadily and nobody can say which part of it matters.",
+        "A handful of unnoticed queries come to dominate the bill."
       ]
     }
   ];
@@ -1274,17 +1874,11 @@ body[data-route="detail"] .detail{ display:block; }
      ============================================================ */
   function compsHTML(comps, parentKey) {
     return comps.map(function (list, i) {
-      return '<div class="cgroup" style="--c:' + LANES[i].c + '">' +
-        '<div class="clabel">' + LANES[i].key + "</div><ul>" +
+      return '<div class="cgroup" style="--c:' + TYPES[i].c + '">' +
+        '<div class="clabel">' + TYPES[i].key + "</div><ul>" +
         list.map(function (c) { return "<li>" + compLabelHTML(c, parentKey) + "</li>"; }).join("") + "</ul></div>";
     }).join("");
   }
-
-  var BUILT_LANES = [
-    { key:"Deterministic code", c:"var(--lane-1)" },
-    { key:"Agentic layer",      c:"var(--lane-3)" },
-    { key:"Human decision",     c:"var(--lane-4)" }
-  ];
 
   function panelHTML(nd) {
     var provides = nd.provides.map(function (pv) {
@@ -1300,8 +1894,8 @@ body[data-route="detail"] .detail{ display:block; }
     }).join("");
 
     var from = nd.comps.map(function (list, i) {
-      return '<div class="cgroup" style="--c:' + BUILT_LANES[i].c + '">' +
-        '<div class="clabel">' + BUILT_LANES[i].key + "</div><ul>" +
+      return '<div class="cgroup" style="--c:' + TYPES[i].c + '">' +
+        '<div class="clabel">' + TYPES[i].key + "</div><ul>" +
         list.map(function (c) { return "<li>" + compLabelHTML(c, nd.key) + "</li>"; }).join("") + "</ul></div>";
     }).join("");
 
@@ -1311,7 +1905,7 @@ body[data-route="detail"] .detail{ display:block; }
           '<div class="p-prov"><span class="sec-k">What it provides</span><div class="provides">' + provides + "</div></div>" +
         "</div>" +
         '<div class="panel-sec"><span class="sec-k">Produced with</span><div class="builtwith">' + built + "</div></div>" +
-        '<div class="panel-sec"><span class="sec-k">Built from</span><div class="built-from">' + from + "</div></div>" +
+        '<div class="panel-sec"><span class="sec-k">Made of</span><div class="built-from">' + from + "</div></div>" +
       "</div>";
   }
 
@@ -1346,7 +1940,9 @@ body[data-route="detail"] .detail{ display:block; }
           : "") +
         '<div class="m-plugs"><span class="k">Plugs into</span><div class="chips">' + chips + "</div></div>" +
         '<span class="module-hint">Click to open components</span>' +
-        '<div class="module-comps">' + compsHTML(m.comps, m.key) + "</div>" +
+        '<div class="module-comps">' + compsHTML(m.comps, m.key) +
+          (m.out ? '<p class="m-out"><span class="k">Provides</span><span>' + m.out.join(". ") + "</span></p>" : "") +
+        "</div>" +
       "</section>";
   }
 
@@ -1365,10 +1961,12 @@ body[data-route="detail"] .detail{ display:block; }
       '<svg class="plugs" aria-hidden="true"></svg>' +
       '<aside class="modules"><span class="col-label">Plugs into the stack</span>' +
         '<div class="modules-inner">' +
-          '<div class="mgroup"><span class="mgroup-label">Context pipeline</span>' +
+          '<div class="mgroup"><span class="mgroup-label">Logical modules</span>' +
+            MODULES.filter(function (m) { return m.group === "log"; }).map(moduleHTML).join("") + "</div>" +
+          '<div class="mgroup"><span class="mgroup-label">Agent</span>' +
+            MODULES.filter(function (m) { return m.group === "agt"; }).map(moduleHTML).join("") + "</div>" +
+          '<div class="mgroup"><span class="mgroup-label">Context</span>' +
             MODULES.filter(function (m) { return m.group === "ctx"; }).map(moduleHTML).join("") + "</div>" +
-          '<div class="mgroup"><span class="mgroup-label">Deterministic modules</span>' +
-            MODULES.filter(function (m) { return m.group === "det"; }).map(moduleHTML).join("") + "</div>" +
         "</div></aside>" +
       '<div class="spine"><span class="col-label">Physical data products &nbsp;·&nbsp; data flows up</span>' + spineHTML + "</div>" +
     "</div>";
@@ -1495,7 +2093,7 @@ body[data-route="detail"] .detail{ display:block; }
 
   /* Legend */
   var lr = document.getElementById("legend-row");
-  LANES.forEach(function (l) {
+  TYPES.forEach(function (l) {
     var d = document.createElement("div");
     d.className = "lgd";
     d.innerHTML = '<div class="bar" style="background:' + l.c + '"></div>' +
