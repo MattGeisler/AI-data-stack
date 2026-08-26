@@ -47,20 +47,20 @@ same order everywhere on the page:
 Each `comps` array in `NODES` and `MODULES` is index-aligned to `TYPES`, so the
 two have to be reordered together.
 
-The physical column has six discrete rows, one per data product. The other
-three columns hold bars that span the rows they apply to, because that is their
-real shape: data quality is one thing across five layers, not five separate
-entries. Current spans:
+The physical column has six cells, one per data product. Each of the other
+three is a single column holding the concerns of that type. A concern is one
+thing across many layers, not one entry per layer, so each card carries a scale
+showing which of the six it covers, reading 01 on the left through 06 on the
+right:
 
-- Business Context, context, 06 only
-- Agent Runtime, agent, 01 to 06
-- DQ Module, logical, 01 to 05
-- Semantic Layer, logical, 03 to 06
-- Linting Model, logical, 02 to 05
+- Context: Business Context, 06 only
+- Agent: Agent Runtime, 01 to 06
+- Logical: DQ Module 01 to 05, Semantic Layer 03 to 06, Linting Model 02 to 05,
+  Transformation SQL 02 to 05
 
-Spans come from each module's `plugs` list. Bars assume a contiguous range.
-The summary shows the bars alone; clicking one opens the module page. A layer's
-own four-type breakdown sits behind "About this layer" on its physical cell.
+Coverage comes from each concern's `plugs` list. The summary shows the cards
+alone; clicking one opens its page. A layer's own four-type breakdown sits
+behind "About this layer" on its physical cell.
 
 Human decisions are not a fifth type. They arrive as PRs and requirements
 against the four, and the operating rule states the pattern: agents propose,

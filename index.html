@@ -241,50 +241,41 @@ body[data-focus="context"]  .built-from .cgroup[data-type="context"]{ display:bl
 body[data-focus] .modules{ display:none; }
 body[data-focus] .node-comps .cgroup{ display:none; }
 
-/* The matrix: three spanning columns and the physical spine */
+/* Four columns. Each concern is a card that states which layers it covers. */
 .mx{
   display:grid;
-  grid-template-columns:
-    minmax(0,.92fr) minmax(0,.92fr)
-    minmax(0,.95fr) minmax(0,.95fr) minmax(0,.95fr)
-    minmax(0,1.95fr);
-  gap:12px;
-  align-items:stretch;
+  grid-template-columns:minmax(0,1fr) minmax(0,1fr) minmax(0,1.15fr) minmax(0,1.9fr);
+  gap:14px;
+  align-items:start;
 }
-.mx-col{ display:contents; }
-.mx-col[data-type="context"]  > *{ grid-column:1; }
-.mx-col[data-type="agent"]    > *{ grid-column:2; }
-.mx-col-phys > *{ grid-column:6; }
-.mx-col-log > *:nth-child(1){ grid-column:3; }
-.mx-col-log > *:nth-child(2){ grid-column:4; }
-.mx-col-log > *:nth-child(3){ grid-column:5; }
+.mx-col{ display:flex; flex-direction:column; gap:12px; min-width:0; }
 
-/* a spanning bar: one thing across the layers it applies to */
 .lanebar{
-  position:relative; text-decoration:none; color:inherit;
-  border:1px dashed var(--h); border-left-width:3px; border-left-style:solid;
-  border-radius:3px; background:var(--t);
-  padding:14px 12px; overflow:hidden;
-  transition:box-shadow .22s var(--ease), transform .22s var(--ease);
+  display:block; text-decoration:none; color:inherit;
+  border:1px solid var(--rule); border-left:3px solid var(--h);
+  border-radius:3px; background:var(--paper-card);
+  padding:14px 15px 15px;
+  transition:box-shadow .22s var(--ease), transform .22s var(--ease), border-color .22s var(--ease);
 }
-.lanebar:hover{ box-shadow:0 6px 20px -14px rgba(22,24,28,.6); transform:translateY(-1px); }
+.lanebar:hover{ box-shadow:0 6px 20px -14px rgba(22,24,28,.55); transform:translateY(-1px); border-color:var(--h); }
 .lanebar:focus-visible{ outline:2px solid var(--accent); outline-offset:2px; }
-.lanebar-in{ position:sticky; top:88px; display:block; }
-.lanebar .shape{ width:46px; margin-bottom:10px; }
+.lanebar .shape{ width:44px; margin-bottom:10px; }
 .lanebar-n{ display:block; font-family:var(--serif); font-size:17px; line-height:1.15; letter-spacing:-.012em; color:var(--ink); }
-.lanebar-reach{
-  display:block; margin-top:5px;
-  font-family:var(--mono); font-size:9px; letter-spacing:.12em; text-transform:uppercase; color:var(--h);
-}
-.lanebar-d{
-  display:-webkit-box; -webkit-line-clamp:5; -webkit-box-orient:vertical; overflow:hidden;
-  margin-top:9px; font-size:11.5px; line-height:1.45; color:var(--ink-2);
-}
+.lanebar-d{ display:block; margin-top:9px; font-size:11.5px; line-height:1.5; color:var(--ink-2); }
 .lanebar-go{
   display:block; margin-top:10px;
   font-family:var(--mono); font-size:8.5px; letter-spacing:.14em; text-transform:uppercase; color:var(--ink-3);
 }
-.bar:hover .lanebar-go{ color:var(--h); }
+.lanebar:hover .lanebar-go{ color:var(--h); }
+
+/* the span scale: 01 at the left through 06 at the right */
+.scale{ display:flex; align-items:center; gap:8px; margin-top:8px; flex-wrap:wrap; }
+.scale-ticks{ display:flex; gap:3px; flex:none; }
+.tick{ width:12px; height:4px; border-radius:1px; background:var(--rule); }
+.tick.on{ background:var(--h); }
+.scale-n{
+  font-family:var(--mono); font-size:9px; letter-spacing:.1em; text-transform:uppercase; color:var(--h);
+}
 
 /* a physical layer cell */
 .cell{
@@ -296,9 +287,9 @@ body[data-focus] .node-comps .cgroup{ display:none; }
   transition:opacity .5s var(--ease), transform .5s var(--ease);
 }
 .cell.is-in{ opacity:1; transform:none; }
-.cell + .cell{ margin-top:0; }
+.mx-col-phys{ gap:34px; }
 .cell::before{
-  content:""; position:absolute; left:50%; top:-15px; width:7px; height:7px; margin-left:-4px;
+  content:""; position:absolute; left:50%; top:-21px; width:7px; height:7px; margin-left:-4px;
   border-left:1px solid var(--ink-3); border-top:1px solid var(--ink-3); transform:rotate(45deg); opacity:.75;
 }
 .mx-col-phys > .cell:first-child::before{ display:none; }
@@ -318,20 +309,11 @@ body[data-focus] .node-comps .cgroup{ display:none; }
 
 @media (max-width:1080px){
   .mx{ grid-template-columns:minmax(0,1fr) minmax(0,1fr); }
-  .mx-col{ display:block; }
-  .mx-col > *{ grid-column:auto !important; grid-row:auto !important; }
   .mx-col-phys{ grid-column:1 / -1; }
-  .lanebar{ margin-bottom:12px; }
-  .lanebar-in{ position:static; }
-  .cell + .cell{ margin-top:34px; }
-  .cell::before{ top:-22px; }
 }
-@media (max-width:620px){
-  .mx{ grid-template-columns:1fr; }
-}
+@media (max-width:620px){ .mx{ grid-template-columns:1fr; } }
 
 /* the four cards dim what they are not */
-body[data-focus] .mx-col:not([data-type="physical"]){ transition:opacity .25s var(--ease); }
 body[data-focus="context"]  .mx-col:not([data-type="context"]):not([data-type="physical"]) > *,
 body[data-focus="agent"]    .mx-col:not([data-type="agent"]):not([data-type="physical"]) > *,
 body[data-focus="logical"]  .mx-col:not([data-type="logical"]):not([data-type="physical"]) > *{ opacity:.18; }
@@ -339,6 +321,7 @@ body[data-focus="physical"] .mx-col:not([data-type="physical"]) > *{ opacity:.18
 body[data-focus="context"]  .mx-col-phys > *,
 body[data-focus="agent"]    .mx-col-phys > *,
 body[data-focus="logical"]  .mx-col-phys > *{ opacity:.55; }
+.mx-col > *{ transition:opacity .25s var(--ease); }
 
 /* module page bits */
 .mod-layer{
@@ -917,6 +900,14 @@ a.wire-t:hover{ color:var(--c); border-bottom-color:currentColor; }
       '<path class="hot"   d="M60 24 V72"/>' +
       '<path class="dimline" d="M25 30 H50 M25 40 H50 M25 50 H46"/>' +
       '<path class="dimline" d="M70 30 H95 M70 40 H95 M74 50 H95"/>',
+
+    /* Module, Transformation SQL: a query that folds many rows into a table */
+    sql:
+      '<rect class="edge" x="10" y="12" width="100" height="60" rx="4"/>' +
+      '<path class="dimline" d="M10 27 H110"/>' +
+      '<path class="hot" d="M20 40 H52 M20 50 H44 M20 60 H60"/>' +
+      '<path class="line" d="M68 40 H100 M68 50 H92 M68 60 H84"/>' +
+      '<circle class="dim" cx="17" cy="19.5" r="2"/><circle class="dim" cx="25" cy="19.5" r="2"/><circle class="dim" cx="33" cy="19.5" r="2"/>',
 
     /* Module, Agent Runtime: a model proposes, a diff comes back for review */
     agent:
@@ -1567,6 +1558,49 @@ a.wire-t:hover{ color:var(--c); border-bottom-color:currentColor; }
       ]
     },
     {
+      "key": "sql",
+      "shape": "sql",
+      "name": "Transformation SQL",
+      "tag": "Logical · the transformations",
+      "group": "log",
+      "line": "The versioned, tested SQL that actually moves data from one layer to the next. Same input, same output, every run.",
+      "plugs": [
+        "ods",
+        "int",
+        "lake",
+        "agg"
+      ],
+      "comps": [
+        [
+          "Why a transformation exists, written next to it",
+          "Which business process each model serves"
+        ],
+        [
+          "Model drafted from a plain-language description",
+          "Refactor and dedup suggestions across models",
+          "Test gaps flagged before review"
+        ],
+        [
+          "Staging, intermediate and mart models",
+          "Incremental and full-refresh strategies",
+          "Unit and data tests in CI",
+          "Version control and code review",
+          "Orchestration, dependencies and backfill"
+        ],
+        [
+          "Compiled models and their run artifacts",
+          "Materialized tables and views"
+        ]
+      ],
+      "decisions": [
+        "Merge approval on every model change",
+        "Which refactors are worth doing"
+      ],
+      "out": [
+        "Numbers produced the same way every run, by code anyone can read"
+      ]
+    },
+    {
       "key": "agt",
       "shape": "agent",
       "name": "Agent Runtime",
@@ -2120,24 +2154,32 @@ a.wire-t:hover{ color:var(--c); border-bottom-color:currentColor; }
 
   var COL_OF = { ctx:"context", agt:"agent", log:"logical" };
 
-  function barHTML(m) {
-    var rows = m.plugs.map(function (k) { return ROW_OF[k]; }).sort(function (a, b) { return a - b; });
-    var top = rows[0], bottom = rows[rows.length - 1];
-    var span = m.plugs.slice().sort(function (a, b) { return ROW_OF[a] - ROW_OF[b]; });
-    var first = NODES[ROW_OF[span[0]] - 1], last = NODES[ROW_OF[span[span.length - 1]] - 1];
-    var reach = span.length === 1
-      ? first.n + " only"
-      : last.n + " → " + first.n;
+  /* Which of the six physical layers a concern covers, drawn as a scale
+     that reads 01 at the left through 06 at the right. */
+  function scaleHTML(m) {
+    var on = {};
+    m.plugs.forEach(function (k) { on[k] = 1; });
+    var ordered = NODES.slice().reverse();
+    var covered = ordered.filter(function (nd) { return on[nd.key]; });
+    var reach = covered.length === 1
+      ? covered[0].n + " only"
+      : covered[0].n + " → " + covered[covered.length - 1].n;
+    return '<span class="scale"><span class="scale-ticks">' +
+        ordered.map(function (nd) {
+          return '<span class="tick' + (on[nd.key] ? " on" : "") + '" title="' + nd.n + " " +
+            nd.name.replace(/&amp;/g, "and") + '"></span>';
+        }).join("") +
+      "</span><span class=\"scale-n\">" + reach + "</span></span>";
+  }
 
+  function barHTML(m) {
     return '<a class="lanebar" href="#/m/' + m.key + '" data-key="' + m.key + '" data-type="' + COL_OF[m.group] + '"' +
-        ' style="--h:var(--h-' + m.key + ');--t:var(--t-' + m.key + ');grid-row:' + top + " / " + (bottom + 1) + '">' +
-        '<span class="lanebar-in">' +
+        ' style="--h:var(--h-' + m.key + ');--t:var(--t-' + m.key + ')">' +
           shapeSVG(m.shape) +
           '<span class="lanebar-n">' + m.name + "</span>" +
-          '<span class="lanebar-reach">' + reach + "</span>" +
+          scaleHTML(m) +
           '<span class="lanebar-d">' + m.line.replace(/<[^>]*>/g, "") + "</span>" +
           '<span class="lanebar-go">Open</span>' +
-        "</span>" +
       "</a>";
   }
 
@@ -2184,7 +2226,7 @@ a.wire-t:hover{ color:var(--c); border-bottom-color:currentColor; }
     '<div class="mx">' +
       '<div class="mx-col" data-type="context">' + barsByCol.context.join("") + "</div>" +
       '<div class="mx-col" data-type="agent">' + barsByCol.agent.join("") + "</div>" +
-      '<div class="mx-col mx-col-log" data-type="logical">' + barsByCol.logical.join("") + "</div>" +
+      '<div class="mx-col" data-type="logical">' + barsByCol.logical.join("") + "</div>" +
       '<div class="mx-col mx-col-phys" data-type="physical">' +
         NODES.map(cellHTML).join("") +
       "</div>" +
