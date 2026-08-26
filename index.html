@@ -918,12 +918,13 @@ body[data-route="detail"] .detail{ display:block; }
      CONTENT
      ============================================================ */
   /* The four components of any dataset. Order is fixed everywhere:
-     physical, logical, agent, context. */
+     context, agent, logical, physical. Every comps array is index-aligned
+     to TYPES, so the two must be reordered together. */
   var TYPES = [
-    { key:"Physical", slug:"physical", g:"tphys",  ds:"The tables, files and systems that hold the bytes", c:"var(--ty-phys)" },
-    { key:"Logical",  slug:"logical",  g:"tlogic", ds:"The declared rules: SQL, semantics, conformance, quality", c:"var(--ty-logic)" },
+    { key:"Context",  slug:"context",  g:"tctx",   ds:"What it means to this business, and what the agent is told", c:"var(--ty-ctx)" },
     { key:"Agent",    slug:"agent",    g:"tagent", ds:"The models that propose work against it", c:"var(--ty-agent)" },
-    { key:"Context",  slug:"context",  g:"tctx",   ds:"What it means to this business, and what the agent is told", c:"var(--ty-ctx)" }
+    { key:"Logical",  slug:"logical",  g:"tlogic", ds:"The declared rules: SQL, semantics, conformance, quality", c:"var(--ty-logic)" },
+    { key:"Physical", slug:"physical", g:"tphys",  ds:"The tables, files and systems that hold the bytes", c:"var(--ty-phys)" }
   ];
 
   /* Physical data products: index 0 is the top of the page (top of the stack) */
@@ -967,13 +968,9 @@ body[data-route="detail"] .detail{ display:block; }
       ],
       "comps": [
         [
-          "Cached serving layer",
-          "Rendered dashboards and reports",
-          "Usage instrumentation"
-        ],
-        [
-          "Metric-bound rendering, no ad-hoc SQL",
-          "Row-level access at query time"
+          "Business glossary and KPI definitions",
+          "Fiscal calendar, segments and hierarchies",
+          "Grounding served to the agent at query time"
         ],
         [
           "Natural-language Q&amp;A",
@@ -982,9 +979,13 @@ body[data-route="detail"] .detail{ display:block; }
           "Follow-up drill-downs"
         ],
         [
-          "Business glossary and KPI definitions",
-          "Fiscal calendar, segments and hierarchies",
-          "Grounding served to the agent at query time"
+          "Metric-bound rendering, no ad-hoc SQL",
+          "Row-level access at query time"
+        ],
+        [
+          "Cached serving layer",
+          "Rendered dashboards and reports",
+          "Usage instrumentation"
         ]
       ],
       "decisions": [
@@ -1035,14 +1036,8 @@ body[data-route="detail"] .detail{ display:block; }
       ],
       "comps": [
         [
-          "Staging, intermediate and mart tables",
-          "Incremental materializations",
-          "Orchestration runs and backfills"
-        ],
-        [
-          "One definition per metric, compiled to SQL",
-          "Unit and data tests in CI",
-          "Metric ownership recorded in the spec"
+          "Why each metric is defined the way it is",
+          "Targets and thresholds it is read against"
         ],
         [
           "Model drafter from plain language",
@@ -1050,8 +1045,14 @@ body[data-route="detail"] .detail{ display:block; }
           "Missing-test suggester"
         ],
         [
-          "Why each metric is defined the way it is",
-          "Targets and thresholds it is read against"
+          "One definition per metric, compiled to SQL",
+          "Unit and data tests in CI",
+          "Metric ownership recorded in the spec"
+        ],
+        [
+          "Staging, intermediate and mart tables",
+          "Incremental materializations",
+          "Orchestration runs and backfills"
         ]
       ],
       "decisions": [
@@ -1102,10 +1103,13 @@ body[data-route="detail"] .detail{ display:block; }
       ],
       "comps": [
         [
-          "Raw zone, immutable and partitioned",
-          "Conformed zone of functional tables",
-          "Open table format with time travel",
-          "Automatic lineage capture"
+          "What each table is for, and who depends on it",
+          "Sensitivity class per dataset"
+        ],
+        [
+          "Lineage Q&amp;A over the catalog",
+          "Orphan and duplicate detection",
+          "Cost and usage scanner"
         ],
         [
           "Declared grain and keys per table",
@@ -1114,13 +1118,10 @@ body[data-route="detail"] .detail{ display:block; }
           "Retention and deletion policy"
         ],
         [
-          "Lineage Q&amp;A over the catalog",
-          "Orphan and duplicate detection",
-          "Cost and usage scanner"
-        ],
-        [
-          "What each table is for, and who depends on it",
-          "Sensitivity class per dataset"
+          "Raw zone, immutable and partitioned",
+          "Conformed zone of functional tables",
+          "Open table format with time travel",
+          "Automatic lineage capture"
         ]
       ],
       "decisions": [
@@ -1171,14 +1172,8 @@ body[data-route="detail"] .detail{ display:block; }
       ],
       "comps": [
         [
-          "Cross-system key map tables",
-          "Match candidate and merge audit tables",
-          "Reconciliation totals per hop"
-        ],
-        [
-          "Entity resolution and match rules",
-          "Survivorship and precedence logic",
-          "Entity and grain definitions"
+          "Which system is authoritative for which field, and why",
+          "What one customer means to this business"
         ],
         [
           "Candidate match proposals",
@@ -1186,8 +1181,14 @@ body[data-route="detail"] .detail{ display:block; }
           "Precedence rule suggestions"
         ],
         [
-          "Which system is authoritative for which field, and why",
-          "What one customer means to this business"
+          "Entity resolution and match rules",
+          "Survivorship and precedence logic",
+          "Entity and grain definitions"
+        ],
+        [
+          "Cross-system key map tables",
+          "Match candidate and merge audit tables",
+          "Reconciliation totals per hop"
         ]
       ],
       "decisions": [
@@ -1234,9 +1235,13 @@ body[data-route="detail"] .detail{ display:block; }
       ],
       "comps": [
         [
-          "1:1 replica tables",
-          "Change log and tombstones",
-          "Replication lag metrics"
+          "What current means for each domain",
+          "Which operational questions this layer answers"
+        ],
+        [
+          "Lag anomaly detection",
+          "Replay and backfill planning",
+          "Drift watch against the source"
         ],
         [
           "CDC apply order and idempotency rules",
@@ -1245,13 +1250,9 @@ body[data-route="detail"] .detail{ display:block; }
           "Freshness SLA per table"
         ],
         [
-          "Lag anomaly detection",
-          "Replay and backfill planning",
-          "Drift watch against the source"
-        ],
-        [
-          "What current means for each domain",
-          "Which operational questions this layer answers"
+          "1:1 replica tables",
+          "Change log and tombstones",
+          "Replication lag metrics"
         ]
       ],
       "decisions": [
@@ -1294,10 +1295,14 @@ body[data-route="detail"] .detail{ display:block; }
       ],
       "comps": [
         [
-          "Source systems of record: CRM, ERP, billing, telemetry",
-          "Change-data-capture connectors",
-          "Landing objects in raw storage",
-          "Credential and secret store"
+          "Who owns each feed, and who to call when it breaks",
+          "What the source system is actually used for",
+          "What an agent is allowed to read from it"
+        ],
+        [
+          "New-source discovery",
+          "Connector config drafting",
+          "Schema-drift watch at the source"
         ],
         [
           "Signed data contracts: schema, grain, cadence",
@@ -1306,14 +1311,10 @@ body[data-route="detail"] .detail{ display:block; }
           "Source system registry"
         ],
         [
-          "New-source discovery",
-          "Connector config drafting",
-          "Schema-drift watch at the source"
-        ],
-        [
-          "Who owns each feed, and who to call when it breaks",
-          "What the source system is actually used for",
-          "What an agent is allowed to read from it"
+          "Source systems of record: CRM, ERP, billing, telemetry",
+          "Change-data-capture connectors",
+          "Landing objects in raw storage",
+          "Credential and secret store"
         ]
       ],
       "decisions": [
@@ -1341,8 +1342,13 @@ body[data-route="detail"] .detail{ display:block; }
       ],
       "comps": [
         [
-          "Quarantine tables for failed rows",
-          "Check results and run history"
+          "What a failure means for the process behind the data",
+          "Which datasets matter most, and to whom"
+        ],
+        [
+          "Failure triage and classification",
+          "Root cause traced across lineage",
+          "Ticket drafting with evidence"
         ],
         [
           "Assertion suites for null, range and uniqueness",
@@ -1352,13 +1358,8 @@ body[data-route="detail"] .detail{ display:block; }
           "Fail-closed quarantine rule"
         ],
         [
-          "Failure triage and classification",
-          "Root cause traced across lineage",
-          "Ticket drafting with evidence"
-        ],
-        [
-          "What a failure means for the process behind the data",
-          "Which datasets matter most, and to whom"
+          "Quarantine tables for failed rows",
+          "Check results and run history"
         ]
       ],
       "decisions": [
@@ -1384,7 +1385,13 @@ body[data-route="detail"] .detail{ display:block; }
       ],
       "comps": [
         [
-          "Compiled views and materializations the definitions produce"
+          "What each concept means to this business",
+          "Certified or draft, and who owns it"
+        ],
+        [
+          "Definition drafting from a description",
+          "Overlapping-metric detection",
+          "Impact analysis before a change"
         ],
         [
           "Entity and grain definitions",
@@ -1394,13 +1401,7 @@ body[data-route="detail"] .detail{ display:block; }
           "One name per concept"
         ],
         [
-          "Definition drafting from a description",
-          "Overlapping-metric detection",
-          "Impact analysis before a change"
-        ],
-        [
-          "What each concept means to this business",
-          "Certified or draft, and who owns it"
+          "Compiled views and materializations the definitions produce"
         ]
       ],
       "decisions": [
@@ -1441,14 +1442,9 @@ body[data-route="detail"] .detail{ display:block; }
       ],
       "comps": [
         [
-          "Target and budget tables",
-          "Fiscal calendar tables",
-          "Context store, versioned and indexed"
-        ],
-        [
-          "Segment and hierarchy definitions",
-          "Entitlement mapped to org structure",
-          "KPI definitions with named owners"
+          "Business glossary",
+          "Plans, targets and policy documents",
+          "Catalogue of the questions people actually ask"
         ],
         [
           "Grounding for natural-language Q&amp;A",
@@ -1457,9 +1453,14 @@ body[data-route="detail"] .detail{ display:block; }
           "Self-serve onboarding explainers"
         ],
         [
-          "Business glossary",
-          "Plans, targets and policy documents",
-          "Catalogue of the questions people actually ask"
+          "Segment and hierarchy definitions",
+          "Entitlement mapped to org structure",
+          "KPI definitions with named owners"
+        ],
+        [
+          "Target and budget tables",
+          "Fiscal calendar tables",
+          "Context store, versioned and indexed"
         ]
       ],
       "decisions": [
@@ -1486,8 +1487,13 @@ body[data-route="detail"] .detail{ display:block; }
       ],
       "comps": [
         [
-          "Conformed, self-describing tables",
-          "Field dictionary"
+          "House naming conventions and why they exist",
+          "Column glossary in business terms"
+        ],
+        [
+          "Column mapping proposer",
+          "Rename and drift detection",
+          "Standard-name suggestion"
         ],
         [
           "Type and unit coercion",
@@ -1497,13 +1503,8 @@ body[data-route="detail"] .detail{ display:block; }
           "Naming standard enforced in CI"
         ],
         [
-          "Column mapping proposer",
-          "Rename and drift detection",
-          "Standard-name suggestion"
-        ],
-        [
-          "House naming conventions and why they exist",
-          "Column glossary in business terms"
+          "Conformed, self-describing tables",
+          "Field dictionary"
         ]
       ],
       "decisions": [
@@ -1531,13 +1532,9 @@ body[data-route="detail"] .detail{ display:block; }
       ],
       "comps": [
         [
-          "Model endpoints and their versions",
-          "Proposal and evaluation logs"
-        ],
-        [
-          "Tool definitions and their permitted scope",
-          "Evaluation suites per task",
-          "Guardrails: what an agent may never write"
+          "System prompts and task instructions",
+          "What the agent is told about this business",
+          "Worked examples of a good proposal"
         ],
         [
           "Task routing across models",
@@ -1545,9 +1542,13 @@ body[data-route="detail"] .detail{ display:block; }
           "Multi-step plans with checkpoints"
         ],
         [
-          "System prompts and task instructions",
-          "What the agent is told about this business",
-          "Worked examples of a good proposal"
+          "Tool definitions and their permitted scope",
+          "Evaluation suites per task",
+          "Guardrails: what an agent may never write"
+        ],
+        [
+          "Model endpoints and their versions",
+          "Proposal and evaluation logs"
         ]
       ],
       "decisions": [
@@ -1566,6 +1567,189 @@ body[data-route="detail"] .detail{ display:block; }
      key it belongs to, `label` matches its text in that comps array.
      ============================================================ */
   var DETAIL = [
+    {
+      "parent": "lake",
+      "slug": "lineage-qa",
+      "lane": "Agent",
+      "label": "Lineage Q&amp;A over the catalog",
+      "lead": "Ask where a number came from and get the path, with evidence attached.",
+      "what": "A model reads the lineage graph and the catalog, then answers questions in plain language. It proposes an answer and shows the path it walked, so the reader checks the work instead of trusting the sentence.",
+      "how": [
+        [
+          "Ground on the graph",
+          "The model queries lineage and catalog metadata for every answer. It never answers from a memorized schema."
+        ],
+        [
+          "Return the path, not the claim alone",
+          "Each answer cites the tables, columns and jobs it traversed, linked back into the catalog."
+        ],
+        [
+          "Cover the questions people actually ask",
+          "What feeds this column, what breaks if I drop it, which dashboards read this table, when did it last load."
+        ],
+        [
+          "Stop at the edge of the graph",
+          "Where lineage is table level or missing, the answer says so and does not fill the gap."
+        ]
+      ],
+      "breaks": [
+        "The graph exists, but only a few people know how to query it, so it goes unused.",
+        "Impact questions get answered from memory, and the answer is confidently wrong."
+      ]
+    },
+    {
+      "parent": "lake",
+      "slug": "orphan-duplicate-detection",
+      "lane": "Agent",
+      "label": "Orphan and duplicate detection",
+      "lead": "Finds rows that point at nothing and rows that exist twice.",
+      "what": "A scanner walks the conformed zone looking for referential orphans and duplicate keys, ranks what it finds by how much downstream work depends on it, and drafts the ticket. It proposes; it does not delete.",
+      "how": [
+        [
+          "Scan on a schedule",
+          "Foreign keys, declared uniqueness and near-duplicate matching run across the whole zone, not only the tables someone remembered to test."
+        ],
+        [
+          "Rank by blast radius",
+          "Lineage says which marts and dashboards read the affected table, so the list is ordered by consequence and not by row count."
+        ],
+        [
+          "Explain the likely cause",
+          "The proposal names the load or the merge rule that produced the orphan, with the run id."
+        ],
+        [
+          "Hand it to a person",
+          "Output is a reviewable ticket with evidence. Deletion and merge stay human decisions."
+        ]
+      ],
+      "breaks": [
+        "Duplicates inflate counts quietly, and the error surfaces in a board deck.",
+        "Orphans break joins in ways that look like missing data, then get patched downstream with a filter."
+      ]
+    },
+    {
+      "parent": "lake",
+      "slug": "cost-usage-scanner",
+      "lane": "Agent",
+      "label": "Cost and usage scanner",
+      "lead": "What storage and compute is actually being read, and what is not.",
+      "what": "The scanner joins query history against storage metrics to show which tables earn their cost. It surfaces unread tables, expensive recurring queries and partitions nobody touches, then proposes changes for a person to approve.",
+      "how": [
+        [
+          "Join usage to cost",
+          "Query logs give reads per table and per column. Storage metrics give bytes and growth. Together they give cost per useful read."
+        ],
+        [
+          "Flag the tails",
+          "Tables with no reads in ninety days, queries that scan far more than they return, partitions that never get pruned."
+        ],
+        [
+          "Propose a change",
+          "Archive, compact, repartition or drop, each with the saving and the affected consumers named."
+        ],
+        [
+          "Approve before acting",
+          "Nothing moves or drops without a human decision, and the retention rules still apply."
+        ]
+      ],
+      "breaks": [
+        "Storage grows steadily and nobody can say which part of it matters.",
+        "A handful of unnoticed queries come to dominate the bill."
+      ]
+    },
+    {
+      "parent": "lake",
+      "slug": "scd-handling",
+      "lane": "Logical",
+      "label": "Slowly-changing dimension handling",
+      "lead": "Attributes that change over time, without losing what they used to be.",
+      "what": "Customers move, products get recategorized, sales reps change territory. Slowly-changing dimension handling records when each attribute value was true, so a historical fact joins to the attributes that applied at the time.",
+      "how": [
+        [
+          "Version the row",
+          "A change closes the current row with an end date and opens a new one, with a surrogate key per version."
+        ],
+        [
+          "Carry valid-from and valid-to",
+          "Every version records the window it was true for, plus a current flag for the common case."
+        ],
+        [
+          "Join on the effective date",
+          "Facts join to the dimension version whose window contains the event date, not to today's version."
+        ],
+        [
+          "Decide what is tracked",
+          "Not every column deserves history. The ones that do are declared; the rest overwrite."
+        ]
+      ],
+      "breaks": [
+        "Last year's revenue moves when a customer changes segment this year.",
+        "Territory and commission reports cannot be reproduced after a reorg.",
+        "Nobody can say what the categorization was on the day of the sale."
+      ]
+    },
+    {
+      "parent": "lake",
+      "slug": "access-policy",
+      "lane": "Logical",
+      "label": "Access policy, row and column level",
+      "lead": "Who can read what, enforced in the engine.",
+      "what": "Access to lake data is expressed as policy: roles, and the rows and columns each role may read. A named owner sets it against a stated purpose, and the grant is recorded where it can be reviewed. The engine enforces it, so the same rules hold whichever tool connects.",
+      "how": [
+        [
+          "Grant to roles",
+          "Access attaches to a role tied to a job function, so joiners and leavers are handled by the role and not by memory."
+        ],
+        [
+          "Record purpose and scope",
+          "Each grant captures who asked, who approved, which tables or columns, and why."
+        ],
+        [
+          "Enforce at query time",
+          "Row and column policies apply inside the engine, so the same rules hold whichever tool connects."
+        ],
+        [
+          "Review on a cadence",
+          "Grants expire or come up for review, and unused access is removed."
+        ]
+      ],
+      "breaks": [
+        "Access accumulates until nobody can say who can see salary or customer contact data.",
+        "A leaver keeps read access because it was granted to a person and not a role.",
+        "Sensitive columns leak through a tool that connected around the policy layer."
+      ]
+    },
+    {
+      "parent": "lake",
+      "slug": "retention-deletion",
+      "lane": "Logical",
+      "label": "Retention and deletion policy",
+      "lead": "How long data is kept, and what happens when someone asks to be forgotten.",
+      "what": "Retention is a business and legal decision recorded per dataset, then enforced by the platform. Deletion requests are handled against that same record, including inside the immutable raw zone.",
+      "how": [
+        [
+          "Set a period per dataset",
+          "Each dataset carries a retention period and the reason behind it: legal, contractual or operational."
+        ],
+        [
+          "Expire automatically",
+          "Expiry runs on schedule against the recorded period. Exceptions are granted explicitly and dated."
+        ],
+        [
+          "Handle subject deletion",
+          "A deletion request rewrites the affected partitions and records that it happened, so an immutable zone and a right to erasure can both hold."
+        ],
+        [
+          "Keep the proof",
+          "What was deleted, when, and under whose approval is retained after the data itself is gone."
+        ]
+      ],
+      "breaks": [
+        "Personal data sits in the lake past its lawful period.",
+        "A deletion request is honoured in the warehouse but not in raw, so the data returns on the next rebuild.",
+        "You cannot demonstrate compliance, because nothing recorded the decision."
+      ]
+    },
     {
       "parent": "lake",
       "slug": "raw-zone",
@@ -1689,189 +1873,6 @@ body[data-route="detail"] .detail{ display:block; }
         "A quality failure takes hours to trace instead of one query.",
         "Hand-written documentation drifts from reality within weeks and stops being trusted."
       ]
-    },
-    {
-      "parent": "lake",
-      "slug": "scd-handling",
-      "lane": "Logical",
-      "label": "Slowly-changing dimension handling",
-      "lead": "Attributes that change over time, without losing what they used to be.",
-      "what": "Customers move, products get recategorized, sales reps change territory. Slowly-changing dimension handling records when each attribute value was true, so a historical fact joins to the attributes that applied at the time.",
-      "how": [
-        [
-          "Version the row",
-          "A change closes the current row with an end date and opens a new one, with a surrogate key per version."
-        ],
-        [
-          "Carry valid-from and valid-to",
-          "Every version records the window it was true for, plus a current flag for the common case."
-        ],
-        [
-          "Join on the effective date",
-          "Facts join to the dimension version whose window contains the event date, not to today's version."
-        ],
-        [
-          "Decide what is tracked",
-          "Not every column deserves history. The ones that do are declared; the rest overwrite."
-        ]
-      ],
-      "breaks": [
-        "Last year's revenue moves when a customer changes segment this year.",
-        "Territory and commission reports cannot be reproduced after a reorg.",
-        "Nobody can say what the categorization was on the day of the sale."
-      ]
-    },
-    {
-      "parent": "lake",
-      "slug": "access-policy",
-      "lane": "Logical",
-      "label": "Access policy, row and column level",
-      "lead": "Who can read what, enforced in the engine.",
-      "what": "Access to lake data is expressed as policy: roles, and the rows and columns each role may read. A named owner sets it against a stated purpose, and the grant is recorded where it can be reviewed. The engine enforces it, so the same rules hold whichever tool connects.",
-      "how": [
-        [
-          "Grant to roles",
-          "Access attaches to a role tied to a job function, so joiners and leavers are handled by the role and not by memory."
-        ],
-        [
-          "Record purpose and scope",
-          "Each grant captures who asked, who approved, which tables or columns, and why."
-        ],
-        [
-          "Enforce at query time",
-          "Row and column policies apply inside the engine, so the same rules hold whichever tool connects."
-        ],
-        [
-          "Review on a cadence",
-          "Grants expire or come up for review, and unused access is removed."
-        ]
-      ],
-      "breaks": [
-        "Access accumulates until nobody can say who can see salary or customer contact data.",
-        "A leaver keeps read access because it was granted to a person and not a role.",
-        "Sensitive columns leak through a tool that connected around the policy layer."
-      ]
-    },
-    {
-      "parent": "lake",
-      "slug": "retention-deletion",
-      "lane": "Logical",
-      "label": "Retention and deletion policy",
-      "lead": "How long data is kept, and what happens when someone asks to be forgotten.",
-      "what": "Retention is a business and legal decision recorded per dataset, then enforced by the platform. Deletion requests are handled against that same record, including inside the immutable raw zone.",
-      "how": [
-        [
-          "Set a period per dataset",
-          "Each dataset carries a retention period and the reason behind it: legal, contractual or operational."
-        ],
-        [
-          "Expire automatically",
-          "Expiry runs on schedule against the recorded period. Exceptions are granted explicitly and dated."
-        ],
-        [
-          "Handle subject deletion",
-          "A deletion request rewrites the affected partitions and records that it happened, so an immutable zone and a right to erasure can both hold."
-        ],
-        [
-          "Keep the proof",
-          "What was deleted, when, and under whose approval is retained after the data itself is gone."
-        ]
-      ],
-      "breaks": [
-        "Personal data sits in the lake past its lawful period.",
-        "A deletion request is honoured in the warehouse but not in raw, so the data returns on the next rebuild.",
-        "You cannot demonstrate compliance, because nothing recorded the decision."
-      ]
-    },
-    {
-      "parent": "lake",
-      "slug": "lineage-qa",
-      "lane": "Agent",
-      "label": "Lineage Q&amp;A over the catalog",
-      "lead": "Ask where a number came from and get the path, with evidence attached.",
-      "what": "A model reads the lineage graph and the catalog, then answers questions in plain language. It proposes an answer and shows the path it walked, so the reader checks the work instead of trusting the sentence.",
-      "how": [
-        [
-          "Ground on the graph",
-          "The model queries lineage and catalog metadata for every answer. It never answers from a memorized schema."
-        ],
-        [
-          "Return the path, not the claim alone",
-          "Each answer cites the tables, columns and jobs it traversed, linked back into the catalog."
-        ],
-        [
-          "Cover the questions people actually ask",
-          "What feeds this column, what breaks if I drop it, which dashboards read this table, when did it last load."
-        ],
-        [
-          "Stop at the edge of the graph",
-          "Where lineage is table level or missing, the answer says so and does not fill the gap."
-        ]
-      ],
-      "breaks": [
-        "The graph exists, but only a few people know how to query it, so it goes unused.",
-        "Impact questions get answered from memory, and the answer is confidently wrong."
-      ]
-    },
-    {
-      "parent": "lake",
-      "slug": "orphan-duplicate-detection",
-      "lane": "Agent",
-      "label": "Orphan and duplicate detection",
-      "lead": "Finds rows that point at nothing and rows that exist twice.",
-      "what": "A scanner walks the conformed zone looking for referential orphans and duplicate keys, ranks what it finds by how much downstream work depends on it, and drafts the ticket. It proposes; it does not delete.",
-      "how": [
-        [
-          "Scan on a schedule",
-          "Foreign keys, declared uniqueness and near-duplicate matching run across the whole zone, not only the tables someone remembered to test."
-        ],
-        [
-          "Rank by blast radius",
-          "Lineage says which marts and dashboards read the affected table, so the list is ordered by consequence and not by row count."
-        ],
-        [
-          "Explain the likely cause",
-          "The proposal names the load or the merge rule that produced the orphan, with the run id."
-        ],
-        [
-          "Hand it to a person",
-          "Output is a reviewable ticket with evidence. Deletion and merge stay human decisions."
-        ]
-      ],
-      "breaks": [
-        "Duplicates inflate counts quietly, and the error surfaces in a board deck.",
-        "Orphans break joins in ways that look like missing data, then get patched downstream with a filter."
-      ]
-    },
-    {
-      "parent": "lake",
-      "slug": "cost-usage-scanner",
-      "lane": "Agent",
-      "label": "Cost and usage scanner",
-      "lead": "What storage and compute is actually being read, and what is not.",
-      "what": "The scanner joins query history against storage metrics to show which tables earn their cost. It surfaces unread tables, expensive recurring queries and partitions nobody touches, then proposes changes for a person to approve.",
-      "how": [
-        [
-          "Join usage to cost",
-          "Query logs give reads per table and per column. Storage metrics give bytes and growth. Together they give cost per useful read."
-        ],
-        [
-          "Flag the tails",
-          "Tables with no reads in ninety days, queries that scan far more than they return, partitions that never get pruned."
-        ],
-        [
-          "Propose a change",
-          "Archive, compact, repartition or drop, each with the saving and the affected consumers named."
-        ],
-        [
-          "Approve before acting",
-          "Nothing moves or drops without a human decision, and the retention rules still apply."
-        ]
-      ],
-      "breaks": [
-        "Storage grows steadily and nobody can say which part of it matters.",
-        "A handful of unnoticed queries come to dominate the bill."
-      ]
     }
   ];
 
@@ -1992,12 +1993,12 @@ body[data-route="detail"] .detail{ display:block; }
       '<svg class="plugs" aria-hidden="true"></svg>' +
       '<aside class="modules"><span class="col-label">Plugs into the stack</span>' +
         '<div class="modules-inner">' +
-          '<div class="mgroup"><span class="mgroup-label">Logical modules</span>' +
-            MODULES.filter(function (m) { return m.group === "log"; }).map(moduleHTML).join("") + "</div>" +
-          '<div class="mgroup"><span class="mgroup-label">Agent</span>' +
-            MODULES.filter(function (m) { return m.group === "agt"; }).map(moduleHTML).join("") + "</div>" +
           '<div class="mgroup"><span class="mgroup-label">Context</span>' +
             MODULES.filter(function (m) { return m.group === "ctx"; }).map(moduleHTML).join("") + "</div>" +
+          '<div class="mgroup"><span class="mgroup-label">Agent</span>' +
+            MODULES.filter(function (m) { return m.group === "agt"; }).map(moduleHTML).join("") + "</div>" +
+          '<div class="mgroup"><span class="mgroup-label">Logical modules</span>' +
+            MODULES.filter(function (m) { return m.group === "log"; }).map(moduleHTML).join("") + "</div>" +
         "</div></aside>" +
       '<div class="spine"><span class="col-label">Physical data products &nbsp;·&nbsp; data flows up</span>' + spineHTML + "</div>" +
     "</div>";

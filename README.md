@@ -34,17 +34,22 @@ components and light up what it plugs into.
 
 ## Inside every box: the four components
 
-Every dataset in the stack is made of four things, named in the same order
-everywhere on the page:
+Every dataset in the stack is made of four things, read left to right in the
+same order everywhere on the page:
 
-- Physical: the tables, files and systems that hold the bytes
-- Logical: the declared rules, SQL, semantics, conformance and quality
-- Agent: the models that propose work against it
+`Context` > `Agent` > `Logical` > `Physical`
+
 - Context: what it means to this business, and what the agent is told
+- Agent: the models that propose work against it
+- Logical: the declared rules, SQL, semantics, conformance and quality
+- Physical: the tables, files and systems that hold the bytes
+
+Each `comps` array in `NODES` and `MODULES` is index-aligned to `TYPES`, so the
+two have to be reordered together.
 
 The spine is the physical axis. The cross axis carries one module group per
-non-physical type: logical (DQ, Semantic Layer, Linting Model), agent (Agent
-Runtime) and context (Business Context).
+non-physical type, in the same order: context (Business Context), agent (Agent
+Runtime) and logical (DQ, Semantic Layer, Linting Model).
 
 Human decisions are not a fifth type. They arrive as PRs and requirements
 against the four, and the operating rule states the pattern: agents propose,
