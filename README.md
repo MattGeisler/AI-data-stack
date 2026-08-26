@@ -47,9 +47,20 @@ same order everywhere on the page:
 Each `comps` array in `NODES` and `MODULES` is index-aligned to `TYPES`, so the
 two have to be reordered together.
 
-The spine is the physical axis. The cross axis carries one module group per
-non-physical type, in the same order: context (Business Context), agent (Agent
-Runtime) and logical (DQ, Semantic Layer, Linting Model).
+The physical column has six discrete rows, one per data product. The other
+three columns hold bars that span the rows they apply to, because that is their
+real shape: data quality is one thing across five layers, not five separate
+entries. Current spans:
+
+- Business Context, context, 06 only
+- Agent Runtime, agent, 01 to 06
+- DQ Module, logical, 01 to 05
+- Semantic Layer, logical, 03 to 06
+- Linting Model, logical, 02 to 05
+
+Spans come from each module's `plugs` list. Bars assume a contiguous range.
+The summary shows the bars alone; clicking one opens the module page. A layer's
+own four-type breakdown sits behind "About this layer" on its physical cell.
 
 Human decisions are not a fifth type. They arrive as PRs and requirements
 against the four, and the operating rule states the pattern: agents propose,

@@ -241,121 +241,114 @@ body[data-focus="context"]  .built-from .cgroup[data-type="context"]{ display:bl
 body[data-focus] .modules{ display:none; }
 body[data-focus] .node-comps .cgroup{ display:none; }
 
-/* Grid: modules | gutter | spine */
-.stack-grid{
+/* The matrix: three spanning columns and the physical spine */
+.mx{
+  display:grid;
+  grid-template-columns:
+    minmax(0,.92fr) minmax(0,.92fr)
+    minmax(0,.95fr) minmax(0,.95fr) minmax(0,.95fr)
+    minmax(0,1.95fr);
+  gap:12px;
+  align-items:stretch;
+}
+.mx-col{ display:contents; }
+.mx-col[data-type="context"]  > *{ grid-column:1; }
+.mx-col[data-type="agent"]    > *{ grid-column:2; }
+.mx-col-phys > *{ grid-column:6; }
+.mx-col-log > *:nth-child(1){ grid-column:3; }
+.mx-col-log > *:nth-child(2){ grid-column:4; }
+.mx-col-log > *:nth-child(3){ grid-column:5; }
+
+/* a spanning bar: one thing across the layers it applies to */
+.lanebar{
+  position:relative; text-decoration:none; color:inherit;
+  border:1px dashed var(--h); border-left-width:3px; border-left-style:solid;
+  border-radius:3px; background:var(--t);
+  padding:14px 12px; overflow:hidden;
+  transition:box-shadow .22s var(--ease), transform .22s var(--ease);
+}
+.lanebar:hover{ box-shadow:0 6px 20px -14px rgba(22,24,28,.6); transform:translateY(-1px); }
+.lanebar:focus-visible{ outline:2px solid var(--accent); outline-offset:2px; }
+.lanebar-in{ position:sticky; top:88px; display:block; }
+.lanebar .shape{ width:46px; margin-bottom:10px; }
+.lanebar-n{ display:block; font-family:var(--serif); font-size:17px; line-height:1.15; letter-spacing:-.012em; color:var(--ink); }
+.lanebar-reach{
+  display:block; margin-top:5px;
+  font-family:var(--mono); font-size:9px; letter-spacing:.12em; text-transform:uppercase; color:var(--h);
+}
+.lanebar-d{
+  display:-webkit-box; -webkit-line-clamp:5; -webkit-box-orient:vertical; overflow:hidden;
+  margin-top:9px; font-size:11.5px; line-height:1.45; color:var(--ink-2);
+}
+.lanebar-go{
+  display:block; margin-top:10px;
+  font-family:var(--mono); font-size:8.5px; letter-spacing:.14em; text-transform:uppercase; color:var(--ink-3);
+}
+.bar:hover .lanebar-go{ color:var(--h); }
+
+/* a physical layer cell */
+.cell{
   position:relative;
-  display:grid; grid-template-columns:238px 78px minmax(0,1fr);
-  transition:grid-template-columns .45s var(--ease);
-}
-body[data-view="tech"] .stack-grid{ grid-template-columns:300px 60px minmax(0,1fr); }
-body[data-view="exec"] .stack-grid{ grid-template-columns:minmax(0,1fr); }
-body[data-view="exec"] .modules,
-body[data-view="exec"] .plugs{ display:none; }
-body[data-view="exec"] .spine{ grid-column:1; }
-
-/* the layer's prose sits behind "About this layer" in both views */
-.node-panel{ display:none; }
-.node.is-open .node-panel{ display:block; }
-
-/* open / close affordance */
-.node-open{
-  appearance:none; background:none; border:0; padding:6px 0 0; margin:0; cursor:pointer;
-  display:inline-flex; align-items:center; gap:7px; font:inherit; color:var(--h);
-  font-family:var(--mono); font-size:9px; letter-spacing:.13em; text-transform:uppercase; font-weight:500;
-  opacity:.72; transition:opacity .2s var(--ease);
-}
-.node:hover .node-open{ opacity:1; }
-.node-open .tri{
-  width:0; height:0; border-left:5px solid currentColor;
-  border-top:3.5px solid transparent; border-bottom:3.5px solid transparent;
-  transition:transform .28s var(--ease);
-}
-.node.is-open .node-open .tri{ transform:rotate(90deg); }
-
-.plugs{ position:absolute; inset:0; width:100%; height:100%; pointer-events:none; z-index:0; overflow:visible; }
-.plugs path{ fill:none; stroke-width:1.25; stroke-dasharray:2 4; opacity:.38; transition:opacity .25s var(--ease), stroke-width .25s var(--ease); }
-.plugs path.on{ opacity:.95; stroke-width:1.7; }
-.plugs circle{ opacity:.4; transition:opacity .25s var(--ease); }
-.plugs circle.on{ opacity:1; }
-.modules{ grid-column:1; display:flex; flex-direction:column; position:relative; z-index:1; }
-.modules-inner{ flex:1; display:flex; flex-direction:column; justify-content:space-between; gap:34px; }
-.mgroup{ display:flex; flex-direction:column; gap:16px; }
-.mgroup-label{
-  font-family:var(--mono); font-size:9px; letter-spacing:.15em; text-transform:uppercase;
-  color:var(--ink-3); display:flex; align-items:center; gap:9px;
-}
-.mgroup-label::after{ content:""; flex:1; height:1px; background:var(--rule); }
-
-/* Business context: a small pipeline of its own */
-.mini-pipe{
-  list-style:none; margin:13px 0 0; padding:2px 0 2px 17px; position:relative;
-}
-.mini-pipe::before{
-  content:""; position:absolute; left:4px; top:9px; bottom:9px; width:1px;
-  background:var(--h); opacity:.32;
-}
-.mini-pipe::after{
-  content:""; position:absolute; left:1.6px; top:6px; width:6px; height:6px;
-  border-left:1.4px solid var(--h); border-top:1.4px solid var(--h);
-  transform:rotate(45deg); opacity:.7;
-}
-.mp-step{ position:relative; padding:8px 0; }
-.mp-step + .mp-step{ border-top:1px dotted var(--rule); }
-.mp-step::before{
-  content:""; position:absolute; left:-16px; top:14px; width:7px; height:7px;
-  border-radius:50%; background:var(--h); opacity:.5;
-  box-shadow:0 0 0 3px var(--paper-card);
-}
-.mp-t{ display:block; font-size:12.5px; font-weight:600; letter-spacing:-.005em; color:var(--ink); line-height:1.3; }
-.mp-d{ display:block; font-size:11px; color:var(--ink-3); line-height:1.42; margin-top:2px; }
-.spine{ grid-column:3; position:relative; z-index:1; }
-.col-label{
-  font-family:var(--mono); font-size:9.5px; letter-spacing:.16em; text-transform:uppercase;
-  color:var(--ink-3); display:block; padding-bottom:9px; margin-bottom:22px;
-  border-bottom:1px solid var(--rule);
-}
-
-/* Cross-cutting module cards */
-.module{
-  background:var(--paper-card); border:1px dashed var(--h); border-radius:4px;
+  background:var(--paper-card); border:1px solid var(--rule-soft); border-radius:3px;
+  border-left:3px solid var(--h);
   padding:15px 17px 16px;
-  box-shadow:0 8px 22px -18px rgba(22,24,28,.35);
+  opacity:0; transform:translateY(10px);
+  transition:opacity .5s var(--ease), transform .5s var(--ease);
 }
-.module-tag{
-  font-family:var(--mono); font-size:8.5px; letter-spacing:.14em; text-transform:uppercase;
-  color:var(--h); font-weight:500; display:block; margin-bottom:4px;
+.cell.is-in{ opacity:1; transform:none; }
+.cell + .cell{ margin-top:0; }
+.cell::before{
+  content:""; position:absolute; left:50%; top:-15px; width:7px; height:7px; margin-left:-4px;
+  border-left:1px solid var(--ink-3); border-top:1px solid var(--ink-3); transform:rotate(45deg); opacity:.75;
 }
-.module-head{
-  appearance:none; background:none; border:0; padding:0; margin:0; width:100%; cursor:pointer;
-  display:flex; align-items:center; gap:13px; text-align:left; font:inherit; color:inherit;
+.mx-col-phys > .cell:first-child::before{ display:none; }
+.cell-top{ display:flex; align-items:flex-start; gap:14px; }
+.cell-top .shape-cell{ width:76px; flex:none; }
+.cell-id{ min-width:0; }
+.cell .node-name{ font-size:21px; }
+.cell .node-role{ display:block; margin-top:2px; }
+.cell .node-line{ font-size:15px; margin-top:10px; }
+.cell-list{ list-style:none; margin:12px 0 0; padding:0; display:flex; flex-wrap:wrap; gap:5px 7px; }
+.cell-list li{
+  font-size:11px; line-height:1.3; padding:5px 8px; border-radius:3px;
+  background:var(--paper-sunk); border:1px solid var(--rule-soft); color:var(--ink-2);
 }
-.module-head .shape{ width:54px; flex:none; }
-.mh-text{ flex:1; min-width:0; }
-.module-head h3{ font-family:var(--serif); font-weight:400; font-size:19px; letter-spacing:-.014em; margin:0; line-height:1.16; }
-.chev{
-  flex:none; width:9px; height:9px; margin-right:2px;
-  border-right:1.5px solid var(--h); border-bottom:1.5px solid var(--h);
-  transform:rotate(45deg) translate(-2px,-2px); transition:transform .28s var(--ease);
+.cell-list .comp-link{ border-bottom:0; }
+.cell .node-out{ margin-top:11px; }
+
+@media (max-width:1080px){
+  .mx{ grid-template-columns:minmax(0,1fr) minmax(0,1fr); }
+  .mx-col{ display:block; }
+  .mx-col > *{ grid-column:auto !important; grid-row:auto !important; }
+  .mx-col-phys{ grid-column:1 / -1; }
+  .lanebar{ margin-bottom:12px; }
+  .lanebar-in{ position:static; }
+  .cell + .cell{ margin-top:34px; }
+  .cell::before{ top:-22px; }
 }
-.module.is-open .chev{ transform:rotate(-135deg) translate(-2px,-2px); }
-.module-comps{ display:none; }
-.module.is-open .module-comps{ display:flex; }
-.module.is-open{ box-shadow:0 10px 30px -20px rgba(22,24,28,.5); }
-.module-hint{
-  font-family:var(--mono); font-size:8.5px; letter-spacing:.12em; text-transform:uppercase;
-  color:var(--ink-3); margin-top:11px; display:block;
+@media (max-width:620px){
+  .mx{ grid-template-columns:1fr; }
 }
-.module.is-open .module-hint{ display:none; }
-.module h3{ font-family:var(--serif); font-weight:400; font-size:20px; letter-spacing:-.014em; margin:0; line-height:1.15; }
-.module .m-line{ font-size:12.5px; line-height:1.5; color:var(--ink-2); margin:11px 0 0; }
-.module .m-line b{ font-weight:600; color:var(--ink); }
-.m-plugs{ margin-top:12px; padding-top:11px; border-top:1px solid var(--rule-soft); }
-.m-plugs .k{ font-family:var(--mono); font-size:8.5px; letter-spacing:.13em; text-transform:uppercase; color:var(--ink-3); display:block; margin-bottom:7px; }
-.m-plugs .chips{ display:flex; flex-wrap:wrap; gap:5px; }
-.m-plugs .chip{
-  font-size:10.5px; line-height:1; padding:5px 8px; border-radius:999px;
-  border:1px solid var(--rule); color:var(--ink-2); background:var(--paper);
+
+/* the four cards dim what they are not */
+body[data-focus] .mx-col:not([data-type="physical"]){ transition:opacity .25s var(--ease); }
+body[data-focus="context"]  .mx-col:not([data-type="context"]):not([data-type="physical"]) > *,
+body[data-focus="agent"]    .mx-col:not([data-type="agent"]):not([data-type="physical"]) > *,
+body[data-focus="logical"]  .mx-col:not([data-type="logical"]):not([data-type="physical"]) > *{ opacity:.18; }
+body[data-focus="physical"] .mx-col:not([data-type="physical"]) > *{ opacity:.18; }
+body[data-focus="context"]  .mx-col-phys > *,
+body[data-focus="agent"]    .mx-col-phys > *,
+body[data-focus="logical"]  .mx-col-phys > *{ opacity:.55; }
+
+/* module page bits */
+.mod-layer{
+  display:inline-block; margin:0 8px 8px 0; padding:6px 10px; border-radius:3px;
+  background:var(--paper-sunk); border:1px solid var(--rule); font-size:13px; color:var(--ink-2);
 }
+.mod-layer b{ font-family:var(--mono); font-size:10px; color:var(--h); margin-right:5px; }
+.mod-group::before{ content:""; }
+.mod-group .st-t{ color:var(--c); }
+.mod-group .st-d{ line-height:1.9; }
 
 /* Spine nodes */
 :root{ --cols:repeat(4,minmax(0,1fr)); --colgap:22px; }
@@ -499,6 +492,23 @@ body[data-view="tech"] .principles h2{ margin-bottom:44px; }
 /* ============================================================
    EXPANSION PANEL
    ============================================================ */
+/* the layer's notes stay closed until asked for */
+.node-panel{ display:none; }
+.cell.is-open .node-panel{ display:block; }
+.node-open{
+  appearance:none; background:none; border:0; padding:10px 0 0; margin:0; cursor:pointer;
+  display:inline-flex; align-items:center; gap:7px; font:inherit; color:var(--h);
+  font-family:var(--mono); font-size:9px; letter-spacing:.13em; text-transform:uppercase; font-weight:500;
+  opacity:.75; transition:opacity .2s var(--ease);
+}
+.cell:hover .node-open{ opacity:1; }
+.node-open .tri{
+  width:0; height:0; border-left:5px solid currentColor;
+  border-top:3.5px solid transparent; border-bottom:3.5px solid transparent;
+  transition:transform .28s var(--ease);
+}
+.cell.is-open .node-open .tri{ transform:rotate(90deg); }
+
 .node-panel{
   margin-top:20px; padding:24px 26px 26px;
   background:var(--paper-card); border:1px solid var(--rule-soft);
@@ -2088,149 +2098,101 @@ a.wire-t:hover{ color:var(--c); border-bottom-color:currentColor; }
           '<div class="p-prov"><span class="sec-k">What it provides</span><div class="provides">' + provides + "</div></div>" +
         "</div>" +
         '<div class="panel-sec"><span class="sec-k">Produced with</span><div class="builtwith">' + built + "</div></div>" +
+        '<div class="panel-sec p-made"><span class="sec-k">What this layer is made of</span>' +
+          '<div class="built-from">' + nd.comps.map(function (list, i) {
+            var t = TYPES[i];
+            return '<div class="cgroup" data-type="' + t.slug + '" style="--c:' + t.c + '">' +
+              '<div class="clabel">' + t.key + "</div><ul>" +
+              list.map(function (c) { return "<li>" + compLabelHTML(c, nd.key) + "</li>"; }).join("") +
+            "</ul></div>";
+          }).join("") + "</div></div>" +
       "</div>";
   }
 
-  /* The four columns of one layer. Always visible: context, agent and logical
-     are layers in their own right, not details of the physical product. */
-  function matrixHTML(nd) {
-    return '<div class="built-from">' + nd.comps.map(function (list, i) {
-      var t = TYPES[i];
-      return '<div class="cgroup" data-type="' + t.slug + '" style="--c:' + t.c + '">' +
-        '<div class="clabel">' + t.key + "</div>" +
-        (t.slug === "physical" ? '<div class="shape-cell">' + shapeSVG(nd.shape) + "</div>" : "") +
-        "<ul>" + list.map(function (c) { return "<li>" + compLabelHTML(c, nd.key) + "</li>"; }).join("") +
-      "</ul></div>";
-    }).join("") + "</div>";
+  /* ============================================================
+     THE MATRIX
+     Six physical rows. Context, agent and logical are bars that
+     span the rows they apply to: data quality is one thing across
+     five layers, not five separate entries.
+     ============================================================ */
+  var ROW_OF = {};
+  NODES.forEach(function (nd, i) { ROW_OF[nd.key] = i + 1; });
+
+  var COL_OF = { ctx:"context", agt:"agent", log:"logical" };
+
+  function barHTML(m) {
+    var rows = m.plugs.map(function (k) { return ROW_OF[k]; }).sort(function (a, b) { return a - b; });
+    var top = rows[0], bottom = rows[rows.length - 1];
+    var span = m.plugs.slice().sort(function (a, b) { return ROW_OF[a] - ROW_OF[b]; });
+    var first = NODES[ROW_OF[span[0]] - 1], last = NODES[ROW_OF[span[span.length - 1]] - 1];
+    var reach = span.length === 1
+      ? first.n + " only"
+      : last.n + " → " + first.n;
+
+    return '<a class="lanebar" href="#/m/' + m.key + '" data-key="' + m.key + '" data-type="' + COL_OF[m.group] + '"' +
+        ' style="--h:var(--h-' + m.key + ');--t:var(--t-' + m.key + ');grid-row:' + top + " / " + (bottom + 1) + '">' +
+        '<span class="lanebar-in">' +
+          shapeSVG(m.shape) +
+          '<span class="lanebar-n">' + m.name + "</span>" +
+          '<span class="lanebar-reach">' + reach + "</span>" +
+          '<span class="lanebar-d">' + m.line.replace(/<[^>]*>/g, "") + "</span>" +
+          '<span class="lanebar-go">Open</span>' +
+        "</span>" +
+      "</a>";
   }
 
-  function nodeHTML(nd) {
-    return '<article class="node" data-key="' + nd.key + '" style="--h:var(--h-' + nd.key + ');--t:var(--t-' + nd.key + ')">' +
-        '<div class="node-head">' +
-          '<div class="node-top"><span class="node-num">' + nd.n + '</span><h3 class="node-name">' + nd.name + "</h3>" +
-          '<span class="node-role">' + nd.role + "</span></div>" +
-          '<p class="node-line">' + nd.line + "</p>" +
-          '<div class="node-meta">' +
-            '<p class="node-out"><span class="k">Output</span><span>' + nd.out + "</span></p>" +
-            '<button type="button" class="node-open" aria-expanded="false">' +
-              '<span class="tri" aria-hidden="true"></span><span class="lbl">About this layer</span></button>' +
-          "</div>" +
+  function cellHTML(nd) {
+    var physical = nd.comps[3] || [];
+    return '<article class="cell" data-key="' + nd.key + '" style="--h:var(--h-' + nd.key + ');--t:var(--t-' + nd.key + ')">' +
+        '<div class="cell-top">' +
+          '<div class="shape-cell">' + shapeSVG(nd.shape) + "</div>" +
+          '<div class="cell-id"><span class="node-num">' + nd.n + "</span>" +
+            '<h3 class="node-name">' + nd.name + "</h3>" +
+            '<span class="node-role">' + nd.role + "</span></div>" +
         "</div>" +
+        '<p class="node-line">' + nd.line + "</p>" +
+        '<ul class="cell-list">' + physical.map(function (c) {
+          return "<li>" + compLabelHTML(c, nd.key) + "</li>";
+        }).join("") + "</ul>" +
+        '<p class="node-out"><span class="k">Output</span><span>' + nd.out + "</span></p>" +
+        '<button type="button" class="node-open" aria-expanded="false">' +
+          '<span class="tri" aria-hidden="true"></span><span class="lbl">About this layer</span></button>' +
         panelHTML(nd) +
-        matrixHTML(nd) +
       "</article>";
   }
 
-  function moduleHTML(m) {
-    var chips = m.plugs.map(function (k) { return '<span class="chip">' + NAME_BY_KEY[k] + "</span>"; }).join("");
-    return '<section class="module" data-key="' + m.key + '" style="--h:var(--h-' + m.key + ');--t:var(--t-' + m.key + ')">' +
-        '<button type="button" class="module-head" aria-expanded="false">' +
-          shapeSVG(m.shape) +
-          '<span class="mh-text"><span class="module-tag">' + m.tag + '</span><h3>' + m.name + "</h3></span>" +
-          '<span class="chev" aria-hidden="true"></span>' +
-        "</button>" +
-        '<p class="m-line">' + m.line + "</p>" +
-        (m.pipeline
-          ? '<ol class="mini-pipe">' + m.pipeline.map(function (st) {
-              return '<li class="mp-step"><span class="mp-t">' + st.t + '</span><span class="mp-d">' + st.d + "</span></li>";
-            }).join("") + "</ol>"
-          : "") +
-        '<div class="m-plugs"><span class="k">Plugs into</span><div class="chips">' + chips + "</div></div>" +
-        '<span class="module-hint">Click to open components</span>' +
-        '<div class="module-comps">' + compsHTML(m.comps, m.key) +
-          (m.out ? '<p class="m-out"><span class="k">Provides</span><span>' + m.out.join(". ") + "</span></p>" : "") +
-        "</div>" +
-      "</section>";
-  }
-
-  var spineHTML = NODES.map(function (nd, i) {
-    return nodeHTML(nd) + (i < NODES.length - 1 ? '<div class="conn" aria-hidden="true"><span class="pulse"></span></div>' : "");
-  }).join("");
+  var barsByCol = { context:[], agent:[], logical:[] };
+  MODULES.forEach(function (m) {
+    var col = COL_OF[m.group];
+    if (col) barsByCol[col].push(barHTML(m));
+  });
 
   var html =
-
-    '<div class="stack-grid">' +
-      '<svg class="plugs" aria-hidden="true"></svg>' +
-      '<aside class="modules"><span class="col-label">Plugs into the stack</span>' +
-        '<div class="modules-inner">' +
-          '<div class="mgroup"><span class="mgroup-label">Context</span>' +
-            MODULES.filter(function (m) { return m.group === "ctx"; }).map(moduleHTML).join("") + "</div>" +
-          '<div class="mgroup"><span class="mgroup-label">Agent</span>' +
-            MODULES.filter(function (m) { return m.group === "agt"; }).map(moduleHTML).join("") + "</div>" +
-          '<div class="mgroup"><span class="mgroup-label">Logical modules</span>' +
-            MODULES.filter(function (m) { return m.group === "log"; }).map(moduleHTML).join("") + "</div>" +
-        "</div></aside>" +
-      '<div class="spine">' +
-        '<div class="cbar"><span class="cbar-label">Four layers, read across. Data flows up.</span>' +
-          '<div class="cbar-row">' +
-            TYPES.map(function (t) {
-              return '<button type="button" class="ctype" data-type="' + t.slug + '" aria-pressed="false" style="--c:' + t.c + '">' +
-                glyphSVG(t.g) +
-                '<span class="ct-n">' + t.key + "</span>" +
-                '<span class="ct-d">' + t.ds + "</span>" +
-                '<span class="ct-go">Follow it down the stack</span>' +
-              "</button>";
-            }).join("") +
-          "</div>" +
-          '<p class="focus-note"><span id="focus-text"></span><button type="button" id="focus-clear">Show all four</button></p>' +
-        "</div>" + spineHTML + "</div>" +
+    '<div class="cbar"><span class="cbar-label">Four layers, read across. Data flows up.</span>' +
+      '<div class="cbar-row">' +
+        TYPES.map(function (t) {
+          return '<button type="button" class="ctype" data-type="' + t.slug + '" aria-pressed="false" style="--c:' + t.c + '">' +
+            glyphSVG(t.g) +
+            '<span class="ct-n">' + t.key + "</span>" +
+            '<span class="ct-d">' + t.ds + "</span>" +
+            '<span class="ct-go">Highlight it</span>' +
+          "</button>";
+        }).join("") +
+      "</div>" +
+      '<p class="focus-note"><span id="focus-text"></span><button type="button" id="focus-clear">Show all four</button></p>' +
+    "</div>" +
+    '<div class="mx">' +
+      '<div class="mx-col" data-type="context">' + barsByCol.context.join("") + "</div>" +
+      '<div class="mx-col" data-type="agent">' + barsByCol.agent.join("") + "</div>" +
+      '<div class="mx-col mx-col-log" data-type="logical">' + barsByCol.logical.join("") + "</div>" +
+      '<div class="mx-col mx-col-phys" data-type="physical">' +
+        NODES.map(cellHTML).join("") +
+      "</div>" +
     "</div>";
 
   var dag = document.getElementById("dag");
   dag.innerHTML = html;
-
-  /* ============================================================
-     GEOMETRY
-     ============================================================ */
-  var grid   = dag.querySelector(".stack-grid");
-  var plugs  = dag.querySelector(".plugs");
-
-  function measure() {
-    var gr = grid.getBoundingClientRect();
-    var firstShape = dag.querySelector(".spine .shape-cell");
-    if (!firstShape || !gr.width) return;
-
-    /* spine centre, expressed relative to the whole dag (the .conn rules live in .spine) */
-    var sr = firstShape.getBoundingClientRect();
-    var spineRect = dag.querySelector(".spine").getBoundingClientRect();
-    dag.style.setProperty("--spine", (sr.left + sr.width / 2 - spineRect.left) + "px");
-
-    /* plug curves: module → each product it attaches to */
-    if (getComputedStyle(plugs).display === "none") return;
-    plugs.setAttribute("viewBox", "0 0 " + Math.round(gr.width) + " " + Math.round(gr.height));
-    var d = "";
-    MODULES.forEach(function (m, mi) {
-      var card = grid.querySelector('.module[data-key="' + m.key + '"]');
-      if (!card) return;
-      var cr = card.getBoundingClientRect();
-      var x1 = cr.right - gr.left;
-      var band = Math.min(cr.height - 36, 132);
-      var top = cr.top + cr.height / 2 - gr.top - band / 2;
-      var step = m.plugs.length > 1 ? band / (m.plugs.length - 1) : 0;
-      m.plugs.forEach(function (k, pi) {
-        var cell = grid.querySelector('.node[data-key="' + k + '"] .shape-cell');
-        if (!cell) return;
-        var nr = cell.getBoundingClientRect();
-        var y1 = top + pi * step;
-        var x2 = nr.left - gr.left - 7, y2 = nr.top + nr.height / 2 - gr.top;
-        var mid = x1 + (x2 - x1) * [0.36, 0.56, 0.76][mi % 3];
-        d += '<circle data-m="' + m.key + '" cx="' + x1 + '" cy="' + y1 + '" r="1.8" fill="var(--h-' + m.key + ')" stroke="none"/>' +
-             '<path data-m="' + m.key + '" d="M' + x1 + " " + y1 + " C" + mid + " " + y1 + ", " + mid + " " + y2 + ", " + x2 + " " + y2 +
-             '" stroke="var(--h-' + m.key + ')"/>' +
-             '<circle data-m="' + m.key + '" cx="' + x2 + '" cy="' + y2 + '" r="2.6" fill="var(--h-' + m.key + ')" stroke="none"/>';
-      });
-    });
-    plugs.innerHTML = d;
-    syncHighlight();
-  }
-
-  function syncHighlight() {
-    var open = {};
-    grid.querySelectorAll(".module.is-open").forEach(function (el) { open[el.dataset.key] = 1; });
-    plugs.querySelectorAll("[data-m]").forEach(function (el) {
-      el.classList.toggle("on", !!open[el.getAttribute("data-m")]);
-    });
-  }
+  var grid = dag;
 
   function toggleNode(node) {
     var open = node.classList.toggle("is-open");
@@ -2239,28 +2201,12 @@ a.wire-t:hover{ color:var(--c); border-bottom-color:currentColor; }
       btn.setAttribute("aria-expanded", String(open));
       btn.querySelector(".lbl").textContent = open ? "Hide layer notes" : "About this layer";
     }
-    remeasure();
   }
-
-  grid.querySelectorAll(".node-open").forEach(function (btn) {
-    btn.addEventListener("click", function () { toggleNode(btn.closest(".node")); });
+  dag.querySelectorAll(".node-open").forEach(function (btn) {
+    btn.addEventListener("click", function () { toggleNode(btn.closest(".cell")); });
   });
+  function remeasure() {}
 
-  grid.querySelectorAll(".module-head").forEach(function (btn) {
-    btn.addEventListener("click", function () {
-      var card = btn.closest(".module");
-      var open = card.classList.toggle("is-open");
-      btn.setAttribute("aria-expanded", String(open));
-      remeasure();
-    });
-  });
-
-  var raf;
-  function remeasure() { cancelAnimationFrame(raf); raf = requestAnimationFrame(function () { measure(); syncHighlight(); }); }
-  measure();
-  window.addEventListener("resize", remeasure, { passive: true });
-  if (document.fonts && document.fonts.ready) document.fonts.ready.then(measure);
-  if (window.ResizeObserver) new ResizeObserver(remeasure).observe(grid);
 
   /* Component focus: read one of the four straight down the stack */
   var focusBtns = dag.querySelectorAll(".ctype");
@@ -2299,7 +2245,6 @@ a.wire-t:hover{ color:var(--c); border-bottom-color:currentColor; }
     document.body.dataset.view = v;
     bExec.setAttribute("aria-pressed", String(v === "exec"));
     bTech.setAttribute("aria-pressed", String(v === "tech"));
-    measure(); setTimeout(measure, 260); setTimeout(measure, 540);
     if (persist !== false) { try { localStorage.setItem("pipeline-view", v); } catch (e) {} }
   }
   bExec.addEventListener("click", function () { setView("exec"); });
@@ -2314,7 +2259,7 @@ a.wire-t:hover{ color:var(--c); border-bottom-color:currentColor; }
   try { if (localStorage.getItem("pipeline-view") === "tech") setView("tech", false); } catch (e) {}
 
   /* Reveal */
-  var nodes = dag.querySelectorAll(".node");
+  var nodes = dag.querySelectorAll(".cell");
   if ("IntersectionObserver" in window) {
     var io = new IntersectionObserver(function (es) {
       es.forEach(function (en) {
@@ -2326,8 +2271,6 @@ a.wire-t:hover{ color:var(--c); border-bottom-color:currentColor; }
     nodes.forEach(function (n) { n.classList.add("is-in"); });
   }
 
-  var pulses = dag.querySelectorAll(".conn .pulse");
-  pulses.forEach(function (p, i) { p.style.animationDelay = ((pulses.length - 1 - i) * 0.3) + "s"; });
 
   /* Sticky header rule */
   var head = document.getElementById("head");
@@ -2360,6 +2303,7 @@ a.wire-t:hover{ color:var(--c); border-bottom-color:currentColor; }
 
   function routeKey() {
     var h = location.hash.replace(/^#\/?/, "");
+    if (/^m\//.test(h) && MODULE_BY_KEY[h.slice(2)]) return h;
     return (DETAIL_BY_ROUTE[h] || EDGES[h]) ? h : null;
   }
 
@@ -2369,6 +2313,46 @@ a.wire-t:hover{ color:var(--c); border-bottom-color:currentColor; }
   function siblingIndex(sib, d) {
     for (var i = 0; i < sib.length; i++) if (sib[i].slug === d.slug) return i;
     return -1;
+  }
+
+  function renderModule(m) {
+    var typeName = { ctx:"Context", agt:"Agent", log:"Logical" }[m.group];
+    detailEl.style.setProperty("--h", "var(--h-" + m.key + ")");
+    detailEl.style.setProperty("--t", "var(--t-" + m.key + ")");
+
+    dParent.textContent = typeName + " layer";
+    dParent.setAttribute("data-parent", "");
+    dLane.textContent = m.plugs.length + " of 6 physical layers";
+    dTitle.textContent = m.name;
+    dLead.hidden = false;
+    dLead.innerHTML = "<span></span>";
+    dLead.firstChild.innerHTML = m.line;
+
+    dWhat.closest(".d-sec").hidden = false;
+    dWhat.closest(".d-sec").querySelector(".sec-k").textContent = "Where it applies";
+    dWhat.innerHTML = NODES.slice().reverse().filter(function (nd) {
+      return m.plugs.indexOf(nd.key) > -1;
+    }).map(function (nd) {
+      return '<span class="mod-layer"><b>' + nd.n + "</b> " + nd.name + "</span>";
+    }).join("");
+
+    dSteps.closest(".d-sec").hidden = false;
+    dSteps.closest(".d-sec").querySelector(".sec-k").textContent = "What it is made of";
+    dSteps.innerHTML = m.comps.map(function (list, i) {
+      if (!list.length) return "";
+      return '<li class="mod-group" style="--c:' + TYPES[i].c + '">' +
+        '<span class="st-t">' + TYPES[i].key + "</span>" +
+        '<span class="st-d">' + list.map(function (c) { return compLabelHTML(c, m.key); }).join(" &nbsp;·&nbsp; ") + "</span>" +
+      "</li>";
+    }).join("");
+
+    dBreaks.closest(".d-sec").hidden = !(m.out && m.out.length);
+    dBreaks.closest(".d-sec").querySelector(".sec-k").textContent = "What it provides";
+    dBreaks.innerHTML = (m.out || []).map(function (o) { return "<li>" + o + "</li>"; }).join("");
+
+    dWires.closest(".d-sec").hidden = true;
+    dNav.innerHTML = "";
+    document.title = m.name + " · " + baseTitle;
   }
 
   function renderDetail(id) {
@@ -2395,6 +2379,9 @@ a.wire-t:hover{ color:var(--c); border-bottom-color:currentColor; }
     dBreaks.innerHTML = d.breaks.map(function (b) { return "<li>" + b + "</li>"; }).join("");
 
     /* sections with nothing in them stay out of the page */
+    dWhat.closest(".d-sec").querySelector(".sec-k").textContent = "What it is";
+    dSteps.closest(".d-sec").querySelector(".sec-k").textContent = "How it works";
+    dBreaks.closest(".d-sec").querySelector(".sec-k").textContent = "What breaks without it";
     dLead.hidden  = !d.lead;
     dWhat.closest(".d-sec").hidden  = !d.what;
     dSteps.closest(".d-sec").hidden = !d.how.length;
@@ -2441,7 +2428,8 @@ a.wire-t:hover{ color:var(--c); border-bottom-color:currentColor; }
     if (key) {
       if (document.body.dataset.route !== "detail") indexScroll = window.scrollY;
       document.body.dataset.route = "detail";
-      renderDetail(key);
+      if (/^m\//.test(key)) renderModule(MODULE_BY_KEY[key.slice(2)]);
+      else renderDetail(key);
       window.scrollTo(0, 0);
       if (!opts || opts.focus !== false) dTitle.focus({ preventScroll: true });
     } else {
