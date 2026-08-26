@@ -51,6 +51,19 @@ against the four, and the operating rule states the pattern: agents propose,
 deterministic code executes, humans decide. The per-layer decision items are
 kept in a `decisions` field in the data, unrendered, so they can come back.
 
+## The component bar
+
+Above the stack sit four cards, one per component type. They replaced the
+consumers tier, which showed dashboards, alerts, embedded product and ad-hoc
+questions. That content was already layer 06's "What it provides", word for
+word, so nothing was lost.
+
+Clicking a card enters focus mode: `body[data-focus="physical"]` and so on.
+Every layer opens showing only that component, so one of the four can be read
+straight down the stack. The module rail hides, since focus is about the
+vertical read. Click the active card again, press Escape, or use "Show all
+four" to leave. Focus works in both views.
+
 ## The two views
 
 In the Executive view, clicking any layer opens a panel with four parts: what

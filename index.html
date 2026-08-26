@@ -184,17 +184,66 @@ body[data-view="tech"] .toggle::before{ transform:translateX(100%); }
 .dag{ margin-inline:auto; max-width:880px; transition:max-width .45s var(--ease); }
 body[data-view="tech"] .dag{ max-width:1216px; }
 
-/* Consumers tier */
-.tier-label{
+/* Component bar: the four types, and the focus control */
+.cbar{ margin:0 0 34px; }
+.cbar-label{
   display:block; text-align:center; margin-bottom:14px;
   font-family:var(--mono); font-size:9.5px; letter-spacing:.16em; text-transform:uppercase; color:var(--ink-3);
 }
-.tier{ display:flex; justify-content:center; align-items:flex-end; gap:32px; flex-wrap:wrap; }
-.endpoint{ display:flex; flex-direction:column-reverse; align-items:center; gap:8px; width:96px; }
-.endpoint .cap{ font-size:11.5px; color:var(--ink-3); text-align:center; line-height:1.3; }
+.cbar-row{ display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:14px; }
+@media (max-width:760px){ .cbar-row{ grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; } }
+@media (max-width:330px){ .cbar-row{ grid-template-columns:1fr; } }
 
-.fan{ display:block; width:100%; height:54px; color:var(--rule); }
-.fan path{ fill:none; stroke:currentColor; stroke-width:1; stroke-dasharray:3 4; }
+.ctype{
+  --h:var(--c); --t:var(--paper-card);
+  appearance:none; text-align:left; cursor:pointer; font-family:var(--sans);
+  background:var(--paper-card); border:1px solid var(--rule); border-radius:3px;
+  padding:14px 15px 15px; display:flex; flex-direction:column; gap:9px;
+  border-top:3px solid var(--c);
+  transition:border-color .22s var(--ease), box-shadow .22s var(--ease), transform .22s var(--ease);
+}
+.ctype:hover{ box-shadow:0 2px 10px rgba(22,24,28,.07); transform:translateY(-1px); }
+.ctype:focus-visible{ outline:2px solid var(--accent); outline-offset:3px; }
+.ctype .glyph{ width:38px; }
+.ctype .ct-n{ font-size:14.5px; font-weight:600; letter-spacing:-.008em; color:var(--c); }
+.ctype .ct-d{ font-size:11.5px; line-height:1.45; color:var(--ink-3); }
+.ctype .ct-go{
+  margin-top:2px; font-family:var(--mono); font-size:9px; letter-spacing:.14em;
+  text-transform:uppercase; color:var(--ink-3);
+}
+.ctype[aria-pressed="true"]{ border-color:var(--c); box-shadow:0 0 0 1px var(--c) inset; }
+.ctype[aria-pressed="true"] .ct-go{ color:var(--c); }
+body[data-focus] .ctype[aria-pressed="false"]{ opacity:.42; }
+
+.focus-note{
+  display:none; align-items:center; justify-content:center; gap:12px;
+  margin:-16px 0 30px; font-size:12.5px; color:var(--ink-3);
+}
+body[data-focus] .focus-note{ display:flex; }
+.focus-note button{
+  appearance:none; background:var(--paper-sunk); border:1px solid var(--rule); border-radius:999px;
+  padding:5px 13px; font-family:var(--sans); font-size:12px; color:var(--ink-2); cursor:pointer;
+}
+.focus-note button:hover{ color:var(--ink); }
+
+/* Focus mode: one component, read straight down the stack */
+body[data-focus] .node-panel .panel-sec{ display:none; }
+body[data-focus] .node-panel .panel-sec.p-made{ display:block; border-top:0; margin-top:0; padding-top:0; }
+body[data-focus] .built-from{ grid-template-columns:1fr; }
+body[data-focus] .p-made > .sec-k{ display:none; }
+body[data-focus] .cgroup ul{
+  display:grid; grid-template-columns:repeat(auto-fill,minmax(230px,1fr)); gap:8px 26px; margin-top:11px;
+}
+body[data-focus] .cgroup li{ font-size:12.5px; }
+body[data-focus] .built-from .cgroup{ display:none; }
+body[data-focus="physical"] .built-from .cgroup[data-type="physical"],
+body[data-focus="logical"]  .built-from .cgroup[data-type="logical"],
+body[data-focus="agent"]    .built-from .cgroup[data-type="agent"],
+body[data-focus="context"]  .built-from .cgroup[data-type="context"]{ display:block; }
+body[data-view="exec"][data-focus] .node-panel{ display:block; }
+body[data-focus] .node-open{ display:none; }
+body[data-focus] .modules{ display:none; }
+body[data-focus] .node-comps .cgroup{ display:none; }
 
 /* Grid: modules | gutter | spine */
 .stack-grid{
@@ -413,27 +462,9 @@ body[data-view="tech"] .node-panel{ grid-column:1 / -1; grid-row:3; }
   .node-name{ font-size:21px; }
   .node-line{ font-size:16px; }
   .node-comps{ grid-template-columns:1fr; gap:18px; padding:16px 18px; }
-  .tier{ gap:16px; }
-  .endpoint{ width:74px; }
 }
 
 /* Legends */
-.legend{ margin-top:44px; padding-top:22px; border-top:1px solid var(--rule); }
-.legend .eyebrow{ display:block; margin-bottom:16px; }
-.legend-row{ display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:22px; }
-.lgd .bar{ height:3px; border-radius:2px; margin-bottom:9px; }
-.lgd .nm{ font-size:12.5px; font-weight:600; letter-spacing:-.005em; line-height:1.3; }
-.lgd .ds{ font-size:11.5px; color:var(--ink-3); line-height:1.45; margin-top:4px; }
-@media (max-width:860px){ .legend-row{ grid-template-columns:repeat(2,1fr); gap:18px; } }
-@media (max-width:480px){ .legend-row{ grid-template-columns:1fr; } }
-
-.legend-inline{
-  margin-top:38px; padding-top:20px; border-top:1px solid var(--rule);
-  display:flex; flex-wrap:wrap; align-items:center; gap:8px 18px; font-size:12.5px; color:var(--ink-3);
-}
-.legend-inline .li{ display:inline-flex; align-items:center; gap:7px; }
-.legend-inline .sw{ width:12px; height:3px; border-radius:2px; flex:none; }
-.legend-inline .lead{ color:var(--ink-2); }
 
 /* ============================================================
    PRINCIPLES / FOOTER
@@ -679,24 +710,11 @@ body[data-route="detail"] .detail{ display:block; }
           <h2 class="exec-only">Six data products, source to decision.</h2>
           <h2 class="tech-only">Six data products. Four components in each.</h2>
         </div>
-        <p class="dg-hint exec-only">Data flows up. <strong>Click a layer</strong> to open its components. Or switch to <strong>Technical</strong> for all of them at once, plus the modules that plug across them.</p>
-        <p class="dg-hint tech-only">Products open into their components. <strong>Click a module</strong> on the left to open it and light up what it plugs into.</p>
+        <p class="dg-hint exec-only">Data flows up. <strong>Click a component</strong> above to follow it down the stack, or <strong>click a layer</strong> to open all four. Switch to <strong>Technical</strong> for everything at once, plus the modules that plug across them.</p>
+        <p class="dg-hint tech-only">Products open into their four components. <strong>Click a component</strong> above to follow one down the stack, or <strong>click a module</strong> on the left to light up what it plugs into.</p>
       </div>
 
       <div class="dag" id="dag"></div>
-
-      <div class="legend-inline exec-only">
-        <span class="lead">Every dataset is made of four things:</span>
-        <span class="li"><span class="sw" style="background:var(--ty-phys)"></span>Physical</span>
-        <span class="li"><span class="sw" style="background:var(--ty-logic)"></span>Logical</span>
-        <span class="li"><span class="sw" style="background:var(--ty-agent)"></span>Agent</span>
-        <span class="li"><span class="sw" style="background:var(--ty-ctx)"></span>Context</span>
-      </div>
-
-      <div class="legend tech-only">
-        <span class="eyebrow">The four components, in every dataset</span>
-        <div class="legend-row" id="legend-row"></div>
-      </div>
 
     </div>
   </section>
@@ -879,6 +897,20 @@ body[data-route="detail"] .detail{ display:block; }
            '<circle class="dim" cx="24" cy="20" r="2"/><circle class="dim" cx="32" cy="20" r="2"/><circle class="dim" cx="40" cy="20" r="2"/>'
   };
 
+  /* one small mark per component type */
+  GLYPH.tphys  = '<rect class="edge" x="9" y="8" width="46" height="28" rx="3"/>' +
+                 '<path class="dimline" d="M9 17 H55 M9 27 H55"/>' +
+                 '<path class="hot" d="M25 8 V36"/>';
+  GLYPH.tlogic = '<path class="hot" d="M23 9 C15 9, 19 20, 11 22 C19 24, 15 35, 23 35"/>' +
+                 '<path class="hot" d="M41 9 C49 9, 45 20, 53 22 C45 24, 49 35, 41 35"/>' +
+                 '<path class="dimline" d="M27 22 H37"/>';
+  GLYPH.tagent = '<rect class="edge" x="7" y="12" width="27" height="21" rx="3"/>' +
+                 '<circle class="dim" cx="14" cy="22" r="1.8"/><circle class="dim" cx="20.5" cy="22" r="1.8"/><circle class="dim" cx="27" cy="22" r="1.8"/>' +
+                 '<path class="hot" d="M38 22 H56 M50 16 L56 22 L50 28"/>';
+  GLYPH.tctx   = '<path class="edge"  d="M32 14 C26 9, 16 8, 8 9 V33 C16 32, 26 33, 32 38 Z"/>' +
+                 '<path class="edge2" d="M32 14 C38 9, 48 8, 56 9 V33 C48 32, 38 33, 32 38 Z"/>' +
+                 '<path class="hot"   d="M32 14 V38"/>';
+
   function shapeSVG(k) { return '<svg class="shape" viewBox="0 0 120 84" aria-hidden="true">' + SHAPE[k] + "</svg>"; }
   function glyphSVG(k) { return '<svg class="glyph" viewBox="0 0 64 44" aria-hidden="true">' + GLYPH[k] + "</svg>"; }
 
@@ -888,17 +920,10 @@ body[data-route="detail"] .detail{ display:block; }
   /* The four components of any dataset. Order is fixed everywhere:
      physical, logical, agent, context. */
   var TYPES = [
-    { key:"Physical", ds:"The tables, files and systems that hold the bytes", c:"var(--ty-phys)" },
-    { key:"Logical",  ds:"The declared rules: SQL, semantics, conformance, quality", c:"var(--ty-logic)" },
-    { key:"Agent",    ds:"The models that propose work against it", c:"var(--ty-agent)" },
-    { key:"Context",  ds:"What it means to this business, and what the agent is told", c:"var(--ty-ctx)" }
-  ];
-
-  var CONSUMERS = [
-    { g:"dash",  t:"Dashboards" },
-    { g:"bell",  t:"Alerts &amp; briefings" },
-    { g:"embed", t:"Embedded product" },
-    { g:"ask",   t:"Ad-hoc questions" }
+    { key:"Physical", slug:"physical", g:"tphys",  ds:"The tables, files and systems that hold the bytes", c:"var(--ty-phys)" },
+    { key:"Logical",  slug:"logical",  g:"tlogic", ds:"The declared rules: SQL, semantics, conformance, quality", c:"var(--ty-logic)" },
+    { key:"Agent",    slug:"agent",    g:"tagent", ds:"The models that propose work against it", c:"var(--ty-agent)" },
+    { key:"Context",  slug:"context",  g:"tctx",   ds:"What it means to this business, and what the agent is told", c:"var(--ty-ctx)" }
   ];
 
   /* Physical data products: index 0 is the top of the page (top of the stack) */
@@ -1874,7 +1899,7 @@ body[data-route="detail"] .detail{ display:block; }
      ============================================================ */
   function compsHTML(comps, parentKey) {
     return comps.map(function (list, i) {
-      return '<div class="cgroup" style="--c:' + TYPES[i].c + '">' +
+      return '<div class="cgroup" data-type="' + TYPES[i].slug + '" style="--c:' + TYPES[i].c + '">' +
         '<div class="clabel">' + TYPES[i].key + "</div><ul>" +
         list.map(function (c) { return "<li>" + compLabelHTML(c, parentKey) + "</li>"; }).join("") + "</ul></div>";
     }).join("");
@@ -1894,7 +1919,7 @@ body[data-route="detail"] .detail{ display:block; }
     }).join("");
 
     var from = nd.comps.map(function (list, i) {
-      return '<div class="cgroup" style="--c:' + TYPES[i].c + '">' +
+      return '<div class="cgroup" data-type="' + TYPES[i].slug + '" style="--c:' + TYPES[i].c + '">' +
         '<div class="clabel">' + TYPES[i].key + "</div><ul>" +
         list.map(function (c) { return "<li>" + compLabelHTML(c, nd.key) + "</li>"; }).join("") + "</ul></div>";
     }).join("");
@@ -1905,7 +1930,7 @@ body[data-route="detail"] .detail{ display:block; }
           '<div class="p-prov"><span class="sec-k">What it provides</span><div class="provides">' + provides + "</div></div>" +
         "</div>" +
         '<div class="panel-sec"><span class="sec-k">Produced with</span><div class="builtwith">' + built + "</div></div>" +
-        '<div class="panel-sec"><span class="sec-k">Made of</span><div class="built-from">' + from + "</div></div>" +
+        '<div class="panel-sec p-made"><span class="sec-k">Made of</span><div class="built-from">' + from + "</div></div>" +
       "</div>";
   }
 
@@ -1951,12 +1976,18 @@ body[data-route="detail"] .detail{ display:block; }
   }).join("");
 
   var html =
-    '<div class="tier-wrap"><span class="tier-label">Consumers</span><div class="tier">' +
-      CONSUMERS.map(function (it) {
-        return '<div class="endpoint">' + glyphSVG(it.g) + '<span class="cap">' + it.t + "</span></div>";
-      }).join("") +
-    "</div></div>" +
-    '<svg class="fan" data-dir="out" aria-hidden="true"></svg>' +
+    '<div class="cbar"><span class="cbar-label">Every dataset is made of four things</span>' +
+      '<div class="cbar-row">' +
+        TYPES.map(function (t) {
+          return '<button type="button" class="ctype" data-type="' + t.slug + '" aria-pressed="false" style="--c:' + t.c + '">' +
+            glyphSVG(t.g) +
+            '<span class="ct-n">' + t.key + "</span>" +
+            '<span class="ct-d">' + t.ds + "</span>" +
+            '<span class="ct-go">Follow it down the stack</span>' +
+          "</button>";
+        }).join("") +
+      "</div></div>" +
+    '<p class="focus-note"><span id="focus-text"></span><button type="button" id="focus-clear">Show all four</button></p>' +
     '<div class="stack-grid">' +
       '<svg class="plugs" aria-hidden="true"></svg>' +
       '<aside class="modules"><span class="col-label">Plugs into the stack</span>' +
@@ -1979,8 +2010,6 @@ body[data-route="detail"] .detail{ display:block; }
      ============================================================ */
   var grid   = dag.querySelector(".stack-grid");
   var plugs  = dag.querySelector(".plugs");
-  var fanEl  = dag.querySelector(".fan");
-  var tierEl = dag.querySelector(".tier-wrap");
 
   function measure() {
     var gr = grid.getBoundingClientRect();
@@ -1991,32 +2020,6 @@ body[data-route="detail"] .detail{ display:block; }
     var sr = firstShape.getBoundingClientRect();
     var spineRect = dag.querySelector(".spine").getBoundingClientRect();
     dag.style.setProperty("--spine", (sr.left + sr.width / 2 - spineRect.left) + "px");
-
-    /* pull the consumers tier over the spine so the fan is a fan, not a sweep,
-       clamped so the row never leaves the diagram at narrow widths */
-    var dr = dag.getBoundingClientRect();
-    var tier = tierEl.querySelector(".tier");
-    tier.style.transform = "none";
-    var tRect = tier.getBoundingClientRect();
-    var shift = (sr.left + sr.width / 2) - (dr.left + dr.width / 2);
-    var minShift = dr.left - tRect.left;
-    var maxShift = dr.right - tRect.right;
-    if (maxShift < minShift) { minShift = maxShift = 0; }
-    shift = Math.max(minShift, Math.min(maxShift, shift));
-    tier.style.transform = "translateX(" + Math.round(shift) + "px)";
-
-    /* fan from the consumers down to the top node */
-    var fr = fanEl.getBoundingClientRect();
-    var W = Math.round(fr.width), H = Math.round(fr.height);
-    if (W && H) {
-      fanEl.setAttribute("viewBox", "0 0 " + W + " " + H);
-      var cx = Math.round(sr.left + sr.width / 2 - fr.left);
-      fanEl.innerHTML = Array.prototype.map.call(tierEl.querySelectorAll(".glyph"), function (g) {
-        var r = g.getBoundingClientRect();
-        var x = Math.round(r.left + r.width / 2 - fr.left);
-        return '<path d="M' + cx + " " + H + " C" + cx + " " + (H * 0.4) + ", " + x + " " + (H * 0.6) + ", " + x + ' 0"/>';
-      }).join("");
-    }
 
     /* plug curves: module → each product it attaches to */
     if (getComputedStyle(plugs).display === "none") return;
@@ -2068,6 +2071,7 @@ body[data-route="detail"] .detail{ display:block; }
   grid.querySelectorAll(".node").forEach(function (node) {
     node.addEventListener("click", function (e) {
       if (document.body.dataset.view !== "exec") return;
+      if (document.body.dataset.focus) return;
       if (window.getSelection && String(window.getSelection()).length) return;
       if (e.target.closest("a")) return;
       e.preventDefault();
@@ -2091,14 +2095,44 @@ body[data-route="detail"] .detail{ display:block; }
   if (document.fonts && document.fonts.ready) document.fonts.ready.then(measure);
   if (window.ResizeObserver) new ResizeObserver(remeasure).observe(grid);
 
-  /* Legend */
-  var lr = document.getElementById("legend-row");
-  TYPES.forEach(function (l) {
-    var d = document.createElement("div");
-    d.className = "lgd";
-    d.innerHTML = '<div class="bar" style="background:' + l.c + '"></div>' +
-      '<div class="nm">' + l.key + '</div><div class="ds">' + l.ds + "</div>";
-    lr.appendChild(d);
+  /* Component focus: read one of the four straight down the stack */
+  var focusBtns = dag.querySelectorAll(".ctype");
+  var focusText = document.getElementById("focus-text");
+  var focusClear = document.getElementById("focus-clear");
+
+  function setFocus(slug) {
+    var body = document.body;
+    if (slug && body.dataset.focus === slug) slug = null;
+    if (slug) body.dataset.focus = slug; else delete body.dataset.focus;
+
+    focusBtns.forEach(function (b) {
+      b.setAttribute("aria-pressed", String(b.getAttribute("data-type") === slug));
+    });
+
+    if (slug) {
+      var t = TYPES.filter(function (x) { return x.slug === slug; })[0];
+      focusText.textContent = "Showing the " + t.key.toLowerCase() + " component of every layer.";
+      grid.querySelectorAll(".node").forEach(function (nd) {
+        nd.classList.add("is-open");
+        var b = nd.querySelector(".node-open");
+        if (b) b.setAttribute("aria-expanded", "true");
+      });
+    } else {
+      grid.querySelectorAll(".node").forEach(function (nd) {
+        nd.classList.remove("is-open");
+        var b = nd.querySelector(".node-open");
+        if (b) { b.setAttribute("aria-expanded", "false"); b.querySelector(".lbl").textContent = "Components"; }
+      });
+    }
+    remeasure();
+  }
+
+  focusBtns.forEach(function (b) {
+    b.addEventListener("click", function () { setFocus(b.getAttribute("data-type")); });
+  });
+  focusClear.addEventListener("click", function () { setFocus(null); });
+  document.addEventListener("keydown", function (e) {
+    if (e.key === "Escape" && document.body.dataset.focus) setFocus(null);
   });
 
   /* View toggle */
