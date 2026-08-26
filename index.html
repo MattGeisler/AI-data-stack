@@ -181,18 +181,18 @@ body[data-view="tech"] .toggle::before{ transform:translateX(100%); }
   .dg-hint{ text-align:left; }
 }
 
-.dag{ margin-inline:auto; max-width:880px; transition:max-width .45s var(--ease); }
-body[data-view="tech"] .dag{ max-width:1216px; }
+.dag{ margin-inline:auto; max-width:1120px; transition:max-width .45s var(--ease); }
+body[data-view="tech"] .dag{ max-width:1280px; }
 
 /* Component bar: the four types, and the focus control */
-.cbar{ margin:0 0 34px; }
+.cbar{ margin:0 0 30px; }
 .cbar-label{
-  display:block; text-align:center; margin-bottom:14px;
+  display:block; margin-bottom:13px; padding-bottom:9px; border-bottom:1px solid var(--rule);
   font-family:var(--mono); font-size:9.5px; letter-spacing:.16em; text-transform:uppercase; color:var(--ink-3);
 }
-.cbar-row{ display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:14px; }
-@media (max-width:760px){ .cbar-row{ grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; } }
-@media (max-width:330px){ .cbar-row{ grid-template-columns:1fr; } }
+.cbar-row{ display:grid; grid-template-columns:var(--cols); gap:var(--colgap); }
+@media (max-width:860px){ .cbar-row{ grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; } }
+@media (max-width:400px){ .cbar-row{ grid-template-columns:1fr; } }
 
 .ctype{
   --h:var(--c); --t:var(--paper-card);
@@ -226,22 +226,18 @@ body[data-focus] .focus-note{ display:flex; }
 }
 .focus-note button:hover{ color:var(--ink); }
 
-/* Focus mode: one component, read straight down the stack */
-body[data-focus] .node-panel .panel-sec{ display:none; }
-body[data-focus] .node-panel .panel-sec.p-made{ display:block; border-top:0; margin-top:0; padding-top:0; }
+/* Focus mode: one of the four, read straight down the stack */
 body[data-focus] .built-from{ grid-template-columns:1fr; }
-body[data-focus] .p-made > .sec-k{ display:none; }
 body[data-focus] .cgroup ul{
   display:grid; grid-template-columns:repeat(auto-fill,minmax(230px,1fr)); gap:8px 26px; margin-top:11px;
 }
 body[data-focus] .cgroup li{ font-size:12.5px; }
+body[data-focus] .cgroup .shape-cell{ display:none; }
 body[data-focus] .built-from .cgroup{ display:none; }
 body[data-focus="physical"] .built-from .cgroup[data-type="physical"],
 body[data-focus="logical"]  .built-from .cgroup[data-type="logical"],
 body[data-focus="agent"]    .built-from .cgroup[data-type="agent"],
 body[data-focus="context"]  .built-from .cgroup[data-type="context"]{ display:block; }
-body[data-view="exec"][data-focus] .node-panel{ display:block; }
-body[data-focus] .node-open{ display:none; }
 body[data-focus] .modules{ display:none; }
 body[data-focus] .node-comps .cgroup{ display:none; }
 
@@ -251,19 +247,15 @@ body[data-focus] .node-comps .cgroup{ display:none; }
   display:grid; grid-template-columns:238px 78px minmax(0,1fr);
   transition:grid-template-columns .45s var(--ease);
 }
-body[data-view="tech"] .stack-grid{ grid-template-columns:326px 74px minmax(0,1fr); }
+body[data-view="tech"] .stack-grid{ grid-template-columns:300px 60px minmax(0,1fr); }
 body[data-view="exec"] .stack-grid{ grid-template-columns:minmax(0,1fr); }
 body[data-view="exec"] .modules,
 body[data-view="exec"] .plugs{ display:none; }
 body[data-view="exec"] .spine{ grid-column:1; }
-body[data-view="exec"] .spine .col-label{ display:none; }
-body[data-view="exec"] .node{ grid-template-columns:minmax(0,1fr) 130px minmax(0,1fr); gap:0 26px; }
-body[data-view="exec"] .node{ cursor:pointer; }
-body[data-view="exec"] .node-out{
-  grid-column:1; grid-row:1; justify-content:flex-end; text-align:right; margin:0; flex-wrap:wrap;
-}
-body[data-view="exec"] .node-panel{ display:none; grid-column:1 / -1; grid-row:2; }
-body[data-view="exec"] .node.is-open .node-panel{ display:block; }
+
+/* the layer's prose sits behind "About this layer" in both views */
+.node-panel{ display:none; }
+.node.is-open .node-panel{ display:block; }
 
 /* open / close affordance */
 .node-open{
@@ -279,19 +271,7 @@ body[data-view="exec"] .node.is-open .node-panel{ display:block; }
   transition:transform .28s var(--ease);
 }
 .node.is-open .node-open .tri{ transform:rotate(90deg); }
-body[data-view="tech"] .node-open{ display:none; }
-body[data-view="exec"] .shape-cell{ grid-column:2; grid-row:1; }
-body[data-view="exec"] .node-body{ grid-column:3; grid-row:1; }
-body[data-view="tech"] .shape-cell{ grid-column:1; grid-row:1; }
-body[data-view="tech"] .node-body{ grid-column:2; grid-row:1; }
-body[data-view="tech"] .node-out{ grid-column:2; grid-row:2; margin-top:8px; }
-body[data-view="tech"] .node-panel{ grid-column:1 / -1; grid-row:3; }
-@media (max-width:760px){
-  body[data-view="exec"] .node{ grid-template-columns:82px minmax(0,1fr); gap:0 16px; }
-  body[data-view="exec"] .shape-cell{ grid-column:1; grid-row:1; }
-  body[data-view="exec"] .node-body{ grid-column:2; grid-row:1; }
-  body[data-view="exec"] .node-out{ grid-column:2; grid-row:2; justify-content:flex-start; text-align:left; margin-top:8px; }
-}
+
 .plugs{ position:absolute; inset:0; width:100%; height:100%; pointer-events:none; z-index:0; overflow:visible; }
 .plugs path{ fill:none; stroke-width:1.25; stroke-dasharray:2 4; opacity:.38; transition:opacity .25s var(--ease), stroke-width .25s var(--ease); }
 .plugs path.on{ opacity:.95; stroke-width:1.7; }
@@ -378,10 +358,30 @@ body[data-view="tech"] .node-panel{ grid-column:1 / -1; grid-row:3; }
 }
 
 /* Spine nodes */
+:root{ --cols:repeat(4,minmax(0,1fr)); --colgap:22px; }
+
 .node{
-  display:grid; grid-template-columns:130px minmax(0,1fr); gap:0 22px; align-items:center;
+  display:block;
   opacity:0; transform:translateY(12px);
   transition:opacity .55s var(--ease), transform .55s var(--ease);
+}
+.node-head{
+  display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1.15fr) minmax(0,.85fr);
+  align-items:start; gap:4px 24px;
+  padding-bottom:11px; margin-bottom:16px; border-bottom:1px solid var(--rule-soft);
+}
+.node-head .node-line{ margin:0; font-size:16px; }
+.node-meta{ display:flex; flex-direction:column; align-items:flex-end; gap:6px; text-align:right; }
+.node-meta .node-out{ margin:0; justify-content:flex-end; flex-wrap:wrap; }
+@media (max-width:1000px){
+  .node-head{ grid-template-columns:minmax(0,1fr) minmax(0,1fr); }
+  .node-meta{ grid-column:1 / -1; flex-direction:row; align-items:baseline; justify-content:space-between; text-align:left; margin-top:6px; }
+  .node-meta .node-out{ justify-content:flex-start; }
+}
+@media (max-width:640px){
+  .node-head{ display:block; }
+  .node-head .node-line{ margin-top:8px; }
+  .node-meta{ margin-top:10px; }
 }
 .node.is-in{ opacity:1; transform:none; }
 .node:hover .shape{ transform:translateY(-3px); }
@@ -450,7 +450,8 @@ body[data-view="tech"] .node-panel{ grid-column:1 / -1; grid-row:3; }
 }
 
 @media (max-width:1080px){ .node-comps{ grid-template-columns:repeat(2,minmax(0,1fr)); gap:20px 22px; } }
-@media (max-width:1180px){ .built-from{ grid-template-columns:repeat(2,minmax(0,1fr)); gap:24px; } }
+@media (max-width:860px){ .built-from{ grid-template-columns:repeat(2,minmax(0,1fr)); gap:16px; } }
+@media (max-width:400px){ .built-from{ grid-template-columns:1fr; } }
 @media (max-width:900px){
   .stack-grid, body[data-view="tech"] .stack-grid{ grid-template-columns:1fr; gap:34px; }
   .modules{ grid-column:1; gap:20px; }
@@ -532,7 +533,13 @@ body[data-view="tech"] .principles h2{ margin-bottom:44px; }
 .bw .n{ display:block; font-size:11.5px; font-weight:600; color:var(--h); letter-spacing:-.005em; line-height:1.25; }
 .bw .d{ display:block; font-size:11px; color:var(--ink-2); line-height:1.45; margin-top:4px; }
 
-.built-from{ display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:26px; }
+.built-from{ display:grid; grid-template-columns:var(--cols); gap:var(--colgap); align-items:start; }
+.cgroup .shape-cell{ margin:10px 0 12px; max-width:120px; }
+.built-from .cgroup{
+  padding:14px 15px 15px; background:var(--paper-card);
+  border:1px solid var(--rule-soft); border-radius:3px; border-top:2px solid var(--c);
+}
+.built-from .cgroup li{ font-size:12px; }
 
 @media (max-width:900px){
   .p-top{ grid-template-columns:1fr; gap:22px; }
@@ -640,6 +647,36 @@ body[data-route="detail"] .detail{ display:block; }
 .d-breaks li::before{
   content:""; position:absolute; left:0; top:8px; width:6px; height:6px; border-radius:50%;
   background:var(--accent); opacity:.55;
+}
+
+.d-wires{ list-style:none; margin:0; padding:0; }
+.wire{
+  --c:var(--ink-3);
+  display:grid; grid-template-columns:132px minmax(0,1fr); gap:0 16px;
+  padding:0 0 16px; margin-bottom:16px; border-bottom:1px solid var(--rule-soft);
+}
+.wire:last-child{ border-bottom:0; margin-bottom:0; padding-bottom:0; }
+.wire[data-type="context"]{  --c:var(--ty-ctx); }
+.wire[data-type="agent"]{    --c:var(--ty-agent); }
+.wire[data-type="logical"]{  --c:var(--ty-logic); }
+.wire[data-type="physical"]{ --c:var(--ty-phys); }
+.wire-rel{
+  font-family:var(--mono); font-size:9.5px; letter-spacing:.13em; text-transform:uppercase;
+  color:var(--c); padding-top:3px; text-align:right;
+}
+.wire-main{ min-width:0; }
+.wire-t{ display:inline-block; font-size:15px; font-weight:600; letter-spacing:-.006em; color:var(--ink); text-decoration:none; }
+a.wire-t{ border-bottom:1px solid var(--rule); transition:border-color .2s var(--ease), color .2s var(--ease); }
+a.wire-t:hover{ color:var(--c); border-bottom-color:currentColor; }
+.wire-where{
+  display:flex; align-items:center; gap:7px; margin-top:3px;
+  font-family:var(--mono); font-size:9px; letter-spacing:.12em; text-transform:uppercase; color:var(--ink-3);
+}
+.wire-dot{ width:3px; height:3px; border-radius:50%; background:var(--rule); }
+.wire-d{ display:block; margin-top:6px; font-size:14px; line-height:1.55; color:var(--ink-2); }
+@media (max-width:620px){
+  .wire{ grid-template-columns:1fr; gap:5px; }
+  .wire-rel{ text-align:left; padding-top:0; }
 }
 
 .detail-nav{
@@ -766,6 +803,10 @@ body[data-route="detail"] .detail{ display:block; }
         <section class="d-sec">
           <span class="sec-k">How it works</span>
           <ol class="d-steps" id="detail-steps"></ol>
+        </section>
+        <section class="d-sec">
+          <span class="sec-k">How it meets the rest of the stack</span>
+          <ul class="d-wires" id="detail-wires"></ul>
         </section>
       </div>
       <aside class="d-side">
@@ -1569,7 +1610,7 @@ body[data-route="detail"] .detail{ display:block; }
   var DETAIL = [
     {
       "parent": "lake",
-      "slug": "lineage-qa",
+      "slug": "lineage-q-and-a-over-the-catalog",
       "lane": "Agent",
       "label": "Lineage Q&amp;A over the catalog",
       "lead": "Ask where a number came from and get the path, with evidence attached.",
@@ -1599,7 +1640,7 @@ body[data-route="detail"] .detail{ display:block; }
     },
     {
       "parent": "lake",
-      "slug": "orphan-duplicate-detection",
+      "slug": "orphan-and-duplicate-detection",
       "lane": "Agent",
       "label": "Orphan and duplicate detection",
       "lead": "Finds rows that point at nothing and rows that exist twice.",
@@ -1629,7 +1670,7 @@ body[data-route="detail"] .detail{ display:block; }
     },
     {
       "parent": "lake",
-      "slug": "cost-usage-scanner",
+      "slug": "cost-and-usage-scanner",
       "lane": "Agent",
       "label": "Cost and usage scanner",
       "lead": "What storage and compute is actually being read, and what is not.",
@@ -1659,7 +1700,7 @@ body[data-route="detail"] .detail{ display:block; }
     },
     {
       "parent": "lake",
-      "slug": "scd-handling",
+      "slug": "slowly-changing-dimension-handling",
       "lane": "Logical",
       "label": "Slowly-changing dimension handling",
       "lead": "Attributes that change over time, without losing what they used to be.",
@@ -1690,7 +1731,7 @@ body[data-route="detail"] .detail{ display:block; }
     },
     {
       "parent": "lake",
-      "slug": "access-policy",
+      "slug": "access-policy-row-and-column-level",
       "lane": "Logical",
       "label": "Access policy, row and column level",
       "lead": "Who can read what, enforced in the engine.",
@@ -1721,7 +1762,7 @@ body[data-route="detail"] .detail{ display:block; }
     },
     {
       "parent": "lake",
-      "slug": "retention-deletion",
+      "slug": "retention-and-deletion-policy",
       "lane": "Logical",
       "label": "Retention and deletion policy",
       "lead": "How long data is kept, and what happens when someone asks to be forgotten.",
@@ -1752,7 +1793,7 @@ body[data-route="detail"] .detail{ display:block; }
     },
     {
       "parent": "lake",
-      "slug": "raw-zone",
+      "slug": "raw-zone-immutable-and-partitioned",
       "lane": "Physical",
       "label": "Raw zone, immutable and partitioned",
       "lead": "Landed bytes, written once, never edited.",
@@ -1783,7 +1824,7 @@ body[data-route="detail"] .detail{ display:block; }
     },
     {
       "parent": "lake",
-      "slug": "conformed-zone",
+      "slug": "conformed-zone-of-functional-tables",
       "lane": "Physical",
       "label": "Conformed zone of functional tables",
       "lead": "Facts and dimensions shaped the way analysis asks for them.",
@@ -1814,7 +1855,7 @@ body[data-route="detail"] .detail{ display:block; }
     },
     {
       "parent": "lake",
-      "slug": "open-table-format",
+      "slug": "open-table-format-with-time-travel",
       "lane": "Physical",
       "label": "Open table format with time travel",
       "lead": "Snapshots and schema changes without rewriting the table.",
@@ -1845,7 +1886,7 @@ body[data-route="detail"] .detail{ display:block; }
     },
     {
       "parent": "lake",
-      "slug": "lineage-capture",
+      "slug": "automatic-lineage-capture",
       "lane": "Physical",
       "label": "Automatic lineage capture",
       "lead": "Every column traced to the query and the run that produced it.",
@@ -1883,10 +1924,132 @@ body[data-route="detail"] .detail{ display:block; }
     (DETAIL_BY_LABEL[d.parent] || (DETAIL_BY_LABEL[d.parent] = {}))[d.label] = d;
   });
 
+  /* ============================================================
+     COMPONENT REGISTRY
+     Every leaf component in every column is addressable as
+     <parent>/<slug>, whether or not it has a written page.
+     ============================================================ */
+  function slugify(label) {
+    return String(label)
+      .replace(/&amp;/g, "-and-")
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/^-+|-+$/g, "")
+      .slice(0, 48);
+  }
+
+  var COMPONENTS = {};
+  var SLUG_OF = {};
+  function registerComps(owner, kind) {
+    owner.comps.forEach(function (list, i) {
+      list.forEach(function (label) {
+        var slug = slugify(label);
+        var id = owner.key + "/" + slug;
+        COMPONENTS[id] = { id:id, label:label, parent:owner.key, kind:kind, type:TYPES[i].slug, typeName:TYPES[i].key };
+        (SLUG_OF[owner.key] || (SLUG_OF[owner.key] = {}))[label] = slug;
+      });
+    });
+  }
+  NODES.forEach(function (n) { registerComps(n, "layer"); });
+  MODULES.forEach(function (m) { registerComps(m, "module"); });
+
+  /* ============================================================
+     INTERACTIONS
+     How a component touches the rest of the stack. Each edge is
+     [relation, target id, what passes between them].
+     Written so far: 04 Data Lake.
+     ============================================================ */
+  var EDGES = {
+    "lake/what-each-table-is-for-and-who-depends-on-it": [
+      ["reads", "lake/automatic-lineage-capture", "The dependency half of the answer comes from the lineage graph, not from a hand-kept list."],
+      ["feeds", "lake/lineage-q-and-a-over-the-catalog", "Gives the agent the purpose of a table, so an answer can say why it matters and not only what it joins to."],
+      ["feeds", "agt/what-the-agent-is-told-about-this-business", "Table purpose is part of the standing context every agent task starts from."],
+      ["constrains", "lake/cost-and-usage-scanner", "A table with no reads but a named dependant is a question, not a candidate for deletion."]
+    ],
+    "lake/sensitivity-class-per-dataset": [
+      ["constrains", "lake/access-policy-row-and-column-level", "The class decides which columns need row or column rules in the first place."],
+      ["constrains", "lake/retention-and-deletion-policy", "Personal data inherits its retention period from its class."],
+      ["constrains", "agt/guardrails-what-an-agent-may-never-write", "Restricted classes are the ones an agent may summarise but never copy into a proposal."],
+      ["reads", "src/what-an-agent-is-allowed-to-read-from-it", "Classification starts at the source contract and travels with the data."]
+    ],
+    "lake/lineage-q-and-a-over-the-catalog": [
+      ["reads", "lake/automatic-lineage-capture", "The graph is the entire ground truth for the answer. No graph, no answer."],
+      ["reads", "lake/what-each-table-is-for-and-who-depends-on-it", "Turns a list of edges into a reason a person cares."],
+      ["feeds", "agg/variance-explainer", "When a number moves, the explainer walks the same lineage to find where it moved."],
+      ["bounded by", "agt/tool-definitions-and-their-permitted-scope", "The catalog query tool is scoped to metadata. It cannot read the rows themselves."]
+    ],
+    "lake/orphan-and-duplicate-detection": [
+      ["reads", "lake/declared-grain-and-keys-per-table", "The declared key is what makes a duplicate detectable at all."],
+      ["reads", "lake/conformed-zone-of-functional-tables", "Scans the conformed zone, where a key is supposed to hold."],
+      ["ranks by", "lake/automatic-lineage-capture", "Blast radius comes from lineage, so the worst orphan is first and not the biggest."],
+      ["escalates to", "dq/failure-triage-and-classification", "A finding becomes a DQ ticket with the evidence attached."],
+      ["proposes to", "int/conflict-explanation-with-evidence", "Duplicates that trace to a bad merge go back to integration, not to the lake."]
+    ],
+    "lake/cost-and-usage-scanner": [
+      ["reads", "lake/open-table-format-with-time-travel", "Snapshot metadata gives file counts and sizes without scanning the data."],
+      ["reads", "lake/raw-zone-immutable-and-partitioned", "Unpruned partitions are the usual reason a query costs more than it should."],
+      ["constrained by", "lake/retention-and-deletion-policy", "It can propose an archive. It cannot propose deleting inside a retention window."],
+      ["constrained by", "lake/what-each-table-is-for-and-who-depends-on-it", "A named dependant blocks a drop proposal even when reads are zero."]
+    ],
+    "lake/declared-grain-and-keys-per-table": [
+      ["shapes", "lake/conformed-zone-of-functional-tables", "The grain is what makes the zone queryable without surprises."],
+      ["reads", "sem/entity-and-grain-definitions", "The lake does not invent grains. It implements the ones the semantic layer defines."],
+      ["enforced by", "dq/assertion-suites-for-null-range-and-uniqueness", "A declared key is worth nothing until a test fails when it breaks."],
+      ["feeds", "agg/one-definition-per-metric-compiled-to-sql", "A metric that aggregates the wrong grain double counts, so the grain travels upward."]
+    ],
+    "lake/slowly-changing-dimension-handling": [
+      ["writes", "lake/conformed-zone-of-functional-tables", "Versioned dimension rows land here with their validity windows."],
+      ["reads", "int/survivorship-and-precedence-logic", "Which value won at integration is the value a version records."],
+      ["feeds", "agg/one-definition-per-metric-compiled-to-sql", "Point-in-time metrics join the version that was true on the event date."],
+      ["explains", "agg/why-each-metric-is-defined-the-way-it-is", "Whether a metric restates history is an SCD decision before it is a metric decision."]
+    ],
+    "lake/access-policy-row-and-column-level": [
+      ["reads", "lake/sensitivity-class-per-dataset", "The class says what needs a rule. The policy says what the rule is."],
+      ["enforces on", "lake/conformed-zone-of-functional-tables", "Rules apply in the engine, so every tool inherits them."],
+      ["propagates to", "dash/row-level-access-at-query-time", "The dashboard does not re-implement access. It inherits what the lake declares."],
+      ["bounds", "agt/retrieval-over-catalog-lineage-and-context", "An agent retrieves under the identity of the person asking, never above it."]
+    ],
+    "lake/retention-and-deletion-policy": [
+      ["overrides", "lake/raw-zone-immutable-and-partitioned", "The one thing allowed to rewrite an immutable zone, and only on a recorded request."],
+      ["reads", "lake/sensitivity-class-per-dataset", "The class carries the lawful basis and therefore the period."],
+      ["constrains", "lake/open-table-format-with-time-travel", "Expiring a snapshot is how time travel stops resurrecting deleted rows."],
+      ["constrains", "lake/cost-and-usage-scanner", "Retention wins over cost. An unread table inside its window stays."]
+    ],
+    "lake/raw-zone-immutable-and-partitioned": [
+      ["feeds", "lake/conformed-zone-of-functional-tables", "Every conformed table is derived from raw and can be rebuilt from it."],
+      ["reads", "ods/1-1-replica-tables", "Raw is where the replica lands, with the load time recorded beside it."],
+      ["recorded in", "lake/automatic-lineage-capture", "The load run is the first edge in every lineage path."],
+      ["bounded by", "lake/retention-and-deletion-policy", "Immutable means immutable until a lawful deletion says otherwise."]
+    ],
+    "lake/conformed-zone-of-functional-tables": [
+      ["reads", "lake/raw-zone-immutable-and-partitioned", "Rebuilt from raw whenever a rule changes, never patched in place."],
+      ["shaped by", "lake/declared-grain-and-keys-per-table", "Grain and keys are declared before a table enters the zone."],
+      ["shaped by", "lint/type-and-unit-coercion", "Types, units and timezones are settled on the way in."],
+      ["feeds", "agg/staging-intermediate-and-mart-tables", "Marts build on the conformed zone, never on raw."],
+      ["queried by", "dash/cached-serving-layer", "The serving layer reads conformed tables through governed metrics."]
+    ],
+    "lake/open-table-format-with-time-travel": [
+      ["holds", "lake/conformed-zone-of-functional-tables", "The transaction log over the files is what makes a table a table."],
+      ["holds", "lake/raw-zone-immutable-and-partitioned", "Atomic commits are why a reader never sees a half-written load."],
+      ["enables", "lake/automatic-lineage-capture", "A snapshot id is what makes a lineage edge reproducible."],
+      ["bounded by", "lake/retention-and-deletion-policy", "Snapshot expiry is set by retention, not by convenience."]
+    ],
+    "lake/automatic-lineage-capture": [
+      ["records", "lake/conformed-zone-of-functional-tables", "Every transformation into the zone emits its inputs, outputs and run id."],
+      ["serves", "lake/lineage-q-and-a-over-the-catalog", "The graph is what the agent queries. It never answers from a remembered schema."],
+      ["serves", "sem/impact-analysis-before-a-change", "Impact analysis walks these edges to find what a definition change breaks."],
+      ["serves", "dq/root-cause-traced-across-lineage", "A failing test becomes a path back to the run that caused it."]
+    ]
+  };
+
+  /* A component links out when there is something to show: a written page,
+     or interactions with the rest of the stack. */
   function compLabelHTML(label, parentKey) {
-    var d = DETAIL_BY_LABEL[parentKey] && DETAIL_BY_LABEL[parentKey][label];
-    if (!d) return label;
-    return '<a class="comp-link" href="#/' + d.parent + "/" + d.slug + '">' + label + "</a>";
+    var slug = SLUG_OF[parentKey] && SLUG_OF[parentKey][label];
+    if (!slug) return label;
+    var id = parentKey + "/" + slug;
+    if (!DETAIL_BY_ROUTE[id] && !EDGES[id]) return label;
+    return '<a class="comp-link" href="#/' + id + '">' + label + "</a>";
   }
 
   var MODULE_BY_KEY = {};
@@ -1919,34 +2082,42 @@ body[data-route="detail"] .detail{ display:block; }
         "</div>";
     }).join("");
 
-    var from = nd.comps.map(function (list, i) {
-      return '<div class="cgroup" data-type="' + TYPES[i].slug + '" style="--c:' + TYPES[i].c + '">' +
-        '<div class="clabel">' + TYPES[i].key + "</div><ul>" +
-        list.map(function (c) { return "<li>" + compLabelHTML(c, nd.key) + "</li>"; }).join("") + "</ul></div>";
-    }).join("");
-
     return '<div class="node-panel">' +
         '<div class="panel-sec p-top">' +
           '<div class="p-what"><span class="sec-k">What this layer is</span><p>' + nd.what + "</p></div>" +
           '<div class="p-prov"><span class="sec-k">What it provides</span><div class="provides">' + provides + "</div></div>" +
         "</div>" +
         '<div class="panel-sec"><span class="sec-k">Produced with</span><div class="builtwith">' + built + "</div></div>" +
-        '<div class="panel-sec p-made"><span class="sec-k">Made of</span><div class="built-from">' + from + "</div></div>" +
       "</div>";
+  }
+
+  /* The four columns of one layer. Always visible: context, agent and logical
+     are layers in their own right, not details of the physical product. */
+  function matrixHTML(nd) {
+    return '<div class="built-from">' + nd.comps.map(function (list, i) {
+      var t = TYPES[i];
+      return '<div class="cgroup" data-type="' + t.slug + '" style="--c:' + t.c + '">' +
+        '<div class="clabel">' + t.key + "</div>" +
+        (t.slug === "physical" ? '<div class="shape-cell">' + shapeSVG(nd.shape) + "</div>" : "") +
+        "<ul>" + list.map(function (c) { return "<li>" + compLabelHTML(c, nd.key) + "</li>"; }).join("") +
+      "</ul></div>";
+    }).join("") + "</div>";
   }
 
   function nodeHTML(nd) {
     return '<article class="node" data-key="' + nd.key + '" style="--h:var(--h-' + nd.key + ');--t:var(--t-' + nd.key + ')">' +
-        '<div class="shape-cell">' + shapeSVG(nd.shape) + "</div>" +
-        '<div class="node-body">' +
+        '<div class="node-head">' +
           '<div class="node-top"><span class="node-num">' + nd.n + '</span><h3 class="node-name">' + nd.name + "</h3>" +
           '<span class="node-role">' + nd.role + "</span></div>" +
           '<p class="node-line">' + nd.line + "</p>" +
-          '<button type="button" class="node-open" aria-expanded="false">' +
-            '<span class="tri" aria-hidden="true"></span><span class="lbl">Components</span></button>' +
+          '<div class="node-meta">' +
+            '<p class="node-out"><span class="k">Output</span><span>' + nd.out + "</span></p>" +
+            '<button type="button" class="node-open" aria-expanded="false">' +
+              '<span class="tri" aria-hidden="true"></span><span class="lbl">About this layer</span></button>' +
+          "</div>" +
         "</div>" +
-        '<p class="node-out"><span class="k">Output</span><span>' + nd.out + "</span></p>" +
         panelHTML(nd) +
+        matrixHTML(nd) +
       "</article>";
   }
 
@@ -1977,18 +2148,7 @@ body[data-route="detail"] .detail{ display:block; }
   }).join("");
 
   var html =
-    '<div class="cbar"><span class="cbar-label">Every dataset is made of four things</span>' +
-      '<div class="cbar-row">' +
-        TYPES.map(function (t) {
-          return '<button type="button" class="ctype" data-type="' + t.slug + '" aria-pressed="false" style="--c:' + t.c + '">' +
-            glyphSVG(t.g) +
-            '<span class="ct-n">' + t.key + "</span>" +
-            '<span class="ct-d">' + t.ds + "</span>" +
-            '<span class="ct-go">Follow it down the stack</span>' +
-          "</button>";
-        }).join("") +
-      "</div></div>" +
-    '<p class="focus-note"><span id="focus-text"></span><button type="button" id="focus-clear">Show all four</button></p>' +
+
     '<div class="stack-grid">' +
       '<svg class="plugs" aria-hidden="true"></svg>' +
       '<aside class="modules"><span class="col-label">Plugs into the stack</span>' +
@@ -2000,7 +2160,20 @@ body[data-route="detail"] .detail{ display:block; }
           '<div class="mgroup"><span class="mgroup-label">Logical modules</span>' +
             MODULES.filter(function (m) { return m.group === "log"; }).map(moduleHTML).join("") + "</div>" +
         "</div></aside>" +
-      '<div class="spine"><span class="col-label">Physical data products &nbsp;·&nbsp; data flows up</span>' + spineHTML + "</div>" +
+      '<div class="spine">' +
+        '<div class="cbar"><span class="cbar-label">Four layers, read across. Data flows up.</span>' +
+          '<div class="cbar-row">' +
+            TYPES.map(function (t) {
+              return '<button type="button" class="ctype" data-type="' + t.slug + '" aria-pressed="false" style="--c:' + t.c + '">' +
+                glyphSVG(t.g) +
+                '<span class="ct-n">' + t.key + "</span>" +
+                '<span class="ct-d">' + t.ds + "</span>" +
+                '<span class="ct-go">Follow it down the stack</span>' +
+              "</button>";
+            }).join("") +
+          "</div>" +
+          '<p class="focus-note"><span id="focus-text"></span><button type="button" id="focus-clear">Show all four</button></p>' +
+        "</div>" + spineHTML + "</div>" +
     "</div>";
 
   var dag = document.getElementById("dag");
@@ -2064,20 +2237,13 @@ body[data-route="detail"] .detail{ display:block; }
     var btn = node.querySelector(".node-open");
     if (btn) {
       btn.setAttribute("aria-expanded", String(open));
-      btn.querySelector(".lbl").textContent = open ? "Hide components" : "Components";
+      btn.querySelector(".lbl").textContent = open ? "Hide layer notes" : "About this layer";
     }
     remeasure();
   }
 
-  grid.querySelectorAll(".node").forEach(function (node) {
-    node.addEventListener("click", function (e) {
-      if (document.body.dataset.view !== "exec") return;
-      if (document.body.dataset.focus) return;
-      if (window.getSelection && String(window.getSelection()).length) return;
-      if (e.target.closest("a")) return;
-      e.preventDefault();
-      toggleNode(node);
-    });
+  grid.querySelectorAll(".node-open").forEach(function (btn) {
+    btn.addEventListener("click", function () { toggleNode(btn.closest(".node")); });
   });
 
   grid.querySelectorAll(".module-head").forEach(function (btn) {
@@ -2113,17 +2279,6 @@ body[data-route="detail"] .detail{ display:block; }
     if (slug) {
       var t = TYPES.filter(function (x) { return x.slug === slug; })[0];
       focusText.textContent = "Showing the " + t.key.toLowerCase() + " component of every layer.";
-      grid.querySelectorAll(".node").forEach(function (nd) {
-        nd.classList.add("is-open");
-        var b = nd.querySelector(".node-open");
-        if (b) b.setAttribute("aria-expanded", "true");
-      });
-    } else {
-      grid.querySelectorAll(".node").forEach(function (nd) {
-        nd.classList.remove("is-open");
-        var b = nd.querySelector(".node-open");
-        if (b) { b.setAttribute("aria-expanded", "false"); b.querySelector(".lbl").textContent = "Components"; }
-      });
     }
     remeasure();
   }
@@ -2195,6 +2350,7 @@ body[data-route="detail"] .detail{ display:block; }
   var dBreaks    = document.getElementById("detail-breaks");
   var dLane      = document.getElementById("detail-lane");
   var dParent    = document.getElementById("detail-parent");
+  var dWires     = document.getElementById("detail-wires");
   var dNav       = document.getElementById("detail-nav");
   var dBack      = document.getElementById("detail-back");
   var baseTitle  = document.title;
@@ -2204,14 +2360,23 @@ body[data-route="detail"] .detail{ display:block; }
 
   function routeKey() {
     var h = location.hash.replace(/^#\/?/, "");
-    return DETAIL_BY_ROUTE[h] ? h : null;
+    return (DETAIL_BY_ROUTE[h] || EDGES[h]) ? h : null;
   }
 
   function siblings(parent) {
     return DETAIL.filter(function (d) { return d.parent === parent; });
   }
+  function siblingIndex(sib, d) {
+    for (var i = 0; i < sib.length; i++) if (sib[i].slug === d.slug) return i;
+    return -1;
+  }
 
-  function renderDetail(d) {
+  function renderDetail(id) {
+    var comp = COMPONENTS[id] || {};
+    var d = DETAIL_BY_ROUTE[id] || {
+      parent: comp.parent, slug: id.split("/")[1], label: comp.label || id,
+      lane: comp.typeName || "", lead: "", what: "", how: [], breaks: []
+    };
     var info = PARENT_INFO[d.parent] || { label: d.parent };
     detailEl.style.setProperty("--h", "var(--h-" + d.parent + ")");
     detailEl.style.setProperty("--t", "var(--t-" + d.parent + ")");
@@ -2227,11 +2392,35 @@ body[data-route="detail"] .detail{ display:block; }
     dSteps.innerHTML = d.how.map(function (st) {
       return '<li><span class="st-t">' + st[0] + '</span><span class="st-d">' + st[1] + "</span></li>";
     }).join("");
-
     dBreaks.innerHTML = d.breaks.map(function (b) { return "<li>" + b + "</li>"; }).join("");
 
+    /* sections with nothing in them stay out of the page */
+    dLead.hidden  = !d.lead;
+    dWhat.closest(".d-sec").hidden  = !d.what;
+    dSteps.closest(".d-sec").hidden = !d.how.length;
+    dBreaks.closest(".d-sec").hidden = !d.breaks.length;
+
+    /* how this component touches the rest of the stack */
+    var edges = EDGES[id] || [];
+    dWires.closest(".d-sec").hidden = !edges.length;
+    dWires.innerHTML = edges.map(function (e) {
+      var t = COMPONENTS[e[1]] || { label: e[1], typeName: "", parent: "" };
+      var tp = PARENT_INFO[t.parent] || { label: t.parent };
+      var linked = DETAIL_BY_ROUTE[e[1]] || EDGES[e[1]];
+      var name = linked
+        ? '<a class="wire-t" href="#/' + e[1] + '">' + t.label + "</a>"
+        : '<span class="wire-t">' + t.label + "</span>";
+      return '<li class="wire" data-type="' + (t.type || "") + '">' +
+          '<span class="wire-rel">' + e[0] + "</span>" +
+          '<span class="wire-main">' + name +
+            '<span class="wire-where">' + tp.label + '<span class="wire-dot"></span>' + t.typeName + "</span>" +
+            '<span class="wire-d">' + e[2] + "</span>" +
+          "</span>" +
+        "</li>";
+    }).join("");
+
     var sib = siblings(d.parent);
-    var i = sib.indexOf(d);
+    var i = siblingIndex(sib, d);
     var prev = sib[i - 1], next = sib[i + 1];
     dNav.innerHTML =
       (prev ? '<a href="#/' + prev.parent + "/" + prev.slug + '"><span class="dn-k">Previous</span><span class="dn-t">' + prev.label + "</span></a>" : "") +
@@ -2252,7 +2441,7 @@ body[data-route="detail"] .detail{ display:block; }
     if (key) {
       if (document.body.dataset.route !== "detail") indexScroll = window.scrollY;
       document.body.dataset.route = "detail";
-      renderDetail(DETAIL_BY_ROUTE[key]);
+      renderDetail(key);
       window.scrollTo(0, 0);
       if (!opts || opts.focus !== false) dTitle.focus({ preventScroll: true });
     } else {
