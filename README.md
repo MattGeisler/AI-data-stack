@@ -10,27 +10,18 @@ dependencies. `index.html` is self-contained.
 Each is drawn as the thing it is: source tiles, a replicated cylinder, a merge
 manifold, the lake cylinder, an aggregate cube, a screen.
 
-## The other axis: modules that plug into the spine
+## The other three layers
 
-Logical modules (quality, semantics and conformance, enforced against the products):
+Context, agent and logical are layers in their own right, not details of a
+physical product. Each is a column of named concerns:
 
-- DQ Module: plugs into Data Source, ODS, Integration, Lake, Aggregate
-- Semantic Layer: plugs into Integration, Lake, Aggregate, Discovery & Dashboard
-- Linting Model: plugs into ODS, Integration, Lake, Aggregate
+- Context: Business knowledge, Skills, Tools, Events
+- Agent: Task, Domain expert, Process owner
+- Logical: Transformation SQL, DQ Module, Linting Model, Semantic Layer
 
-Agent:
-
-- Agent Runtime: plugs into all six products. Model endpoints, tool scope,
-  evaluation suites, guardrails, prompts and worked examples.
-
-Context pipeline (a small pipeline of its own):
-
-- Business Context: business inputs, context modelling, context store, grounding
-  service, plugged into Discovery & Dashboard
-
-These are not data products. They attach to the products and do not sit in the
-flow. They appear only in the Technical view, collapsed. Click one to open its
-components and light up what it plugs into.
+The summary shows the names alone. Clicking one opens its page: which of the
+six physical layers it covers, what it is made of by type, what it provides.
+A physical layer opens the same way, into its own four-type breakdown.
 
 ## Inside every box: the four components
 

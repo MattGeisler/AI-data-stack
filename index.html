@@ -46,6 +46,18 @@
   --h-sem:  #334E68;  --t-sem:  #E8EDF2;
   --h-agt:  #B4533A;  --t-agt:  #F8EDE7;
 
+  /* context concerns, violet family */
+  --h-bk:   #7A4B9C;  --t-bk:   #F0EAF7;
+  --h-sk:   #6A5AA6;  --t-sk:   #ECEAF7;
+  --h-tl:   #8B4F97;  --t-tl:   #F3E9F5;
+  --h-ev:   #5D4B8C;  --t-ev:   #EAE8F4;
+  /* agent concerns, terracotta family */
+  --h-tk:   #B4533A;  --t-tk:   #F8EDE7;
+  --h-de:   #A05A3C;  --t-de:   #F6EEE7;
+  --h-po:   #8C4530;  --t-po:   #F5EAE4;
+  /* logical concerns */
+  --h-sql:  #2F6B55;  --t-sql:  #E6F0EB;
+
   /* the four component types */
   --ty-phys:  #46505F;
   --ty-logic: #1F6B60;
@@ -241,86 +253,72 @@ body[data-focus="context"]  .built-from .cgroup[data-type="context"]{ display:bl
 body[data-focus] .modules{ display:none; }
 body[data-focus] .node-comps .cgroup{ display:none; }
 
-/* Four columns. Each concern is a card that states which layers it covers. */
+/* Four columns of names. Everything else is behind a click. */
 .mx{
   display:grid;
-  grid-template-columns:minmax(0,1fr) minmax(0,1fr) minmax(0,1.15fr) minmax(0,1.9fr);
-  gap:14px;
+  grid-template-columns:repeat(4,minmax(0,1fr));
+  gap:18px;
   align-items:start;
 }
 .mx-col{ display:flex; flex-direction:column; gap:12px; min-width:0; }
+.mx-col-phys{ gap:30px; }
 
 .lanebar{
-  display:block; text-decoration:none; color:inherit;
+  display:flex; align-items:center; gap:12px;
+  text-decoration:none; color:inherit;
   border:1px solid var(--rule); border-left:3px solid var(--h);
   border-radius:3px; background:var(--paper-card);
-  padding:14px 15px 15px;
+  padding:14px 15px;
   transition:box-shadow .22s var(--ease), transform .22s var(--ease), border-color .22s var(--ease);
 }
 .lanebar:hover{ box-shadow:0 6px 20px -14px rgba(22,24,28,.55); transform:translateY(-1px); border-color:var(--h); }
 .lanebar:focus-visible{ outline:2px solid var(--accent); outline-offset:2px; }
-.lanebar .shape{ width:44px; margin-bottom:10px; }
-.lanebar-n{ display:block; font-family:var(--serif); font-size:17px; line-height:1.15; letter-spacing:-.012em; color:var(--ink); }
-.lanebar-d{ display:block; margin-top:9px; font-size:11.5px; line-height:1.5; color:var(--ink-2); }
-.lanebar-go{
-  display:block; margin-top:10px;
-  font-family:var(--mono); font-size:8.5px; letter-spacing:.14em; text-transform:uppercase; color:var(--ink-3);
-}
-.lanebar:hover .lanebar-go{ color:var(--h); }
-
-/* the span scale: 01 at the left through 06 at the right */
-.scale{ display:flex; align-items:center; gap:8px; margin-top:8px; flex-wrap:wrap; }
-.scale-ticks{ display:flex; gap:3px; flex:none; }
-.tick{ width:12px; height:4px; border-radius:1px; background:var(--rule); }
-.tick.on{ background:var(--h); }
-.scale-n{
-  font-family:var(--mono); font-size:9px; letter-spacing:.1em; text-transform:uppercase; color:var(--h);
+.lanebar .shape{ width:46px; flex:none; }
+.lanebar-n{
+  font-family:var(--serif); font-size:18px; line-height:1.18; letter-spacing:-.014em; color:var(--ink);
 }
 
-/* a physical layer cell */
+/* a physical layer */
 .cell{
   position:relative;
-  background:var(--paper-card); border:1px solid var(--rule-soft); border-radius:3px;
-  border-left:3px solid var(--h);
-  padding:15px 17px 16px;
   opacity:0; transform:translateY(10px);
   transition:opacity .5s var(--ease), transform .5s var(--ease);
 }
 .cell.is-in{ opacity:1; transform:none; }
-.mx-col-phys{ gap:34px; }
 .cell::before{
-  content:""; position:absolute; left:50%; top:-21px; width:7px; height:7px; margin-left:-4px;
-  border-left:1px solid var(--ink-3); border-top:1px solid var(--ink-3); transform:rotate(45deg); opacity:.75;
+  content:""; position:absolute; left:34px; top:-19px; width:7px; height:7px; margin-left:-4px;
+  border-left:1px solid var(--ink-3); border-top:1px solid var(--ink-3); transform:rotate(45deg); opacity:.8;
 }
 .mx-col-phys > .cell:first-child::before{ display:none; }
-.cell-top{ display:flex; align-items:flex-start; gap:14px; }
-.cell-top .shape-cell{ width:76px; flex:none; }
-.cell-id{ min-width:0; }
-.cell .node-name{ font-size:21px; }
-.cell .node-role{ display:block; margin-top:2px; }
-.cell .node-line{ font-size:15px; margin-top:10px; }
-.cell-list{ list-style:none; margin:12px 0 0; padding:0; display:flex; flex-wrap:wrap; gap:5px 7px; }
-.cell-list li{
-  font-size:11px; line-height:1.3; padding:5px 8px; border-radius:3px;
-  background:var(--paper-sunk); border:1px solid var(--rule-soft); color:var(--ink-2);
+.cell-head{
+  appearance:none; width:100%; cursor:pointer; text-align:left; font:inherit;
+  display:flex; align-items:center; gap:12px;
+  border:1px solid var(--rule); border-left:3px solid var(--h); border-radius:3px;
+  background:var(--paper-card); padding:12px 14px;
+  transition:box-shadow .22s var(--ease), border-color .22s var(--ease);
 }
-.cell-list .comp-link{ border-bottom:0; }
-.cell .node-out{ margin-top:11px; }
+.cell-head:hover{ box-shadow:0 6px 20px -14px rgba(22,24,28,.55); border-color:var(--h); }
+.cell-head:focus-visible{ outline:2px solid var(--accent); outline-offset:2px; }
+.cell-head .shape-cell{ width:44px; flex:none; }
+.cell-id{ flex:1; min-width:0; display:flex; align-items:baseline; gap:9px; flex-wrap:wrap; }
+.cell .node-num{ font-family:var(--mono); font-size:10px; color:var(--h); }
+.cell .node-name{ font-family:var(--serif); font-size:18px; line-height:1.18; letter-spacing:-.014em; }
+.cell-head .tri{
+  flex:none; width:0; height:0; border-left:5px solid var(--ink-3);
+  border-top:3.5px solid transparent; border-bottom:3.5px solid transparent;
+  transition:transform .28s var(--ease);
+}
+.cell.is-open .cell-head .tri{ transform:rotate(90deg); }
+.cell .node-panel{ margin-top:0; }
 
-@media (max-width:1080px){
-  .mx{ grid-template-columns:minmax(0,1fr) minmax(0,1fr); }
-  .mx-col-phys{ grid-column:1 / -1; }
-}
-@media (max-width:620px){ .mx{ grid-template-columns:1fr; } }
+@media (max-width:1000px){ .mx{ grid-template-columns:repeat(2,minmax(0,1fr)); } }
+@media (max-width:560px){ .mx{ grid-template-columns:1fr; } }
 
 /* the four cards dim what they are not */
-body[data-focus="context"]  .mx-col:not([data-type="context"]):not([data-type="physical"]) > *,
-body[data-focus="agent"]    .mx-col:not([data-type="agent"]):not([data-type="physical"]) > *,
-body[data-focus="logical"]  .mx-col:not([data-type="logical"]):not([data-type="physical"]) > *{ opacity:.18; }
-body[data-focus="physical"] .mx-col:not([data-type="physical"]) > *{ opacity:.18; }
-body[data-focus="context"]  .mx-col-phys > *,
-body[data-focus="agent"]    .mx-col-phys > *,
-body[data-focus="logical"]  .mx-col-phys > *{ opacity:.55; }
+body[data-focus="context"]  .mx-col:not([data-type="context"]) > *,
+body[data-focus="agent"]    .mx-col:not([data-type="agent"]) > *,
+body[data-focus="logical"]  .mx-col:not([data-type="logical"]) > *,
+body[data-focus="physical"] .mx-col:not([data-type="physical"]) > *{ opacity:.2; }
 .mx-col > *{ transition:opacity .25s var(--ease); }
 
 /* module page bits */
@@ -737,11 +735,11 @@ a.wire-t:hover{ color:var(--c); border-bottom-color:currentColor; }
       <div class="dg-head">
         <div>
           <div class="eyebrow">The Stack</div>
-          <h2 class="exec-only">Six data products, source to decision.</h2>
-          <h2 class="tech-only">Six data products. Four components in each.</h2>
+          <h2 class="exec-only">Four layers, source to decision.</h2>
+          <h2 class="tech-only">Four layers. Six data products.</h2>
         </div>
-        <p class="dg-hint exec-only">Data flows up. <strong>Click a component</strong> above to follow it down the stack, or <strong>click a layer</strong> to open all four. Switch to <strong>Technical</strong> for everything at once, plus the modules that plug across them.</p>
-        <p class="dg-hint tech-only">Products open into their four components. <strong>Click a component</strong> above to follow one down the stack, or <strong>click a module</strong> on the left to light up what it plugs into.</p>
+        <p class="dg-hint exec-only">Four layers, read across. Data flows up the physical column. <strong>Click anything</strong> to open it.</p>
+        <p class="dg-hint tech-only">Four layers, read across. <strong>Click anything</strong> to open it, or use the cards above to highlight one layer at a time.</p>
       </div>
 
       <div class="dag" id="dag"></div>
@@ -901,6 +899,54 @@ a.wire-t:hover{ color:var(--c); border-bottom-color:currentColor; }
       '<path class="dimline" d="M25 30 H50 M25 40 H50 M25 50 H46"/>' +
       '<path class="dimline" d="M70 30 H95 M70 40 H95 M74 50 H95"/>',
 
+    /* Skills: a stack of written procedures, one checked */
+    skills:
+      '<rect class="edge" x="14" y="12" width="92" height="20" rx="3"/>' +
+      '<rect class="edge" x="14" y="36" width="92" height="20" rx="3"/>' +
+      '<rect class="face" x="14" y="60" width="92" height="20" rx="3"/>' +
+      '<path class="dimline" d="M26 22 H74 M26 46 H82"/>' +
+      '<path class="hot" d="M26 70 l6 6 l12 -14"/>',
+
+    /* Tools: a bounded socket a call plugs into */
+    tools:
+      '<rect class="edge" x="10" y="24" width="58" height="36" rx="4"/>' +
+      '<circle class="dim" cx="26" cy="42" r="3"/><circle class="dim" cx="40" cy="42" r="3"/><circle class="dim" cx="54" cy="42" r="3"/>' +
+      '<path class="hot" d="M68 34 H96 M88 28 L96 34 L88 40"/>' +
+      '<path class="dimline" d="M68 50 H96 M76 44 L68 50 L76 56"/>' +
+      '<path class="line" d="M104 24 V60"/>',
+
+    /* Events: something happened, at a moment */
+    events:
+      '<path class="dimline" d="M8 52 H36"/>' +
+      '<path class="hot" d="M36 52 L46 52 L52 28 L62 70 L70 44 L76 52 H86"/>' +
+      '<path class="dimline" d="M86 52 H112"/>' +
+      '<circle class="dim" cx="62" cy="16" r="3"/>',
+
+    /* Task: one unit of work with a definition of done */
+    task:
+      '<rect class="edge" x="20" y="10" width="80" height="64" rx="4"/>' +
+      '<path class="hot" d="M32 26 l5 5 l10 -11"/>' +
+      '<path class="dimline" d="M54 26 H88"/>' +
+      '<path class="hot" d="M32 44 l5 5 l10 -11"/>' +
+      '<path class="dimline" d="M54 44 H88"/>' +
+      '<rect class="face" x="30" y="58 " width="14" height="10" rx="2"/>' +
+      '<path class="dimline" d="M54 62 H80"/>',
+
+    /* Domain expert: one subject, deeply known */
+    expert:
+      '<circle class="face" cx="60" cy="42" r="20"/>' +
+      '<path class="hot" d="M60 22 V8 M60 62 V76 M40 42 H26 M80 42 H94"/>' +
+      '<circle class="dim" cx="60" cy="4" r="3"/><circle class="dim" cx="60" cy="80" r="3"/>' +
+      '<circle class="dim" cx="22" cy="42" r="3"/><circle class="dim" cx="98" cy="42" r="3"/>' +
+      '<path class="dimline" d="M52 42 H68"/>',
+
+    /* Process owner: a loop that is watched */
+    owner:
+      '<path class="hot" d="M84 30 A28 28 0 1 0 88 52"/>' +
+      '<path class="hot" d="M76 20 L86 30 L74 38"/>' +
+      '<circle class="face" cx="60" cy="46" r="10"/>' +
+      '<path class="dimline" d="M60 66 V78 M44 78 H76"/>',
+
     /* Module, Transformation SQL: a query that folds many rows into a table */
     sql:
       '<rect class="edge" x="10" y="12" width="100" height="60" rx="4"/>' +
@@ -1004,7 +1050,7 @@ a.wire-t:hover{ color:var(--c); border-bottom-color:currentColor; }
           "Every tile references a metric name: change a definition once and it propagates here at the same moment."
         ],
         [
-          "ctx",
+          "bk",
           "Targets, segments, calendar and glossary: the context that makes an answer mean something to this business."
         ]
       ],
@@ -1369,12 +1415,253 @@ a.wire-t:hover{ color:var(--c); border-bottom-color:currentColor; }
   /* Cross-cutting modules: a different axis, plugged into the products above */
   var MODULES = [
     {
-      "key": "dq",
-      "shape": "funnel",
-      "name": "DQ Module",
-      "tag": "Deterministic · quality",
-      "group": "log",
-      "line": "Checked against a contract at <b>every boundary</b>, not just the door. Failures quarantine; they do not propagate.",
+      "key": "bk",
+      "shape": "book",
+      "name": "Business knowledge",
+      "tag": "Context · what it means here",
+      "group": "ctx",
+      "line": "What the numbers mean in this business: the glossary, the KPI definitions, the targets and the calendar everything is read against.",
+      "plugs": [
+        "int",
+        "lake",
+        "agg",
+        "dash"
+      ],
+      "comps": [
+        [
+          "Business glossary, one name per concept",
+          "KPI definitions with named owners",
+          "Plans, targets and policy documents"
+        ],
+        [
+          "Grounding for natural-language questions",
+          "Context-aware anomaly narratives",
+          "Suggested next questions"
+        ],
+        [
+          "Segment and hierarchy definitions",
+          "Fiscal calendar and period logic",
+          "Entitlement mapped to org structure"
+        ],
+        [
+          "Target and budget tables",
+          "Context store, versioned and indexed"
+        ]
+      ],
+      "decisions": [
+        "Target setting and sign-off",
+        "Glossary ownership and review"
+      ],
+      "out": [
+        "A shared vocabulary, and answers phrased in business terms"
+      ]
+    },
+    {
+      "key": "sk",
+      "shape": "skills",
+      "name": "Skills",
+      "tag": "Context · how work gets done",
+      "group": "ctx",
+      "line": "Reusable procedures an agent can carry out, written down once and version-controlled: how to onboard a source, how to triage a failed test, how to draft a metric.",
+      "plugs": [
+        "src",
+        "ods",
+        "int",
+        "lake",
+        "agg",
+        "dash"
+      ],
+      "comps": [
+        [
+          "What good looks like for each procedure",
+          "Worked examples of a correct proposal"
+        ],
+        [
+          "Skill selection for the task at hand",
+          "Multi-step plans with checkpoints"
+        ],
+        [
+          "Versioned skill definitions",
+          "Preconditions and stop conditions",
+          "Evaluation suite per skill"
+        ],
+        [
+          "Skill registry and its run history"
+        ]
+      ],
+      "decisions": [
+        "Which skills an agent may run unattended"
+      ],
+      "out": [
+        "The same procedure every time, whoever or whatever runs it"
+      ]
+    },
+    {
+      "key": "tl",
+      "shape": "tools",
+      "name": "Tools",
+      "tag": "Context · what it may call",
+      "group": "ctx",
+      "line": "The functions an agent is allowed to call, each with a declared scope: read the catalog, open a pull request, run a test. Never write to production.",
+      "plugs": [
+        "src",
+        "ods",
+        "int",
+        "lake",
+        "agg",
+        "dash"
+      ],
+      "comps": [
+        [
+          "What each tool is for, in plain language",
+          "Which tools suit which task"
+        ],
+        [
+          "Tool selection and argument drafting",
+          "Retrieval over catalog, lineage and context"
+        ],
+        [
+          "Tool definitions and their permitted scope",
+          "Guardrails: what an agent may never write",
+          "Rate and cost limits per tool"
+        ],
+        [
+          "Tool endpoints and their call logs"
+        ]
+      ],
+      "decisions": [
+        "Which tools are granted, and to whom"
+      ],
+      "out": [
+        "A bounded surface an agent can act through, and a log of every call"
+      ]
+    },
+    {
+      "key": "ev",
+      "shape": "events",
+      "name": "Events",
+      "tag": "Context · what just happened",
+      "group": "ctx",
+      "line": "The things that happen and an agent should know about: a load landed, a test failed, a metric moved, a contract changed.",
+      "plugs": [
+        "src",
+        "ods",
+        "int",
+        "lake",
+        "agg",
+        "dash"
+      ],
+      "comps": [
+        [
+          "Which events matter, and to whom",
+          "What a given event usually means"
+        ],
+        [
+          "Event triage and classification",
+          "Narratives written from the actual deltas"
+        ],
+        [
+          "Event schema and severity rules",
+          "Subscription and routing rules",
+          "Deduplication and suppression windows"
+        ],
+        [
+          "Event stream and its retained history"
+        ]
+      ],
+      "decisions": [
+        "What escalates to a person, and how fast"
+      ],
+      "out": [
+        "A stack that notices things, instead of waiting to be asked"
+      ]
+    },
+    {
+      "key": "tk",
+      "shape": "task",
+      "name": "Task",
+      "tag": "Agent · one unit of work",
+      "group": "agt",
+      "line": "A single piece of work with a definition of done: draft this model, explain this variance, propose these matches. Every task ends in a reviewable diff.",
+      "plugs": [
+        "src",
+        "ods",
+        "int",
+        "lake",
+        "agg",
+        "dash"
+      ],
+      "comps": [
+        [
+          "Why the task was raised",
+          "What a finished task looks like"
+        ],
+        [
+          "Planning and decomposition",
+          "Drafting the proposal with its evidence",
+          "Self-check before hand-off"
+        ],
+        [
+          "Task specification and acceptance criteria",
+          "Retry and escalation rules",
+          "Evaluation against the expected result"
+        ],
+        [
+          "Task queue, run logs and produced diffs"
+        ]
+      ],
+      "decisions": [
+        "Accept, amend or reject the proposal"
+      ],
+      "out": [
+        "A reviewable diff with its evidence, never a silent write"
+      ]
+    },
+    {
+      "key": "de",
+      "shape": "expert",
+      "name": "Domain expert",
+      "tag": "Agent · knows one subject",
+      "group": "agt",
+      "line": "An agent grounded in one subject area, holding its definitions, quirks and history, so a proposal reads like it came from someone who knows the business.",
+      "plugs": [
+        "int",
+        "lake",
+        "agg",
+        "dash"
+      ],
+      "comps": [
+        [
+          "The domain's glossary and its edge cases",
+          "History of past decisions in this domain"
+        ],
+        [
+          "Metric and model drafting in domain terms",
+          "Variance explained against domain norms",
+          "Overlapping-definition detection"
+        ],
+        [
+          "Scope of the domain, written down",
+          "Which definitions it may propose changes to"
+        ],
+        [
+          "The domain's tables, metrics and dashboards"
+        ]
+      ],
+      "decisions": [
+        "Certification of a domain definition"
+      ],
+      "out": [
+        "Proposals a domain owner recognises as their own"
+      ]
+    },
+    {
+      "key": "po",
+      "shape": "owner",
+      "name": "Process owner",
+      "tag": "Agent · owns a running process",
+      "group": "agt",
+      "line": "An agent that owns a recurring process end to end: watch it, notice when it breaks, propose the fix, hand a person the decision.",
       "plugs": [
         "src",
         "ods",
@@ -1384,177 +1671,28 @@ a.wire-t:hover{ color:var(--c); border-bottom-color:currentColor; }
       ],
       "comps": [
         [
-          "What a failure means for the process behind the data",
-          "Which datasets matter most, and to whom"
+          "What the process is for, and who depends on it",
+          "What normal looks like for it"
         ],
         [
-          "Failure triage and classification",
+          "Continuous watch against expectation",
           "Root cause traced across lineage",
-          "Ticket drafting with evidence"
+          "Remediation drafted with evidence"
         ],
         [
-          "Assertion suites for null, range and uniqueness",
-          "Freshness SLA checks",
-          "Reconciliation counts across hops",
-          "Versioned data contracts",
-          "Fail-closed quarantine rule"
+          "Process definition and its schedule",
+          "Health checks and their thresholds",
+          "Escalation path when a fix is refused"
         ],
         [
-          "Quarantine tables for failed rows",
-          "Check results and run history"
+          "The pipelines, jobs and tables it runs"
         ]
       ],
       "decisions": [
-        "Quarantine release approval",
-        "Contract change sign-off"
+        "Approve the remediation, or take it back"
       ],
       "out": [
-        "Trust score and freshness state on every dataset"
-      ]
-    },
-    {
-      "key": "sem",
-      "shape": "model",
-      "name": "Semantic Layer",
-      "tag": "Deterministic · definitions",
-      "group": "log",
-      "line": "Where a table becomes a concept. Entities, grains and metrics <b>defined once</b> and reused everywhere.",
-      "plugs": [
-        "int",
-        "lake",
-        "agg",
-        "dash"
-      ],
-      "comps": [
-        [
-          "What each concept means to this business",
-          "Certified or draft, and who owns it"
-        ],
-        [
-          "Definition drafting from a description",
-          "Overlapping-metric detection",
-          "Impact analysis before a change"
-        ],
-        [
-          "Entity and grain definitions",
-          "Conformed dimensions and hierarchies",
-          "Metric expressions compiled to SQL",
-          "Version-controlled model spec",
-          "One name per concept"
-        ],
-        [
-          "Compiled views and materializations the definitions produce"
-        ]
-      ],
-      "decisions": [
-        "Definition review and certification",
-        "Ownership assignment"
-      ],
-      "out": [
-        "A single vocabulary every tool queries against"
-      ]
-    },
-    {
-      "key": "ctx",
-      "shape": "book",
-      "name": "Business Context",
-      "tag": "A pipeline of its own",
-      "group": "ctx",
-      "line": "What the numbers <b>mean to this business</b>. Its own small pipeline (inputs, modelled, stored, served) that plugs into discovery.",
-      "plugs": [
-        "dash"
-      ],
-      "pipeline": [
-        {
-          "t": "Grounding service",
-          "d": "Serves definitions and context to Q&amp;A, narratives and search."
-        },
-        {
-          "t": "Context store",
-          "d": "Versioned, indexed, retrievable."
-        },
-        {
-          "t": "Context modelling",
-          "d": "Glossary, KPI definitions, segments, hierarchies."
-        },
-        {
-          "t": "Business inputs",
-          "d": "Plans, targets, org structure, calendars, policy docs."
-        }
-      ],
-      "comps": [
-        [
-          "Business glossary",
-          "Plans, targets and policy documents",
-          "Catalogue of the questions people actually ask"
-        ],
-        [
-          "Grounding for natural-language Q&amp;A",
-          "Suggested next questions",
-          "Context-aware anomaly narratives",
-          "Self-serve onboarding explainers"
-        ],
-        [
-          "Segment and hierarchy definitions",
-          "Entitlement mapped to org structure",
-          "KPI definitions with named owners"
-        ],
-        [
-          "Target and budget tables",
-          "Fiscal calendar tables",
-          "Context store, versioned and indexed"
-        ]
-      ],
-      "decisions": [
-        "Target setting and sign-off",
-        "Glossary ownership and review"
-      ],
-      "out": [
-        "A shared vocabulary",
-        "Discovery that answers in business terms"
-      ]
-    },
-    {
-      "key": "lint",
-      "shape": "comb",
-      "name": "Linting Model",
-      "tag": "Deterministic · conformance",
-      "group": "log",
-      "line": "Naming, types and units held to <b>one standard</b>, wherever data lands.",
-      "plugs": [
-        "ods",
-        "int",
-        "lake",
-        "agg"
-      ],
-      "comps": [
-        [
-          "House naming conventions and why they exist",
-          "Column glossary in business terms"
-        ],
-        [
-          "Column mapping proposer",
-          "Rename and drift detection",
-          "Standard-name suggestion"
-        ],
-        [
-          "Type and unit coercion",
-          "Timezone normalization",
-          "Canonical key formatting",
-          "Deterministic dedup rules",
-          "Naming standard enforced in CI"
-        ],
-        [
-          "Conformed, self-describing tables",
-          "Field dictionary"
-        ]
-      ],
-      "decisions": [
-        "Steward review queue",
-        "Mapping accept or reject"
-      ],
-      "out": [
-        "Conformed tables that describe themselves"
+        "A process that reports on itself and arrives with a fix attached"
       ]
     },
     {
@@ -1601,15 +1739,100 @@ a.wire-t:hover{ color:var(--c); border-bottom-color:currentColor; }
       ]
     },
     {
-      "key": "agt",
-      "shape": "agent",
-      "name": "Agent Runtime",
-      "tag": "Agent · models and loops",
-      "group": "agt",
-      "line": "The models that propose work, and the runtime they execute in. Every proposal arrives as a reviewable diff with its evidence attached.",
+      "key": "dq",
+      "shape": "funnel",
+      "name": "DQ Module",
+      "tag": "Deterministic · quality",
+      "group": "log",
+      "line": "Checked against a contract at <b>every boundary</b>, not just the door. Failures quarantine; they do not propagate.",
       "plugs": [
         "src",
         "ods",
+        "int",
+        "lake",
+        "agg"
+      ],
+      "comps": [
+        [
+          "What a failure means for the process behind the data",
+          "Which datasets matter most, and to whom"
+        ],
+        [
+          "Failure triage and classification",
+          "Root cause traced across lineage",
+          "Ticket drafting with evidence"
+        ],
+        [
+          "Assertion suites for null, range and uniqueness",
+          "Freshness SLA checks",
+          "Reconciliation counts across hops",
+          "Versioned data contracts",
+          "Fail-closed quarantine rule"
+        ],
+        [
+          "Quarantine tables for failed rows",
+          "Check results and run history"
+        ]
+      ],
+      "decisions": [
+        "Quarantine release approval",
+        "Contract change sign-off"
+      ],
+      "out": [
+        "Trust score and freshness state on every dataset"
+      ]
+    },
+    {
+      "key": "lint",
+      "shape": "comb",
+      "name": "Linting Model",
+      "tag": "Deterministic · conformance",
+      "group": "log",
+      "line": "Naming, types and units held to <b>one standard</b>, wherever data lands.",
+      "plugs": [
+        "ods",
+        "int",
+        "lake",
+        "agg"
+      ],
+      "comps": [
+        [
+          "House naming conventions and why they exist",
+          "Column glossary in business terms"
+        ],
+        [
+          "Column mapping proposer",
+          "Rename and drift detection",
+          "Standard-name suggestion"
+        ],
+        [
+          "Type and unit coercion",
+          "Timezone normalization",
+          "Canonical key formatting",
+          "Deterministic dedup rules",
+          "Naming standard enforced in CI"
+        ],
+        [
+          "Conformed, self-describing tables",
+          "Field dictionary"
+        ]
+      ],
+      "decisions": [
+        "Steward review queue",
+        "Mapping accept or reject"
+      ],
+      "out": [
+        "Conformed tables that describe themselves"
+      ]
+    },
+    {
+      "key": "sem",
+      "shape": "model",
+      "name": "Semantic Layer",
+      "tag": "Deterministic · definitions",
+      "group": "log",
+      "line": "Where a table becomes a concept. Entities, grains and metrics <b>defined once</b> and reused everywhere.",
+      "plugs": [
         "int",
         "lake",
         "agg",
@@ -1617,31 +1840,31 @@ a.wire-t:hover{ color:var(--c); border-bottom-color:currentColor; }
       ],
       "comps": [
         [
-          "System prompts and task instructions",
-          "What the agent is told about this business",
-          "Worked examples of a good proposal"
+          "What each concept means to this business",
+          "Certified or draft, and who owns it"
         ],
         [
-          "Task routing across models",
-          "Retrieval over catalog, lineage and context",
-          "Multi-step plans with checkpoints"
+          "Definition drafting from a description",
+          "Overlapping-metric detection",
+          "Impact analysis before a change"
         ],
         [
-          "Tool definitions and their permitted scope",
-          "Evaluation suites per task",
-          "Guardrails: what an agent may never write"
+          "Entity and grain definitions",
+          "Conformed dimensions and hierarchies",
+          "Metric expressions compiled to SQL",
+          "Version-controlled model spec",
+          "One name per concept"
         ],
         [
-          "Model endpoints and their versions",
-          "Proposal and evaluation logs"
+          "Compiled views and materializations the definitions produce"
         ]
       ],
       "decisions": [
-        "Which proposals are accepted",
-        "Where an agent is allowed to act"
+        "Definition review and certification",
+        "Ownership assignment"
       ],
       "out": [
-        "Reviewable diffs with evidence, never a silent write"
+        "A single vocabulary every tool queries against"
       ]
     }
   ];
@@ -2007,20 +2230,20 @@ a.wire-t:hover{ color:var(--c); border-bottom-color:currentColor; }
     "lake/what-each-table-is-for-and-who-depends-on-it": [
       ["reads", "lake/automatic-lineage-capture", "The dependency half of the answer comes from the lineage graph, not from a hand-kept list."],
       ["feeds", "lake/lineage-q-and-a-over-the-catalog", "Gives the agent the purpose of a table, so an answer can say why it matters and not only what it joins to."],
-      ["feeds", "agt/what-the-agent-is-told-about-this-business", "Table purpose is part of the standing context every agent task starts from."],
+      ["feeds", "bk/business-glossary-one-name-per-concept", "Table purpose is part of the standing context every agent task starts from."],
       ["constrains", "lake/cost-and-usage-scanner", "A table with no reads but a named dependant is a question, not a candidate for deletion."]
     ],
     "lake/sensitivity-class-per-dataset": [
       ["constrains", "lake/access-policy-row-and-column-level", "The class decides which columns need row or column rules in the first place."],
       ["constrains", "lake/retention-and-deletion-policy", "Personal data inherits its retention period from its class."],
-      ["constrains", "agt/guardrails-what-an-agent-may-never-write", "Restricted classes are the ones an agent may summarise but never copy into a proposal."],
+      ["constrains", "tl/guardrails-what-an-agent-may-never-write", "Restricted classes are the ones an agent may summarise but never copy into a proposal."],
       ["reads", "src/what-an-agent-is-allowed-to-read-from-it", "Classification starts at the source contract and travels with the data."]
     ],
     "lake/lineage-q-and-a-over-the-catalog": [
       ["reads", "lake/automatic-lineage-capture", "The graph is the entire ground truth for the answer. No graph, no answer."],
       ["reads", "lake/what-each-table-is-for-and-who-depends-on-it", "Turns a list of edges into a reason a person cares."],
       ["feeds", "agg/variance-explainer", "When a number moves, the explainer walks the same lineage to find where it moved."],
-      ["bounded by", "agt/tool-definitions-and-their-permitted-scope", "The catalog query tool is scoped to metadata. It cannot read the rows themselves."]
+      ["bounded by", "tl/tool-definitions-and-their-permitted-scope", "The catalog query tool is scoped to metadata. It cannot read the rows themselves."]
     ],
     "lake/orphan-and-duplicate-detection": [
       ["reads", "lake/declared-grain-and-keys-per-table", "The declared key is what makes a duplicate detectable at all."],
@@ -2051,7 +2274,7 @@ a.wire-t:hover{ color:var(--c); border-bottom-color:currentColor; }
       ["reads", "lake/sensitivity-class-per-dataset", "The class says what needs a rule. The policy says what the rule is."],
       ["enforces on", "lake/conformed-zone-of-functional-tables", "Rules apply in the engine, so every tool inherits them."],
       ["propagates to", "dash/row-level-access-at-query-time", "The dashboard does not re-implement access. It inherits what the lake declares."],
-      ["bounds", "agt/retrieval-over-catalog-lineage-and-context", "An agent retrieves under the identity of the person asking, never above it."]
+      ["bounds", "tl/retrieval-over-catalog-lineage-and-context", "An agent retrieves under the identity of the person asking, never above it."]
     ],
     "lake/retention-and-deletion-policy": [
       ["overrides", "lake/raw-zone-immutable-and-partitioned", "The one thing allowed to rewrite an immutable zone, and only on a recorded request."],
@@ -2154,51 +2377,22 @@ a.wire-t:hover{ color:var(--c); border-bottom-color:currentColor; }
 
   var COL_OF = { ctx:"context", agt:"agent", log:"logical" };
 
-  /* Which of the six physical layers a concern covers, drawn as a scale
-     that reads 01 at the left through 06 at the right. */
-  function scaleHTML(m) {
-    var on = {};
-    m.plugs.forEach(function (k) { on[k] = 1; });
-    var ordered = NODES.slice().reverse();
-    var covered = ordered.filter(function (nd) { return on[nd.key]; });
-    var reach = covered.length === 1
-      ? covered[0].n + " only"
-      : covered[0].n + " → " + covered[covered.length - 1].n;
-    return '<span class="scale"><span class="scale-ticks">' +
-        ordered.map(function (nd) {
-          return '<span class="tick' + (on[nd.key] ? " on" : "") + '" title="' + nd.n + " " +
-            nd.name.replace(/&amp;/g, "and") + '"></span>';
-        }).join("") +
-      "</span><span class=\"scale-n\">" + reach + "</span></span>";
-  }
-
   function barHTML(m) {
     return '<a class="lanebar" href="#/m/' + m.key + '" data-key="' + m.key + '" data-type="' + COL_OF[m.group] + '"' +
         ' style="--h:var(--h-' + m.key + ');--t:var(--t-' + m.key + ')">' +
           shapeSVG(m.shape) +
           '<span class="lanebar-n">' + m.name + "</span>" +
-          scaleHTML(m) +
-          '<span class="lanebar-d">' + m.line.replace(/<[^>]*>/g, "") + "</span>" +
-          '<span class="lanebar-go">Open</span>' +
       "</a>";
   }
 
   function cellHTML(nd) {
-    var physical = nd.comps[3] || [];
     return '<article class="cell" data-key="' + nd.key + '" style="--h:var(--h-' + nd.key + ');--t:var(--t-' + nd.key + ')">' +
-        '<div class="cell-top">' +
-          '<div class="shape-cell">' + shapeSVG(nd.shape) + "</div>" +
-          '<div class="cell-id"><span class="node-num">' + nd.n + "</span>" +
-            '<h3 class="node-name">' + nd.name + "</h3>" +
-            '<span class="node-role">' + nd.role + "</span></div>" +
-        "</div>" +
-        '<p class="node-line">' + nd.line + "</p>" +
-        '<ul class="cell-list">' + physical.map(function (c) {
-          return "<li>" + compLabelHTML(c, nd.key) + "</li>";
-        }).join("") + "</ul>" +
-        '<p class="node-out"><span class="k">Output</span><span>' + nd.out + "</span></p>" +
-        '<button type="button" class="node-open" aria-expanded="false">' +
-          '<span class="tri" aria-hidden="true"></span><span class="lbl">About this layer</span></button>' +
+        '<button type="button" class="cell-head" aria-expanded="false">' +
+          '<span class="shape-cell">' + shapeSVG(nd.shape) + "</span>" +
+          '<span class="cell-id"><span class="node-num">' + nd.n + "</span>" +
+            '<span class="node-name">' + nd.name + "</span></span>" +
+          '<span class="tri" aria-hidden="true"></span>' +
+        "</button>" +
         panelHTML(nd) +
       "</article>";
   }
@@ -2238,13 +2432,10 @@ a.wire-t:hover{ color:var(--c); border-bottom-color:currentColor; }
 
   function toggleNode(node) {
     var open = node.classList.toggle("is-open");
-    var btn = node.querySelector(".node-open");
-    if (btn) {
-      btn.setAttribute("aria-expanded", String(open));
-      btn.querySelector(".lbl").textContent = open ? "Hide layer notes" : "About this layer";
-    }
+    var btn = node.querySelector(".cell-head");
+    if (btn) btn.setAttribute("aria-expanded", String(open));
   }
-  dag.querySelectorAll(".node-open").forEach(function (btn) {
+  dag.querySelectorAll(".cell-head").forEach(function (btn) {
     btn.addEventListener("click", function () { toggleNode(btn.closest(".cell")); });
   });
   function remeasure() {}
