@@ -1630,7 +1630,7 @@ a.wire-t:hover{ color:var(--c); border-bottom-color:currentColor; }
       "name": "Tools",
       "tag": "Context · what it may call",
       "group": "ctx",
-      "line": "The functions an agent is allowed to call, each with a declared scope: read the catalog, open a pull request, run a test. Never write to production.",
+      "line": "The functions an agent is allowed to call, each with a declared scope: read the catalog, open a pull request, run a test. Never write to production. Every call is logged against the task that asked for it, and the log is what narrows a grant or widens it.",
       "plugs": [
         "src",
         "ods",
@@ -1642,23 +1642,43 @@ a.wire-t:hover{ color:var(--c); border-bottom-color:currentColor; }
       "comps": [
         [
           "What each tool is for, in plain language",
-          "Which tools suit which task"
+          "Which tools suit which task",
+          "What a call costs, and whose budget it lands on",
+          "Which systems the business will not let an agent touch",
+          "Who owns each tool, and who to ask when it changes",
+          "What went wrong the last time a scope was widened",
+          "Worked examples: a good call and a bad one"
         ],
         [
           "Tool selection and argument drafting",
-          "Retrieval over catalog, lineage and context"
+          "Retrieval over catalog, lineage and context",
+          "Reads the call log for tools that fail or go unused",
+          "Requests a scope it does not have, with the task that needs it",
+          "Retries and backs off inside the declared limits",
+          "Reports a call that returned something unexpected",
+          "Drafts a tool definition when a step keeps being done by hand"
         ],
         [
           "Tool definitions and their permitted scope",
           "Guardrails: what an agent may never write",
-          "Rate and cost limits per tool"
+          "Rate and cost limits per tool",
+          "A person approves every grant, and every widening",
+          "Grants expire, and are renewed deliberately",
+          "Every call carries the task it was made for",
+          "Dry run before write, wherever a write is allowed at all"
         ],
         [
-          "Tool endpoints and their call logs"
+          "Tool endpoints and their call logs",
+          "The tool registry, versioned alongside the skills",
+          "The credential store, and the identity each tool calls as",
+          "Sandbox environments where a write is safe",
+          "Cost and usage metering per tool and per agent"
         ]
       ],
       "decisions": [
-        "Which tools are granted, and to whom"
+        "Which tools are granted, and to whom",
+        "Whether a widening request is approved, and for how long",
+        "Which calls an agent may make unattended"
       ],
       "out": [
         "A bounded surface an agent can act through, and a log of every call"
@@ -2355,6 +2375,109 @@ a.wire-t:hover{ color:var(--c); border-bottom-color:currentColor; }
      Written so far: 04 Data Lake.
      ============================================================ */
   var EDGES = {
+    "tl/what-each-tool-is-for-in-plain-language": [
+      ["reads","tl/tool-definitions-and-their-permitted-scope","The plain sentence is written from the definition it describes, so the two cannot drift apart."],
+      ["serves","tl/tool-selection-and-argument-drafting","Selection is only ever as good as the description an agent reads before it chooses."],
+      ["serves","sk/selects-the-skill-that-fits-the-task","A skill picks a tool by what it does, and not by what someone named it."],
+      ["mirrors","lake/what-each-table-is-for-and-who-depends-on-it","Same discipline one column over: the thing and the sentence explaining it live together."]
+    ],
+    "tl/what-a-call-costs-and-whose-budget-it-lands-on": [
+      ["reads","tl/cost-and-usage-metering-per-tool-and-per-agent","The figure comes off the meter, and not off an estimate someone made once at the start."],
+      ["sets","tl/rate-and-cost-limits-per-tool","A limit is a budget decision before it is ever a technical one."],
+      ["serves","tl/tool-selection-and-argument-drafting","Cost is an input to picking the cheaper call that answers the same question."],
+      ["mirrors","lake/cost-and-usage-scanner","The lake asks which tables earn their storage. This asks which tools earn their calls."]
+    ],
+    "tl/which-systems-the-business-will-not-let-an-agent": [
+      ["governs","tl/guardrails-what-an-agent-may-never-write","The business draws the line. The guardrail is where that line gets enforced."],
+      ["constrains","tl/tool-definitions-and-their-permitted-scope","A system on this list never appears inside a scope, whatever the task claims to need."],
+      ["reads","lake/sensitivity-class-per-dataset","Sensitivity settles most of these before anyone has the argument."],
+      ["informs","src/what-an-agent-is-allowed-to-read-from-it","The same boundary, restated at the feed where the data enters."]
+    ],
+    "tl/what-went-wrong-the-last-time-a-scope-was-widene": [
+      ["reads","tl/tool-endpoints-and-their-call-logs","The log is the record of what a widening actually let happen, once it was live."],
+      ["informs","tl/a-person-approves-every-grant-and-every-widening","The reviewer reads the last incident before granting the next request."],
+      ["stored in","bk/the-document-repository-under-version-control","An incident write-up is business knowledge, and lives where the rest of it lives."],
+      ["bounds","tl/requests-a-scope-it-does-not-have-with-the-task-","A request against a scope that has already caused an incident starts from behind."],
+      ["serves","po/escalation-path-when-a-fix-is-refused","When a fix is refused because no tool can make it, this record is what argues the case upward."]
+    ],
+    "tl/tool-selection-and-argument-drafting": [
+      ["reads","tl/tool-definitions-and-their-permitted-scope","It chooses from what is declared, and never from what it can guess an endpoint might accept."],
+      ["reads","tl/what-each-tool-is-for-in-plain-language","Arguments get drafted against the described purpose, so a wrong tool is caught before the call."],
+      ["bounded by","tl/rate-and-cost-limits-per-tool","The limit is checked before the call goes out, and not discovered by hitting it."],
+      ["writes","tl/tool-endpoints-and-their-call-logs","Every attempt lands in the log, including the ones the guardrail refused."],
+      ["serves","de/metric-and-model-drafting-in-domain-terms","A domain expert proposes through tools, so the proposal is bounded before it is written."]
+    ],
+    "tl/retrieval-over-catalog-lineage-and-context": [
+      ["reads","lake/automatic-lineage-capture","Retrieval walks the captured graph, so an answer traces to something real."],
+      ["reads","bk/agent-readable-context-store-chunked-and-embedde","Catalog metadata alone says what a column is. Context says why the business cares."],
+      ["grounds","tk/drafting-the-proposal-with-its-evidence","A proposal carries the retrieved evidence with it, and the reader checks the path."],
+      ["serves","lake/lineage-q-and-a-over-the-catalog","The Q&amp;A surface is this retrieval with a question box in front of it."]
+    ],
+    "tl/reads-the-call-log-for-tools-that-fail-or-go-unu": [
+      ["reads","tl/tool-endpoints-and-their-call-logs","Across sessions. One failed call is noise; the same failed call every day is a defect."],
+      ["reads","tl/cost-and-usage-metering-per-tool-and-per-agent","A tool nobody calls is a grant nobody needs, and shows up here first."],
+      ["hands to","tl/drafts-a-tool-definition-when-a-step-keeps-being","A step done by hand in five sessions is a tool that was never defined."],
+      ["proposes to","tl/a-person-approves-every-grant-and-every-widening","Findings arrive at the same queue that approves grants, worded as narrow or widen."],
+      ["feeds","po/continuous-watch-against-expectation","A tool failing quietly is a process problem before anyone thinks to call it a tool problem."]
+    ],
+    "tl/requests-a-scope-it-does-not-have-with-the-task-": [
+      ["gated by","tl/a-person-approves-every-grant-and-every-widening","An agent can ask. It cannot grant, and it cannot grant itself."],
+      ["reads","tk/task-specification-and-acceptance-criteria","The request carries the task, so a reviewer sees what the scope is for."],
+      ["constrained by","tl/guardrails-what-an-agent-may-never-write","A request that crosses a guardrail is refused at the door and never reaches review."],
+      ["mirrors","sk/drafts-a-skill-change-as-a-pull-request","Skills and scopes move through the same shape: an agent proposes, a person merges."]
+    ],
+    "tl/drafts-a-tool-definition-when-a-step-keeps-being": [
+      ["reads","tl/tool-endpoints-and-their-call-logs","The evidence for a new tool is the log of people doing its job by hand."],
+      ["writes","tl/the-tool-registry-versioned-alongside-the-skills","A drafted definition lands in the registry as a pull request, with its call history attached."],
+      ["gated by","tl/a-person-approves-every-grant-and-every-widening","A new tool is a bigger decision than a wider one, and lands in the same queue."],
+      ["mirrors","sk/writes-a-new-skill-when-a-procedure-keeps-being-","A missing tool and a missing skill are found the same way, by noticing repetition."],
+      ["serves","tk/planning-and-decomposition","Once the tool exists, the next plan can name the step that used to be improvised."]
+    ],
+    "tl/tool-definitions-and-their-permitted-scope": [
+      ["governs","tl/tool-endpoints-and-their-call-logs","The endpoint accepts what the definition declares. There is no second path in."],
+      ["governs","sk/runs-the-skill-and-records-what-happened","A skill calls through tools, so the scope bounds the skill without the skill knowing it."],
+      ["scoped by","tl/guardrails-what-an-agent-may-never-write","Guardrails sit above the definition and cannot be widened by editing it."],
+      ["stored in","tl/the-tool-registry-versioned-alongside-the-skills","Definitions are versioned next to the skills, and reviewed the same way."],
+      ["constrains","agg/orchestration-runs-and-backfills","A backfill is a write, and it goes through a declared scope like every other write."]
+    ],
+    "tl/guardrails-what-an-agent-may-never-write": [
+      ["constrains","tl/tool-endpoints-and-their-call-logs","Refusal happens at the endpoint, so a wrong call fails the same way every time."],
+      ["governs","tl/dry-run-before-write-wherever-a-write-is-allowed","Where a write is allowed at all, it is rehearsed first and never taken on trust."],
+      ["reads","lake/access-policy-row-and-column-level","The guardrail inherits the access policy instead of restating it and going stale."],
+      ["enforces on","tk/planning-and-decomposition","A plan that needs a forbidden write is not a plan. It is an escalation."]
+    ],
+    "tl/a-person-approves-every-grant-and-every-widening": [
+      ["governs","tl/tool-definitions-and-their-permitted-scope","Approved means granted. There is no other route into a permitted scope."],
+      ["governs","tl/grants-expire-and-are-renewed-deliberately","Renewal is the same decision as the first grant, taken again on purpose."],
+      ["reads","tl/what-went-wrong-the-last-time-a-scope-was-widene","The reviewer starts from what the last widening cost, and not from the request alone."],
+      ["mirrors","sk/a-person-approves-every-skill-change","The one gate that keeps a self-improving loop from drifting on its own."],
+      ["reads","dq/which-datasets-matter-most-and-to-whom","Which data a scope would reach decides how carefully the request gets read."]
+    ],
+    "tl/grants-expire-and-are-renewed-deliberately": [
+      ["governs","tl/the-credential-store-and-the-identity-each-tool-","A credential that outlives its grant is the quiet way a bounded surface stops being bounded."],
+      ["constrains","tl/tool-definitions-and-their-permitted-scope","A scope carries an end date, so nothing accumulates by being forgotten."],
+      ["reads","tl/cost-and-usage-metering-per-tool-and-per-agent","Usage since the last renewal is the argument for or against the next one."],
+      ["mirrors","lake/retention-and-deletion-policy","Grants expire for the reason data does: keeping it forever is a decision nobody made."]
+    ],
+    "tl/every-call-carries-the-task-it-was-made-for": [
+      ["writes","tl/tool-endpoints-and-their-call-logs","The task id rides with the call, so the log answers why and not only what."],
+      ["reads","tk/task-queue-run-logs-and-produced-diffs","The task is the unit that makes a call explainable after the fact."],
+      ["serves","po/root-cause-traced-across-lineage","Tracing a bad table back to the call that wrote it needs the two joined."],
+      ["enables","tl/cost-and-usage-metering-per-tool-and-per-agent","Metering per agent is only possible once every call names who asked for it."]
+    ],
+    "tl/tool-endpoints-and-their-call-logs": [
+      ["governed by","tl/tool-definitions-and-their-permitted-scope","The log records what the scope allowed, including the attempts it turned away."],
+      ["feeds","tl/cost-and-usage-metering-per-tool-and-per-agent","The meter is built from the log, so cost and behaviour never disagree."],
+      ["read by","tl/reads-the-call-log-for-tools-that-fail-or-go-unu","The review pass is the only thing that turns a log into a narrower grant."],
+      ["mirrors","sk/session-logs-and-error-traces","Two logs, two halves of one question: what the agent tried, and what it was allowed to call."],
+      ["serves","tk/task-queue-run-logs-and-produced-diffs","A diff and the calls that produced it get read together, or neither one explains the other."]
+    ],
+    "tl/the-credential-store-and-the-identity-each-tool-": [
+      ["mirrors","src/credential-and-secret-store","The same secrets the connectors use. One store, and not a second copy kept for agents."],
+      ["serves","tl/tool-endpoints-and-their-call-logs","Each tool calls as a named identity, so the log records who acted and not only what ran."],
+      ["governed by","tl/grants-expire-and-are-renewed-deliberately","The credential expires when the grant does, without anyone having to remember."],
+      ["scoped by","tl/tool-definitions-and-their-permitted-scope","The identity holds the permissions the definition declares, and none beyond them."]
+    ],
     "sk/how-to-run-a-query-here-the-domain-and-the-metho": [
       ["reads", "sk/environment-matrix-which-method-applies-where", "The same question is a different query in dev and in production. The matrix is what the skill consults."],
       ["reads", "sem/metric-expressions-compiled-to-sql", "A skill points at the governed definition instead of teaching someone to rewrite it."],
@@ -2987,6 +3110,24 @@ a.wire-t:hover{ color:var(--c); border-bottom-color:currentColor; }
         ids: [
           "sk/evaluation-suite-per-skill-run-before-merge",
           "sk/the-skill-repository-git-tracked"
+        ]
+      }
+    },
+    tl: {
+      note: "A grant is a standing decision. The log is what makes it reviewable, and reviewing it is what keeps the surface small.",
+      stages: [
+        { t:"Grant",  id:"tl/a-person-approves-every-grant-and-every-widening", by:"logical" },
+        { t:"Scope",  id:"tl/tool-definitions-and-their-permitted-scope",  by:"logical" },
+        { t:"Call",   id:"tl/tool-selection-and-argument-drafting",  by:"agent" },
+        { t:"Log",    id:"tl/tool-endpoints-and-their-call-logs",  by:"physical" },
+        { t:"Meter",  id:"tl/cost-and-usage-metering-per-tool-and-per-agent", by:"physical" },
+        { t:"Review", id:"tl/reads-the-call-log-for-tools-that-fail-or-go-unu", by:"agent" }
+      ],
+      back: {
+        label: "Narrowed or widened",
+        ids: [
+          "tl/requests-a-scope-it-does-not-have-with-the-task-",
+          "tl/grants-expire-and-are-renewed-deliberately"
         ]
       }
     }
