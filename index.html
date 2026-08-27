@@ -1455,7 +1455,7 @@ a.wire-t:hover{ color:var(--c); border-bottom-color:currentColor; }
       "name": "Business knowledge",
       "tag": "Context · what only people know",
       "group": "ctx",
-      "line": "What the business knows and the data cannot show: monthly business reviews, reports, the analyses already done and the commentary stakeholders leave behind. Written by people, version-controlled like code.",
+      "line": "What the business knows and the data cannot show, from inside the company and outside it: reviews, reports, prior analyses, stakeholder commentary. Agents parse it into a form an agent can consume, compose it into tiers, and test each source before it is trusted.",
       "plugs": [
         "int",
         "lake",
@@ -1468,34 +1468,43 @@ a.wire-t:hover{ color:var(--c); border-bottom-color:currentColor; }
           "Board and investor reporting",
           "Prior analyses, and what each one concluded",
           "Stakeholder commentary against a metric and a period",
+          "Internal sources: wikis, decks, threads, tickets",
+          "External sources: market data, regulation, competitor filings",
           "Why the business does it this way, written down"
         ],
         [
-          "Retrieval across the document corpus",
-          "Answers that cite the document they came from",
+          "Parses documents into agent-readable context",
+          "Composes sources into tiers and keeps them deduplicated",
+          "Tests the veracity of a source before it is promoted",
           "Flags a trend that contradicts an earlier finding",
           "Asks a stakeholder for commentary when a number moves",
-          "Drafts the recurring review from the numbers, for a person to correct"
+          "Drafts the recurring review from the numbers, for a person to correct",
+          "Retrieves the right context for the question being asked"
         ],
         [
+          "Tiers: canonical, supporting, unverified",
+          "Veracity checks, and the confidence a source carries",
+          "Provenance: internal or external, published by whom and when",
           "Every document versioned, with an author and a date",
           "A finding linked to the metric and period it concerns",
           "Superseded documents marked, never deleted",
-          "Review cadence and owner per document",
-          "What counts as a finding worth keeping"
+          "Review cadence and owner per document"
         ],
         [
           "The document repository, under version control",
+          "The wiki, generated from it and kept in sync",
+          "Agent-readable context store, chunked and embedded",
           "The commentary store, keyed to metric and period",
-          "Search index over both"
+          "Search index across all of it"
         ]
       ],
       "decisions": [
+        "Which tier a source belongs in",
         "Which findings are kept and which are retired",
         "Who owns a document, and when it is reviewed next"
       ],
       "out": [
-        "The reasons behind the numbers, kept where they can be found and cited"
+        "Context an agent can retrieve, with a tier and a source attached to every claim"
       ]
     },
     {
@@ -2269,6 +2278,44 @@ a.wire-t:hover{ color:var(--c); border-bottom-color:currentColor; }
      Written so far: 04 Data Lake.
      ============================================================ */
   var EDGES = {
+    "bk/parses-documents-into-agent-readable-context": [
+      ["reads", "bk/the-document-repository-under-version-control", "It parses the versioned source, so a chunk can always be traced back to a document and a revision."],
+      ["writes", "bk/agent-readable-context-store-chunked-and-embedde", "A deck becomes passages an agent can retrieve. The deck stays the record; the store is the working copy."],
+      ["writes", "bk/the-wiki-generated-from-it-and-kept-in-sync", "The human-readable rendering and the machine-readable one come from the same parse, so they cannot drift."],
+      ["hands to", "bk/tests-the-veracity-of-a-source-before-it-is-prom", "Parsed and stored is not the same as trusted. Nothing is promoted until it is checked."]
+    ],
+    "bk/tests-the-veracity-of-a-source-before-it-is-prom": [
+      ["checks against", "bk/prior-analyses-and-what-each-one-concluded", "A claim that contradicts a standing finding is held back until a person rules on it."],
+      ["checks against", "agg/one-definition-per-metric-compiled-to-sql", "A number quoted in a document is checked against the governed metric before it is trusted."],
+      ["reads", "bk/provenance-internal-or-external-published-by-who", "Who published it, and when, is most of the judgment. External sources age differently from internal ones."],
+      ["sets", "bk/veracity-checks-and-the-confidence-a-source-carr", "The output is a confidence a retrieval can filter on, not a pass or fail."],
+      ["gates", "bk/composes-sources-into-tiers-and-keeps-them-dedup", "Nothing reaches the canonical tier without passing."]
+    ],
+    "bk/composes-sources-into-tiers-and-keeps-them-dedup": [
+      ["reads", "bk/tiers-canonical-supporting-unverified", "The tiers are declared. The agent places sources into them, and does not invent a new one."],
+      ["reads", "bk/internal-sources-wikis-decks-threads-tickets", "Four decks saying the same thing become one passage with four citations."],
+      ["reads", "bk/external-sources-market-data-regulation-competit", "External material is composed alongside internal, and never silently outranks it."],
+      ["feeds", "bk/retrieves-the-right-context-for-the-question-bei", "Retrieval asks the canonical tier first and widens only when it comes back thin."]
+    ],
+    "bk/retrieves-the-right-context-for-the-question-bei": [
+      ["reads", "bk/agent-readable-context-store-chunked-and-embedde", "Retrieval runs over the parsed store, never over the raw documents."],
+      ["serves", "dash/natural-language-q-and-a", "This is what makes an answer specific to this business instead of generically plausible."],
+      ["serves", "dash/anomaly-narratives", "A number moved. The commentary and the prior analysis are what turn that into a sentence worth reading."],
+      ["serves", "dash/scheduled-briefings", "The briefing carries the context alongside the numbers, so nobody has to go looking for it."],
+      ["bounded by", "tl/retrieval-over-catalog-lineage-and-context", "Retrieval runs under the identity of the person asking, so context follows the same access rules as data."]
+    ],
+    "bk/external-sources-market-data-regulation-competit": [
+      ["ranked by", "bk/tiers-canonical-supporting-unverified", "External material rarely starts canonical. It earns its way up, or stays supporting."],
+      ["checked by", "bk/tests-the-veracity-of-a-source-before-it-is-prom", "The check that matters most, since nobody in the building wrote it."],
+      ["recorded in", "bk/provenance-internal-or-external-published-by-who", "A regulatory filing and a competitor's blog post are not the same kind of claim."],
+      ["informs", "agg/targets-and-thresholds-it-is-read-against", "A market number is often the reason a target is set where it is."]
+    ],
+    "bk/the-wiki-generated-from-it-and-kept-in-sync": [
+      ["generated from", "bk/parses-documents-into-agent-readable-context", "One parse, two renderings. The wiki is not maintained by hand beside the documents."],
+      ["reads", "bk/tiers-canonical-supporting-unverified", "A page shows the tier it was built from, so a reader knows how much weight to put on it."],
+      ["serves", "dash/business-glossary-and-kpi-definitions", "The definitions a person reads and the ones an agent retrieves are the same text."],
+      ["governed by", "bk/every-document-versioned-with-an-author-and-a-da", "A generated page still carries the revision of the source it came from."]
+    ],
     "bk/monthly-business-reviews-and-the-decisions-in-th": [
       ["reads", "agg/one-definition-per-metric-compiled-to-sql", "The review is written against the governed metric set, so the numbers in it are the numbers everywhere else."],
       ["produces", "bk/prior-analyses-and-what-each-one-concluded", "Last month's review is next month's prior finding."],
@@ -2291,17 +2338,17 @@ a.wire-t:hover{ color:var(--c); border-bottom-color:currentColor; }
       ["reads", "bk/prior-analyses-and-what-each-one-concluded", "It needs a written conclusion to contradict. This is what makes analyses worth keeping."],
       ["reads", "agg/variance-explainer", "The variance says the number moved. This asks whether the move breaks something we believed."],
       ["raises", "ev/which-events-matter-and-to-whom", "A contradicted finding is an event, routed to whoever owns the belief."],
-      ["proposes to", "bk/what-counts-as-a-finding-worth-keeping", "Findings that keep being contradicted are candidates for retirement."]
+      ["demotes in", "bk/tiers-canonical-supporting-unverified", "A finding the data keeps contradicting drops out of the canonical tier."]
     ],
     "bk/every-document-versioned-with-an-author-and-a-da": [
       ["governs", "bk/the-document-repository-under-version-control", "Same discipline as code: an author, a date, a diff, a review."],
       ["governs", "bk/superseded-documents-marked-never-deleted", "A retired conclusion still explains a decision someone made at the time."],
-      ["feeds", "bk/answers-that-cite-the-document-they-came-from", "A citation is worth something only when the reader can open the exact version cited."],
+      ["feeds", "bk/retrieves-the-right-context-for-the-question-bei", "A citation is worth something only when the reader can open the exact version cited."],
       ["mirrors", "sem/version-controlled-model-spec", "Definitions and the documents that argue for them move under the same review."]
     ],
     "bk/the-document-repository-under-version-control": [
-      ["indexed by", "bk/search-index-over-both", "Documents and commentary are searched together, since the answer is often split across them."],
-      ["read by", "bk/retrieval-across-the-document-corpus", "Retrieval runs over the repository, never over a summary of it."],
+      ["indexed by", "bk/search-index-across-all-of-it", "Documents and commentary are searched together, since the answer is often split across them."],
+      ["parsed by", "bk/parses-documents-into-agent-readable-context", "The repository is the record. What an agent reads is parsed from it, never edited in place."],
       ["bounded by", "tl/guardrails-what-an-agent-may-never-write", "An agent proposes a document change as a diff. It does not commit one."],
       ["scoped by", "lake/sensitivity-class-per-dataset", "A board document carries the same handling class as the numbers inside it."]
     ],

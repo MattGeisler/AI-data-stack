@@ -18,13 +18,29 @@ physical product. Each is a column of named concerns:
 - Context: Business knowledge, Skills, Tools, Events
 
 Business knowledge is the odd one: it is not assembled from other parts of the
-stack. It is the material only people can write. Monthly business reviews,
-board reporting, the analyses already done and what they concluded, and the
-commentary stakeholders leave against a metric and a period. The data informs
-it (a trend can contradict an earlier finding) and an agent can draft the
-recurring parts, but a person writes what it means. All of it is versioned with
-an author and a date, superseded documents are marked and never deleted, and a
-finding is filed against the metric it concerns.
+stack. It is the material only people can write, from inside the company and
+outside it. Monthly business reviews, board reporting, the analyses already
+done and what they concluded, the commentary stakeholders leave against a
+metric and a period, and external material like market data, regulation and
+competitor filings.
+
+Agents build it into something an agent can consume. One parses documents into
+a chunked, embedded store and generates the wiki from the same parse, so the
+human rendering and the machine one cannot drift. One composes sources into
+tiers, canonical down to unverified, and deduplicates them. One tests the
+veracity of a source before it is promoted, checking claims against standing
+findings and quoted numbers against the governed metric, and sets a confidence
+that retrieval can filter on.
+
+It is consumed at discovery: retrieval serves natural-language questions,
+anomaly narratives and scheduled briefings, so an answer is specific to this
+business instead of generically plausible. Retrieval runs under the identity of
+the person asking, so context follows the same access rules as data.
+
+The discipline is version control. Every document has an author and a date,
+superseded documents are marked and never deleted, provenance records whether a
+source is internal or external and who published it, and a finding is filed
+against the metric and period it concerns.
 - Agent: Task, Domain expert, Process owner
 - Logical: Transformation SQL, DQ Module, Linting Model, Semantic Layer
 
