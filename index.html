@@ -1797,9 +1797,9 @@ a.wire-t:hover{ color:var(--c); border-bottom-color:currentColor; }
       "key": "de",
       "shape": "expert",
       "name": "Domain expert",
-      "tag": "Agent · knows one subject",
+      "tag": "Agent · one business domain",
       "group": "agt",
-      "line": "An agent grounded in one subject area, holding its definitions, quirks and history, so a proposal reads like it came from someone who knows the business.",
+      "line": "One agent per business domain, and only that domain. In a credit business, account acquisition is a domain: approval rates, the application funnel, campaign response. Other agents consult it when a task needs to understand the business. It answers from retrieved business knowledge with the sources attached, and it says so when the question belongs to someone else.",
       "plugs": [
         "int",
         "lake",
@@ -1809,26 +1809,45 @@ a.wire-t:hover{ color:var(--c); border-bottom-color:currentColor; }
       "comps": [
         [
           "The domain's glossary and its edge cases",
-          "History of past decisions in this domain"
+          "History of past decisions in this domain",
+          "Where the domain starts, and where it hands off to the next one",
+          "What normal looks like for the domain's headline numbers",
+          "The questions this domain is asked most often",
+          "Who owns the domain in the business, and who to escalate to",
+          "Worked answers: a good consult, and one that overreached"
         ],
         [
+          "Answers a question from another agent, with its sources attached",
+          "Retrieves domain context before answering, never from memory",
           "Metric and model drafting in domain terms",
           "Variance explained against domain norms",
-          "Overlapping-definition detection"
+          "Overlapping-definition detection",
+          "Says which part of the question is outside its domain",
+          "Flags a question the domain cannot answer from what it has"
         ],
         [
           "Scope of the domain, written down",
-          "Which definitions it may propose changes to"
+          "Which definitions it may propose changes to",
+          "One expert per domain, and one domain per expert",
+          "Every answer cites the business knowledge it came from",
+          "It advises; it never writes to the domain's tables",
+          "Confidence stated, and unknowns stated as unknowns",
+          "Consultations are logged like any other call"
         ],
         [
-          "The domain's tables, metrics and dashboards"
+          "The domain's tables, metrics and dashboards",
+          "The domain's slice of the context store, chunked and embedded",
+          "Consultation log: who asked, what was answered, what was cited",
+          "The domain register: which domains exist, and who runs each"
         ]
       ],
       "decisions": [
-        "Certification of a domain definition"
+        "Certification of a domain definition",
+        "Where one domain ends and the next begins",
+        "Whether an answer is good enough to act on, or needs a person"
       ],
       "out": [
-        "Proposals a domain owner recognises as their own"
+        "An answer another agent can build on, with the business knowledge it rests on attached"
       ]
     },
     {
@@ -2453,6 +2472,114 @@ a.wire-t:hover{ color:var(--c); border-bottom-color:currentColor; }
      Written so far: 04 Data Lake.
      ============================================================ */
   var EDGES = {
+    "de/the-domain-s-glossary-and-its-edge-cases": [
+      ["reads","sem/one-name-per-concept","The glossary and the semantic layer say the same thing, or one of them is wrong."],
+      ["reads","bk/why-the-business-does-it-this-way-written-down","Edge cases are almost always a decision someone made and wrote down."],
+      ["serves","de/answers-a-question-from-another-agent-with-its-s","A consult is the glossary applied to the question actually asked."],
+      ["mirrors","lint/column-glossary-in-business-terms","The same words, one column over, attached to the fields instead of the concepts."]
+    ],
+    "de/history-of-past-decisions-in-this-domain": [
+      ["reads","bk/monthly-business-reviews-and-the-decisions-in-th","Most domain history is decisions taken in a review and never written anywhere else."],
+      ["reads","bk/prior-analyses-and-what-each-one-concluded","An analysis that already settled this is the cheapest possible answer."],
+      ["serves","tk/what-has-already-been-tried-and-what-it-cost","A task asking the domain what was tried is how repetition gets caught early."],
+      ["grounds","de/variance-explained-against-domain-norms","A number is only unusual against what this domain has already seen."]
+    ],
+    "de/where-the-domain-starts-and-where-it-hands-off-t": [
+      ["governs","de/says-which-part-of-the-question-is-outside-its-d","Knowing where the domain ends is what makes declining a question useful instead of unhelpful."],
+      ["reads","sem/entity-and-grain-definitions","Domain boundaries follow entity boundaries more often than org charts."],
+      ["hands to","de/the-domain-register-which-domains-exist-and-who-","A question outside the domain goes to a named other domain, and not into the void."],
+      ["mirrors","int/what-one-customer-means-to-this-business","Acquisition and servicing disagree about what a customer is, and the boundary is where that shows."]
+    ],
+    "de/what-normal-looks-like-for-the-domain-s-headline": [
+      ["reads","agg/targets-and-thresholds-it-is-read-against","Normal is the target and the tolerance, and both are already written down."],
+      ["grounds","de/variance-explained-against-domain-norms","Explaining a variance starts from the norm, and not from the last two data points."],
+      ["serves","po/what-normal-looks-like-for-it","The process owner watches against the same numbers the domain is judged on."],
+      ["reads","dash/business-glossary-and-kpi-definitions","Approval rate has one definition, and the domain uses the published one."]
+    ],
+    "de/the-questions-this-domain-is-asked-most-often": [
+      ["reads","de/consultation-log-who-asked-what-was-answered-wha","What gets asked most is a fact about the log, not an impression."],
+      ["shapes","de/the-domain-s-slice-of-the-context-store-chunked-","The retrieval slice is tuned to the questions that actually arrive."],
+      ["serves","dash/natural-language-q-and-a","The questions people ask a dashboard and the ones agents ask the domain are the same questions."],
+      ["informs","bk/review-cadence-and-owner-per-document","A document that answers a frequent question is worth keeping current."]
+    ],
+    "de/answers-a-question-from-another-agent-with-its-s": [
+      ["reads","de/the-domain-s-slice-of-the-context-store-chunked-","It answers out of the retrieved slice, so the answer moves when the business does."],
+      ["grounds","tk/drafting-the-proposal-with-its-evidence","A proposal reads like someone who knows the business because someone who does was asked."],
+      ["serves","dash/grounding-served-to-the-agent-at-query-time","Dashboard design is a consult: what this domain cares about, before any tile is drawn."],
+      ["bounded by","tl/tool-definitions-and-their-permitted-scope","A consult is a tool call, logged and bounded like every other one."]
+    ],
+    "de/retrieves-domain-context-before-answering-never-": [
+      ["reads","bk/agent-readable-context-store-chunked-and-embedde","The store is the source. There is no second copy the expert remembers."],
+      ["reads","bk/tiers-canonical-supporting-unverified","Canonical first. An answer built on unverified sources says so."],
+      ["reads","tl/retrieval-over-catalog-lineage-and-context","Business context and technical context are retrieved together, or the answer is half an answer."],
+      ["writes","de/every-answer-cites-the-business-knowledge-it-cam","What was retrieved becomes the citation, without anyone assembling it by hand."]
+    ],
+    "de/metric-and-model-drafting-in-domain-terms": [
+      ["reads","sem/metric-expressions-compiled-to-sql","It drafts against the governed expression, and never a private version of it."],
+      ["hands to","agg/model-drafter-from-plain-language","The domain supplies the words; the drafter turns them into a model."],
+      ["checked by","de/which-definitions-it-may-propose-changes-to","What it may propose changes to is narrower than what it may talk about."],
+      ["reads","de/the-domain-s-glossary-and-its-edge-cases","Drafting in domain terms means the glossary's terms, spelled the glossary's way."]
+    ],
+    "de/variance-explained-against-domain-norms": [
+      ["reads","agg/variance-explainer","The mechanical decomposition comes first; the domain says which part of it matters."],
+      ["reads","de/what-normal-looks-like-for-the-domain-s-headline","Against the norm, not against last month, which may also have been unusual."],
+      ["serves","dash/anomaly-narratives","A narrative that names a campaign or a policy change is a domain answer, not a statistical one."],
+      ["reads","bk/stakeholder-commentary-against-a-metric-and-a-pe","Someone often already explained this movement in a sentence nobody indexed."]
+    ],
+    "de/overlapping-definition-detection": [
+      ["reads","sem/overlapping-metric-detection","Detection is mechanical. Deciding the two really are the same concept is not."],
+      ["raises","sem/one-name-per-concept","Two names for one thing is the defect, and it gets raised where names are governed."],
+      ["serves","rv/argues-the-opposite-case-before-agreeing","The commonest objection to a new metric is that it already exists under another name."],
+      ["reads","de/the-domain-s-glossary-and-its-edge-cases","Edge cases are where two definitions look identical and are not."]
+    ],
+    "de/says-which-part-of-the-question-is-outside-its-d": [
+      ["reads","de/scope-of-the-domain-written-down","Declining is only credible when the scope was written down first."],
+      ["hands to","de/the-domain-register-which-domains-exist-and-who-","It names the domain that should answer, so the asker is not left to guess."],
+      ["mirrors","lake/lineage-q-and-a-over-the-catalog","Both stop at the edge of what they can evidence, and say where the edge was."],
+      ["serves","rv/says-plainly-when-it-cannot-tell","A reviewer inherits the domain's uncertainty instead of discovering it later."]
+    ],
+    "de/flags-a-question-the-domain-cannot-answer-from-w": [
+      ["reads","de/consultation-log-who-asked-what-was-answered-wha","The same question asked three times with a thin answer is a gap in the knowledge, not in the model."],
+      ["raises","bk/internal-sources-wikis-decks-threads-tickets","The fix is usually a document that was never written, or never indexed."],
+      ["escalates to","de/who-owns-the-domain-in-the-business-and-who-to-e","The domain owner is the person who can decide the missing thing is worth writing."],
+      ["mirrors","tl/reads-the-call-log-for-tools-that-fail-or-go-unu","Both read their own logs for the shape of what is missing."]
+    ],
+    "de/scope-of-the-domain-written-down": [
+      ["governs","de/answers-a-question-from-another-agent-with-its-s","Every answer is inside the scope, or it is declined and routed."],
+      ["governs","de/which-definitions-it-may-propose-changes-to","Talking about a definition and being allowed to change it are two different grants."],
+      ["reads","de/where-the-domain-starts-and-where-it-hands-off-t","Scope is the boundary written as a rule instead of as a description."],
+      ["mirrors","src/source-system-registry","A register of what exists and who owns it, applied to domains instead of feeds."]
+    ],
+    "de/every-answer-cites-the-business-knowledge-it-cam": [
+      ["reads","bk/provenance-internal-or-external-published-by-who","A citation without provenance is a footnote, not evidence."],
+      ["reads","bk/veracity-checks-and-the-confidence-a-source-carr","The confidence in the source becomes the confidence in the answer."],
+      ["serves","rv/reads-the-proposal-against-the-evidence-it-cites","The reviewer checks the domain's citations the same way it checks anyone's."],
+      ["writes","de/consultation-log-who-asked-what-was-answered-wha","Question, answer and sources are one record, so the answer stays checkable."]
+    ],
+    "de/it-advises-it-never-writes-to-the-domain-s-table": [
+      ["governs","de/metric-and-model-drafting-in-domain-terms","It drafts a model. Something else merges it."],
+      ["enforced by","tl/guardrails-what-an-agent-may-never-write","Stated here, made true one column over, where the writes actually happen."],
+      ["hands to","tk/a-diff-is-the-only-output-never-a-direct-write","A domain proposal joins the same queue as every other proposal."],
+      ["mirrors","rv/a-review-never-merges-anything","Advise and review both stop short of the merge, and for the same reason."]
+    ],
+    "de/the-domain-s-slice-of-the-context-store-chunked-": [
+      ["generated from","bk/agent-readable-context-store-chunked-and-embedde","One store, sliced per domain, so retrieval does not have to search the whole business."],
+      ["reads","bk/a-finding-linked-to-the-metric-and-period-it-con","A finding tied to a metric and a period is the most retrievable shape knowledge takes."],
+      ["serves","de/retrieves-domain-context-before-answering-never-","This is what the expert is equipped with. Without it, it is a general model with a job title."],
+      ["scoped by","de/scope-of-the-domain-written-down","The slice follows the scope, so the expert cannot answer outside it by accident."]
+    ],
+    "de/consultation-log-who-asked-what-was-answered-wha": [
+      ["feeds","de/the-questions-this-domain-is-asked-most-often","The log is where the domain finds out what it is actually for."],
+      ["read by","de/flags-a-question-the-domain-cannot-answer-from-w","Thin answers repeated are the signal that something is missing upstream."],
+      ["mirrors","tl/tool-endpoints-and-their-call-logs","Consultations are calls, and get the same treatment as calls."],
+      ["serves","tk/task-history-searchable-by-what-it-touched","Which domain a task consulted is part of how it got to its answer."]
+    ],
+    "de/the-domain-s-tables-metrics-and-dashboards": [
+      ["reads","agg/staging-intermediate-and-mart-tables","The domain's marts are what its answers are eventually checked against."],
+      ["reads","dash/rendered-dashboards-and-reports","What the business already looks at constrains what a new answer may quietly contradict."],
+      ["governed by","de/scope-of-the-domain-written-down","Which tables belong to the domain is a scope question, and it is answered in advance."],
+      ["serves","de/answers-a-question-from-another-agent-with-its-s","An answer that names the table it came from is worth more than one that does not."]
+    ],
     "tk/why-the-task-was-raised": [
       ["reads","ev/event-triage-and-classification","Most tasks start as something that happened, classified into something worth doing."],
       ["reads","bk/stakeholder-commentary-against-a-metric-and-a-pe","The other half start as a person saying a number looks wrong."],
@@ -3369,6 +3496,24 @@ a.wire-t:hover{ color:var(--c); border-bottom-color:currentColor; }
         ids: [
           "tk/writes-what-it-learned-back-where-the-next-task-",
           "tk/stops-and-escalates-instead-of-guessing"
+        ]
+      }
+    },
+    de: {
+      note: "A consult is a cycle, not a lookup. What the domain is asked shapes what it retrieves, and what it cannot answer becomes the next thing the business writes down.",
+      stages: [
+        { t:"Asked",    id:"de/the-questions-this-domain-is-asked-most-often", by:"context" },
+        { t:"Scope",    id:"de/scope-of-the-domain-written-down", by:"logical" },
+        { t:"Retrieve", id:"de/retrieves-domain-context-before-answering-never-", by:"agent" },
+        { t:"Answer",   id:"de/answers-a-question-from-another-agent-with-its-s", by:"agent" },
+        { t:"Cite",     id:"de/every-answer-cites-the-business-knowledge-it-cam", by:"logical" },
+        { t:"Log",      id:"de/consultation-log-who-asked-what-was-answered-wha", by:"physical" }
+      ],
+      back: {
+        label: "What comes back",
+        ids: [
+          "de/flags-a-question-the-domain-cannot-answer-from-w",
+          "de/the-domain-s-slice-of-the-context-store-chunked-"
         ]
       }
     }
