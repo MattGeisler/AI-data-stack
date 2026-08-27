@@ -17,6 +17,16 @@ physical product. Each is a column of named concerns:
 
 - Context: Business knowledge, Skills, Tools, Events
 
+Skills are a product of the stack in their own right, since they are what
+agents use to build everything else. Each one is a written procedure: how to
+run a query in this domain and this environment, how to use the DQ tool, how to
+apply the linting methods, how to query through the semantic layer, how to
+change a physical table safely, how to publish. They live in a git-tracked
+repository and improve on a loop. An agent runs one and records the session, a
+second reads the logs and errors across sessions, a third drafts the change as
+a pull request, the evaluation suite runs, and a person approves. An agent can
+write the change; it cannot merge it.
+
 Business knowledge is the odd one: it is not assembled from other parts of the
 stack. It is the material only people can write, from inside the company and
 outside it. Monthly business reviews, board reporting, the analyses already

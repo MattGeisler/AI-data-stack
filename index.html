@@ -689,7 +689,7 @@ body[data-route="detail"] .detail{ display:block; }
 
 .loop-row{
   position:relative; z-index:1; list-style:none; margin:0; padding:0;
-  display:grid; grid-template-columns:repeat(7,minmax(0,1fr)); gap:0 22px; align-items:stretch;
+  display:grid; grid-template-columns:repeat(var(--n,7),minmax(0,1fr)); gap:0 22px; align-items:stretch;
 }
 .loop-s{ --c:var(--ink-3); display:flex; }
 .loop-s[data-by="context"]{  --c:var(--ty-ctx); }
@@ -732,8 +732,8 @@ body[data-route="detail"] .detail{ display:block; }
 
 @media (max-width:900px){
   .loop{ overflow-x:auto; -webkit-overflow-scrolling:touch; }
-  .loop-row{ min-width:860px; }
-  .loop-back{ min-width:860px; }
+  .loop-row{ min-width:calc(var(--n,7) * 122px); }
+  .loop-back{ min-width:calc(var(--n,7) * 122px); }
   .loop-note{ text-align:left; }
   .loop-scroll-hint{ display:block; position:sticky; left:0; }
 }
@@ -1646,9 +1646,9 @@ a.wire-t:hover{ color:var(--c); border-bottom-color:currentColor; }
       "key": "sk",
       "shape": "skills",
       "name": "Skills",
-      "tag": "Context · how work gets done",
+      "tag": "Context · how the work is done",
       "group": "ctx",
-      "line": "Reusable procedures an agent can carry out, written down once and version-controlled: how to onboard a source, how to triage a failed test, how to draft a metric.",
+      "line": "How to do the work, written down and version-controlled. How to run a query in this domain and this environment, how to use the DQ tool, how to publish. Agents run them, learn from the sessions, and propose changes. A person approves every one.",
       "plugs": [
         "src",
         "ods",
@@ -1659,27 +1659,40 @@ a.wire-t:hover{ color:var(--c); border-bottom-color:currentColor; }
       ],
       "comps": [
         [
-          "What good looks like for each procedure",
-          "Worked examples of a correct proposal"
+          "How to run a query here: the domain, and the method for each environment",
+          "How to use the DQ tool, and what a failure means",
+          "How to apply the linting methods",
+          "How to query through the semantic layer",
+          "How to change a physical table safely",
+          "How to publish to GitHub",
+          "What good looks like for each procedure, with worked examples"
         ],
         [
-          "Skill selection for the task at hand",
-          "Multi-step plans with checkpoints"
+          "Selects the skill that fits the task",
+          "Runs the skill and records what happened",
+          "Reads session logs and errors for what went wrong",
+          "Drafts a skill change as a pull request",
+          "Writes a new skill when a procedure keeps being improvised"
         ],
         [
-          "Versioned skill definitions",
+          "Versioned skill definitions, reviewed like code",
+          "A person approves every skill change",
+          "Evaluation suite per skill, run before merge",
           "Preconditions and stop conditions",
-          "Evaluation suite per skill"
+          "Environment matrix: which method applies where"
         ],
         [
+          "The skill repository, git tracked",
+          "Session logs and error traces",
           "Skill registry and its run history"
         ]
       ],
       "decisions": [
+        "Approve or reject a proposed skill change",
         "Which skills an agent may run unattended"
       ],
       "out": [
-        "The same procedure every time, whoever or whatever runs it"
+        "The procedures agents use to build everything else in the stack"
       ]
     },
     {
@@ -2413,6 +2426,54 @@ a.wire-t:hover{ color:var(--c); border-bottom-color:currentColor; }
      Written so far: 04 Data Lake.
      ============================================================ */
   var EDGES = {
+    "sk/how-to-run-a-query-here-the-domain-and-the-metho": [
+      ["reads", "sk/environment-matrix-which-method-applies-where", "The same question is a different query in dev and in production. The matrix is what the skill consults."],
+      ["reads", "sem/metric-expressions-compiled-to-sql", "A skill points at the governed definition instead of teaching someone to rewrite it."],
+      ["writes", "agg/staging-intermediate-and-mart-tables", "Following the skill is how a model gets built, so the skill is upstream of the table."],
+      ["evaluated by", "sk/evaluation-suite-per-skill-run-before-merge", "A query skill is worth only as much as the test that proves it still runs."]
+    ],
+    "sk/how-to-change-a-physical-table-safely": [
+      ["governs", "lake/conformed-zone-of-functional-tables", "The procedure for altering a table is the thing standing between a schema change and an outage."],
+      ["reads", "lake/declared-grain-and-keys-per-table", "A safe change starts from what the table promises."],
+      ["reads", "sem/impact-analysis-before-a-change", "The skill makes running impact analysis a step, not a habit some people have."],
+      ["bounded by", "sk/preconditions-and-stop-conditions", "Where the skill stops and hands back to a person is the most important line in it."]
+    ],
+    "sk/how-to-use-the-dq-tool-and-what-a-failure-means": [
+      ["reads", "dq/assertion-suites-for-null-range-and-uniqueness", "The skill teaches the tool that already exists, and does not invent a second way to test."],
+      ["feeds", "dq/failure-triage-and-classification", "Triage is only repeatable when the procedure behind it is written down."],
+      ["reads", "dq/what-a-failure-means-for-the-process-behind-the-", "A failed test and a broken business process are not the same sentence."],
+      ["serves", "po/continuous-watch-against-expectation", "The process owner runs this skill instead of improvising a check."]
+    ],
+    "sk/runs-the-skill-and-records-what-happened": [
+      ["reads", "sk/versioned-skill-definitions-reviewed-like-code", "It runs the merged version, so two agents in two sessions do the same thing."],
+      ["writes", "sk/session-logs-and-error-traces", "The record of the run is the raw material for the next improvement."],
+      ["bounded by", "tl/tool-definitions-and-their-permitted-scope", "A skill can only call what the tools allow. The skill does not widen its own scope."],
+      ["serves", "tk/planning-and-decomposition", "A task is planned out of skills that exist, not invented each time."]
+    ],
+    "sk/reads-session-logs-and-errors-for-what-went-wron": [
+      ["reads", "sk/session-logs-and-error-traces", "Across sessions, not one at a time. A single failure is noise; the same failure twice is a skill defect."],
+      ["reads", "sk/skill-registry-and-its-run-history", "Which skills run often and fail often is where the improvement is worth the most."],
+      ["hands to", "sk/drafts-a-skill-change-as-a-pull-request", "A finding becomes a diff, or it was not really a finding."],
+      ["raises", "sk/writes-a-new-skill-when-a-procedure-keeps-being-", "A procedure improvised in five sessions is a missing skill."]
+    ],
+    "sk/drafts-a-skill-change-as-a-pull-request": [
+      ["writes", "sk/the-skill-repository-git-tracked", "A pull request against the repository, with the sessions that motivated it attached."],
+      ["checked by", "sk/evaluation-suite-per-skill-run-before-merge", "The suite runs before a person is asked to look."],
+      ["gated by", "sk/a-person-approves-every-skill-change", "An agent can write the change. It cannot merge it."],
+      ["mirrors", "bk/every-document-versioned-with-an-author-and-a-da", "Skills and business documents move under the same review, for the same reason."]
+    ],
+    "sk/a-person-approves-every-skill-change": [
+      ["governs", "sk/the-skill-repository-git-tracked", "The one gate that keeps a self-improving loop from drifting on its own."],
+      ["governs", "sk/versioned-skill-definitions-reviewed-like-code", "Merged means approved. There is no other path into the merged version."],
+      ["reads", "sk/evaluation-suite-per-skill-run-before-merge", "The reviewer reads a passing suite and a diff, not a promise."],
+      ["bounds", "sk/writes-a-new-skill-when-a-procedure-keeps-being-", "A new skill is a bigger decision than an edit, and lands in the same queue."]
+    ],
+    "sk/the-skill-repository-git-tracked": [
+      ["holds", "sk/versioned-skill-definitions-reviewed-like-code", "Skills are a product of the stack, kept the way code is kept."],
+      ["read by", "sk/selects-the-skill-that-fits-the-task", "Selection reads the repository, so a new skill is available the moment it merges."],
+      ["mirrors", "sql/version-control-and-code-review", "The transformations and the procedures for writing them live under one discipline."],
+      ["published by", "sk/how-to-publish-to-github", "The skill for publishing is itself published the same way."]
+    ],
     "bk/parses-documents-into-agent-readable-context": [
       ["reads", "bk/the-document-repository-under-version-control", "It parses the versioned source, so a chunk can always be traced back to a document and a revision."],
       ["writes", "bk/agent-readable-context-store-chunked-and-embedde", "A deck becomes passages an agent can retrieve. The deck stays the record; the store is the working copy."],
@@ -2592,7 +2653,9 @@ a.wire-t:hover{ color:var(--c); border-bottom-color:currentColor; }
     "governed by":"in govern", "scoped by":"in govern", "constrained by":"in govern",
     "enforced by":"in govern",
     /* handed to a consumer */
-    "serves":"out serve", "grounds":"out serve"
+    "serves":"out serve", "grounds":"out serve", "read by":"out serve",
+    /* added with the skills loop */
+    "evaluated by":"in govern", "gated by":"in govern", "published by":"in write"
   };
   function relParts(verb) {
     var v = RELS[verb] || "out write";
@@ -2961,6 +3024,24 @@ a.wire-t:hover{ color:var(--c); border-bottom-color:currentColor; }
           "bk/flags-a-trend-that-contradicts-an-earlier-findin"
         ]
       }
+    },
+    sk: {
+      note: "A skill improves from the sessions that ran it. An agent proposes the change; a person merges it.",
+      stages: [
+        { t:"Skill",   id:"sk/versioned-skill-definitions-reviewed-like-code",   by:"logical" },
+        { t:"Run",     id:"sk/runs-the-skill-and-records-what-happened",         by:"agent" },
+        { t:"Log",     id:"sk/session-logs-and-error-traces",                    by:"physical" },
+        { t:"Learn",   id:"sk/reads-session-logs-and-errors-for-what-went-wron", by:"agent" },
+        { t:"Propose", id:"sk/drafts-a-skill-change-as-a-pull-request",          by:"agent" },
+        { t:"Approve", id:"sk/a-person-approves-every-skill-change",             by:"logical" }
+      ],
+      back: {
+        label: "Merged",
+        ids: [
+          "sk/evaluation-suite-per-skill-run-before-merge",
+          "sk/the-skill-repository-git-tracked"
+        ]
+      }
     }
   };
 
@@ -2973,7 +3054,7 @@ a.wire-t:hover{ color:var(--c); border-bottom-color:currentColor; }
 
     host.innerHTML =
       '<svg class="loop-wires" aria-hidden="true"></svg>' +
-      '<ol class="loop-row">' +
+      '<ol class="loop-row" style="--n:' + spec.stages.length + '">' +
         spec.stages.map(function (st, i) {
           var c = COMPONENTS[st.id];
           return '<li class="loop-s" data-i="' + i + '" data-by="' + st.by + '">' +
