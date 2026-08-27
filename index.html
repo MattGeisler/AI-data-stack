@@ -735,11 +735,8 @@ a.wire-t:hover{ color:var(--c); border-bottom-color:currentColor; }
       <div class="dg-head">
         <div>
           <div class="eyebrow">The Stack</div>
-          <h2 class="exec-only">Four layers, source to decision.</h2>
-          <h2 class="tech-only">Four layers. Six data products.</h2>
         </div>
-        <p class="dg-hint exec-only">Four layers, read across. Data flows up the physical column. <strong>Click anything</strong> to open it.</p>
-        <p class="dg-hint tech-only">Four layers, read across. <strong>Click anything</strong> to open it, or use the cards above to highlight one layer at a time.</p>
+        <p class="dg-hint">Four domain components matrixing across the stack, read across. Data flows up.</p>
       </div>
 
       <div class="dag" id="dag"></div>
@@ -2404,7 +2401,7 @@ a.wire-t:hover{ color:var(--c); border-bottom-color:currentColor; }
   });
 
   var html =
-    '<div class="cbar"><span class="cbar-label">Four layers, read across. Data flows up.</span>' +
+    '<div class="cbar">' +
       '<div class="cbar-row">' +
         TYPES.map(function (t) {
           return '<button type="button" class="ctype" data-type="' + t.slug + '" aria-pressed="false" style="--c:' + t.c + '">' +
