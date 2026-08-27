@@ -204,7 +204,7 @@ body[data-view="tech"] .dag{ max-width:1280px; }
 }
 .cbar-row{ display:grid; grid-template-columns:var(--cols); gap:var(--colgap); }
 @media (max-width:860px){ .cbar-row{ grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; } }
-@media (max-width:400px){ .cbar-row{ grid-template-columns:1fr; } }
+@media (max-width:330px){ .cbar-row{ grid-template-columns:1fr; } }
 
 .ctype{
   --h:var(--c); --t:var(--paper-card);
@@ -228,8 +228,8 @@ body[data-view="tech"] .dag{ max-width:1280px; }
 body[data-focus] .ctype[aria-pressed="false"]{ opacity:.42; }
 
 .focus-note{
-  display:none; align-items:center; justify-content:center; gap:12px;
-  margin:-16px 0 30px; font-size:12.5px; color:var(--ink-3);
+  display:none; align-items:center; justify-content:center; gap:10px; flex-wrap:wrap;
+  margin:14px 0 0; font-size:12.5px; color:var(--ink-3);
 }
 body[data-focus] .focus-note{ display:flex; }
 .focus-note button{
@@ -289,7 +289,7 @@ body[data-focus] .node-comps .cgroup{ display:none; }
   content:""; position:absolute; left:34px; top:-19px; width:7px; height:7px; margin-left:-4px;
   border-left:1px solid var(--ink-3); border-top:1px solid var(--ink-3); transform:rotate(45deg); opacity:.8;
 }
-.mx-col-phys > .cell:first-child::before{ display:none; }
+.mx-col-phys > .cell:first-of-type::before{ display:none; }
 .cell-head{
   appearance:none; width:100%; cursor:pointer; text-align:left; font:inherit;
   display:flex; align-items:center; gap:12px;
@@ -311,8 +311,46 @@ body[data-focus] .node-comps .cgroup{ display:none; }
 .cell.is-open .cell-head .tri{ transform:rotate(90deg); }
 .cell .node-panel{ margin-top:0; }
 
-@media (max-width:1000px){ .mx{ grid-template-columns:repeat(2,minmax(0,1fr)); } }
-@media (max-width:560px){ .mx{ grid-template-columns:1fr; } }
+/* On wide screens the four cards above are the column headers, so the
+   in-column heading is redundant. Narrow screens need it back. */
+.col-h{ display:none; }
+
+@media (max-width:1000px){
+  .mx{ grid-template-columns:repeat(2,minmax(0,1fr)); gap:26px 16px; }
+  .col-h{
+    display:flex; align-items:center; gap:8px; margin:0 0 2px;
+    padding-bottom:8px; border-bottom:2px solid var(--c);
+    font-family:var(--mono); font-size:10px; letter-spacing:.15em;
+    text-transform:uppercase; color:var(--c); font-weight:500;
+  }
+  .col-h .glyph{ width:24px; flex:none; }
+  .col-h .glyph .edge, .col-h .glyph .edge2, .col-h .glyph .line,
+  .col-h .glyph .dimline, .col-h .glyph .hot{ stroke-width:2.6; }
+  /* the cards above become tabs: tapping one shows that column alone */
+  body[data-focus="context"]  .mx-col:not([data-type="context"]),
+  body[data-focus="agent"]    .mx-col:not([data-type="agent"]),
+  body[data-focus="logical"]  .mx-col:not([data-type="logical"]),
+  body[data-focus="physical"] .mx-col:not([data-type="physical"]){ display:none; }
+  body[data-focus] .mx{ grid-template-columns:1fr; }
+  body[data-focus] .mx-col > *{ opacity:1; }
+  /* keep the header cards compact so content starts above the fold */
+  .ctype{ padding:11px 12px 12px; gap:6px; }
+  .ctype .ct-d{ display:none; }
+  .ctype .glyph{ width:30px; }
+  .ctype .ct-go{ margin-top:0; }
+  .cbar-row{ gap:10px; }
+}
+@media (max-width:620px){
+  .mx{ grid-template-columns:1fr; }
+  .lanebar{ padding:12px 13px; }
+  .lanebar .shape{ width:40px; }
+  .lanebar-n{ font-size:16.5px; }
+  .cell-head{ padding:10px 12px; }
+  .cell-head .shape-cell{ width:38px; }
+  .cell .node-name{ font-size:16.5px; }
+  .mx-col-phys{ gap:26px; }
+  .cell::before{ left:30px; top:-17px; }
+}
 
 /* the four cards dim what they are not */
 body[data-focus="context"]  .mx-col:not([data-type="context"]) > *,
@@ -2415,12 +2453,16 @@ a.wire-t:hover{ color:var(--c); border-bottom-color:currentColor; }
       '<p class="focus-note"><span id="focus-text"></span><button type="button" id="focus-clear">Show all four</button></p>' +
     "</div>" +
     '<div class="mx">' +
-      '<div class="mx-col" data-type="context">' + barsByCol.context.join("") + "</div>" +
-      '<div class="mx-col" data-type="agent">' + barsByCol.agent.join("") + "</div>" +
-      '<div class="mx-col" data-type="logical">' + barsByCol.logical.join("") + "</div>" +
-      '<div class="mx-col mx-col-phys" data-type="physical">' +
-        NODES.map(cellHTML).join("") +
-      "</div>" +
+      TYPES.map(function (t) {
+        var body = t.slug === "physical"
+          ? NODES.map(cellHTML).join("")
+          : barsByCol[t.slug].join("");
+        return '<section class="mx-col' + (t.slug === "physical" ? " mx-col-phys" : "") +
+            '" data-type="' + t.slug + '" style="--c:' + t.c + '">' +
+            '<h3 class="col-h">' + glyphSVG(t.g) + "<span>" + t.key + "</span></h3>" +
+            body +
+          "</section>";
+      }).join("") +
     "</div>";
 
   var dag = document.getElementById("dag");

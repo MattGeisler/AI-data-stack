@@ -23,6 +23,11 @@ The summary shows the names alone. Clicking one opens its page: which of the
 six physical layers it covers, what it is made of by type, what it provides.
 A physical layer opens the same way, into its own four-type breakdown.
 
+On a phone the four columns cannot sit side by side, so each one names itself
+and they stack in order. The four cards at the top become tabs below 1000px:
+tapping one shows that domain alone. Above 1000px the cards are the column
+headers and tapping one dims the rest instead.
+
 ## Inside every box: the four components
 
 Every dataset in the stack is made of four things, read left to right in the
