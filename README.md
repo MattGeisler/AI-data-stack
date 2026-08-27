@@ -56,7 +56,8 @@ against the metric and period it concerns.
 
 The summary shows the names alone. Clicking one opens its page: which of the
 six physical layers it covers, what it is made of by type, what it provides.
-A physical layer opens the same way, into its own four-type breakdown.
+A physical layer opens the same way, at `#/l/<key>`, into its own four-type
+breakdown, what it provides, and the concerns that produce it.
 
 On a phone the four columns cannot sit side by side, so each one names itself
 and they stack in order. The four cards at the top become tabs below 1000px:

@@ -239,19 +239,7 @@ body[data-focus] .focus-note{ display:flex; }
 .focus-note button:hover{ color:var(--ink); }
 
 /* Focus mode: one of the four, read straight down the stack */
-body[data-focus] .built-from{ grid-template-columns:1fr; }
-body[data-focus] .cgroup ul{
-  display:grid; grid-template-columns:repeat(auto-fill,minmax(230px,1fr)); gap:8px 26px; margin-top:11px;
-}
-body[data-focus] .cgroup li{ font-size:12.5px; }
-body[data-focus] .cgroup .shape-cell{ display:none; }
-body[data-focus] .built-from .cgroup{ display:none; }
-body[data-focus="physical"] .built-from .cgroup[data-type="physical"],
-body[data-focus="logical"]  .built-from .cgroup[data-type="logical"],
-body[data-focus="agent"]    .built-from .cgroup[data-type="agent"],
-body[data-focus="context"]  .built-from .cgroup[data-type="context"]{ display:block; }
-body[data-focus] .modules{ display:none; }
-body[data-focus] .node-comps .cgroup{ display:none; }
+
 
 /* Four columns of names. Everything else is behind a click. */
 .mx{
@@ -308,8 +296,8 @@ body[data-focus] .node-comps .cgroup{ display:none; }
   border-top:3.5px solid transparent; border-bottom:3.5px solid transparent;
   transition:transform .28s var(--ease);
 }
-.cell.is-open .cell-head .tri{ transform:rotate(90deg); }
-.cell .node-panel{ margin-top:0; }
+.cell-head{ text-decoration:none; color:inherit; }
+.cell-head:hover .tri{ transform:translateX(2px); }
 
 /* On wide screens the four cards above are the column headers, so the
    in-column heading is redundant. Narrow screens need it back. */
@@ -360,6 +348,16 @@ body[data-focus="physical"] .mx-col:not([data-type="physical"]) > *{ opacity:.2;
 .mx-col > *{ transition:opacity .25s var(--ease); }
 
 /* module page bits */
+.lay-with{ display:block; margin-top:20px; }
+.lay-with-k{
+  display:block; margin-bottom:9px;
+  font-family:var(--mono); font-size:9px; letter-spacing:.14em; text-transform:uppercase; color:var(--ink-3);
+}
+a.mod-layer{ text-decoration:none; transition:border-color .2s var(--ease), color .2s var(--ease); }
+a.mod-layer:hover{ border-color:var(--h); color:var(--ink); }
+.d-breaks li b{ display:block; font-size:13.5px; color:var(--ink); margin-bottom:3px; }
+.d-breaks li span{ display:block; }
+.d-breaks .lay-out b{ color:var(--out-k); }
 .mod-layer{
   display:inline-block; margin:0 8px 8px 0; padding:6px 10px; border-radius:3px;
   background:var(--paper-sunk); border:1px solid var(--rule); font-size:13px; color:var(--ink-2);
@@ -462,8 +460,7 @@ body[data-focus="physical"] .mx-col:not([data-type="physical"]) > *{ opacity:.2;
 }
 
 @media (max-width:1080px){ .node-comps{ grid-template-columns:repeat(2,minmax(0,1fr)); gap:20px 22px; } }
-@media (max-width:860px){ .built-from{ grid-template-columns:repeat(2,minmax(0,1fr)); gap:16px; } }
-@media (max-width:400px){ .built-from{ grid-template-columns:1fr; } }
+
 @media (max-width:900px){
   .stack-grid, body[data-view="tech"] .stack-grid{ grid-template-columns:1fr; gap:34px; }
   .modules{ grid-column:1; gap:20px; }
@@ -512,74 +509,6 @@ body[data-view="tech"] .principles h2{ margin-bottom:44px; }
    EXPANSION PANEL
    ============================================================ */
 /* the layer's notes stay closed until asked for */
-.node-panel{ display:none; }
-.cell.is-open .node-panel{ display:block; }
-.node-open{
-  appearance:none; background:none; border:0; padding:10px 0 0; margin:0; cursor:pointer;
-  display:inline-flex; align-items:center; gap:7px; font:inherit; color:var(--h);
-  font-family:var(--mono); font-size:9px; letter-spacing:.13em; text-transform:uppercase; font-weight:500;
-  opacity:.75; transition:opacity .2s var(--ease);
-}
-.cell:hover .node-open{ opacity:1; }
-.node-open .tri{
-  width:0; height:0; border-left:5px solid currentColor;
-  border-top:3.5px solid transparent; border-bottom:3.5px solid transparent;
-  transition:transform .28s var(--ease);
-}
-.cell.is-open .node-open .tri{ transform:rotate(90deg); }
-
-.node-panel{
-  margin-top:20px; padding:24px 26px 26px;
-  background:var(--paper-card); border:1px solid var(--rule-soft);
-  border-left:3px solid var(--h); border-radius:3px;
-  cursor:default;
-}
-.panel-sec + .panel-sec{ margin-top:22px; padding-top:20px; border-top:1px solid var(--rule-soft); }
-.sec-k{
-  display:block; margin-bottom:13px;
-  font-family:var(--mono); font-size:9px; letter-spacing:.14em; text-transform:uppercase;
-  color:var(--ink-3); font-weight:500;
-}
-
-.p-top{ display:grid; grid-template-columns:minmax(0,1.12fr) minmax(0,1fr); gap:26px 34px; }
-.p-what p{
-  margin:0; font-family:var(--serif); font-weight:300; font-size:16.5px; line-height:1.56;
-  color:var(--ink-2); letter-spacing:-.003em;
-}
-.p-what p b{ color:var(--ink); font-weight:500; }
-
-.provides{ display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:14px 18px; }
-.prov{ border-top:2px solid var(--h); padding-top:9px; }
-.prov .t{ display:block; font-size:12.5px; font-weight:600; letter-spacing:-.005em; line-height:1.3; color:var(--ink); }
-.prov .d{ display:block; font-size:11px; color:var(--ink-3); line-height:1.42; margin-top:3px; }
-
-.builtwith{ display:grid; grid-template-columns:repeat(auto-fit,minmax(210px,1fr)); gap:13px; }
-.bw{
-  display:flex; gap:11px; align-items:flex-start;
-  border:1px dashed var(--h); border-radius:4px; padding:11px 13px; background:var(--t);
-}
-.bw .shape{ width:34px; flex:none; margin-top:2px; }
-.bw .n{ display:block; font-size:11.5px; font-weight:600; color:var(--h); letter-spacing:-.005em; line-height:1.25; }
-.bw .d{ display:block; font-size:11px; color:var(--ink-2); line-height:1.45; margin-top:4px; }
-
-.built-from{ display:grid; grid-template-columns:var(--cols); gap:var(--colgap); align-items:start; }
-.cgroup .shape-cell{ margin:10px 0 12px; max-width:120px; }
-.built-from .cgroup{
-  padding:14px 15px 15px; background:var(--paper-card);
-  border:1px solid var(--rule-soft); border-radius:3px; border-top:2px solid var(--c);
-}
-.built-from .cgroup li{ font-size:12px; }
-
-@media (max-width:900px){
-  .p-top{ grid-template-columns:1fr; gap:22px; }
-  .built-from{ grid-template-columns:1fr; gap:20px; }
-}
-@media (max-width:560px){
-  .provides{ grid-template-columns:1fr; }
-  .node-panel{ padding:18px 18px 20px; }
-}
-
-/* collapsed by default; components open on click */
 .module-comps{ display:none; }
 .module.is-open .module-comps{ display:flex; }
 
@@ -2671,6 +2600,9 @@ a.wire-t:hover{ color:var(--c); border-bottom-color:currentColor; }
     return '<a class="comp-link" href="#/' + id + '">' + label + "</a>";
   }
 
+  var NODE_BY_KEY = {};
+  NODES.forEach(function (n) { NODE_BY_KEY[n.key] = n; });
+
   var MODULE_BY_KEY = {};
   MODULES.forEach(function (m) { MODULE_BY_KEY[m.key] = m; });
 
@@ -2686,36 +2618,6 @@ a.wire-t:hover{ color:var(--c); border-bottom-color:currentColor; }
         '<div class="clabel">' + TYPES[i].key + "</div><ul>" +
         list.map(function (c) { return "<li>" + compLabelHTML(c, parentKey) + "</li>"; }).join("") + "</ul></div>";
     }).join("");
-  }
-
-  function panelHTML(nd) {
-    var provides = nd.provides.map(function (pv) {
-      return '<div class="prov"><span class="t">' + pv[0] + '</span><span class="d">' + pv[1] + "</span></div>";
-    }).join("");
-
-    var built = nd.builtWith.map(function (bw) {
-      var m = MODULE_BY_KEY[bw[0]];
-      return '<div class="bw" style="--h:var(--h-' + bw[0] + ');--t:var(--t-' + bw[0] + ')">' +
-          shapeSVG(m.shape) +
-          '<div><span class="n">' + m.name + '</span><span class="d">' + bw[1] + "</span></div>" +
-        "</div>";
-    }).join("");
-
-    return '<div class="node-panel">' +
-        '<div class="panel-sec p-top">' +
-          '<div class="p-what"><span class="sec-k">What this layer is</span><p>' + nd.what + "</p></div>" +
-          '<div class="p-prov"><span class="sec-k">What it provides</span><div class="provides">' + provides + "</div></div>" +
-        "</div>" +
-        '<div class="panel-sec"><span class="sec-k">Produced with</span><div class="builtwith">' + built + "</div></div>" +
-        '<div class="panel-sec p-made"><span class="sec-k">What this layer is made of</span>' +
-          '<div class="built-from">' + nd.comps.map(function (list, i) {
-            var t = TYPES[i];
-            return '<div class="cgroup" data-type="' + t.slug + '" style="--c:' + t.c + '">' +
-              '<div class="clabel">' + t.key + "</div><ul>" +
-              list.map(function (c) { return "<li>" + compLabelHTML(c, nd.key) + "</li>"; }).join("") +
-            "</ul></div>";
-          }).join("") + "</div></div>" +
-      "</div>";
   }
 
   /* ============================================================
@@ -2739,13 +2641,12 @@ a.wire-t:hover{ color:var(--c); border-bottom-color:currentColor; }
 
   function cellHTML(nd) {
     return '<article class="cell" data-key="' + nd.key + '" style="--h:var(--h-' + nd.key + ');--t:var(--t-' + nd.key + ')">' +
-        '<button type="button" class="cell-head" aria-expanded="false">' +
+        '<a class="cell-head" href="#/l/' + nd.key + '">' +
           '<span class="shape-cell">' + shapeSVG(nd.shape) + "</span>" +
           '<span class="cell-id"><span class="node-num">' + nd.n + "</span>" +
             '<span class="node-name">' + nd.name + "</span></span>" +
           '<span class="tri" aria-hidden="true"></span>' +
-        "</button>" +
-        panelHTML(nd) +
+        "</a>" +
       "</article>";
   }
 
@@ -2786,14 +2687,6 @@ a.wire-t:hover{ color:var(--c); border-bottom-color:currentColor; }
   dag.innerHTML = html;
   var grid = dag;
 
-  function toggleNode(node) {
-    var open = node.classList.toggle("is-open");
-    var btn = node.querySelector(".cell-head");
-    if (btn) btn.setAttribute("aria-expanded", String(open));
-  }
-  dag.querySelectorAll(".cell-head").forEach(function (btn) {
-    btn.addEventListener("click", function () { toggleNode(btn.closest(".cell")); });
-  });
   function remeasure() {}
 
 
@@ -2813,7 +2706,7 @@ a.wire-t:hover{ color:var(--c); border-bottom-color:currentColor; }
 
     if (slug) {
       var t = TYPES.filter(function (x) { return x.slug === slug; })[0];
-      focusText.textContent = "Showing the " + t.key.toLowerCase() + " component of every layer.";
+      focusText.textContent = "Highlighting the " + t.key.toLowerCase() + " layer.";
     }
     remeasure();
   }
@@ -2895,6 +2788,7 @@ a.wire-t:hover{ color:var(--c); border-bottom-color:currentColor; }
   function routeKey() {
     var h = location.hash.replace(/^#\/?/, "");
     if (/^m\//.test(h) && MODULE_BY_KEY[h.slice(2)]) return h;
+    if (/^l\//.test(h) && NODE_BY_KEY[h.slice(2)]) return h;
     return (DETAIL_BY_ROUTE[h] || EDGES[h]) ? h : null;
   }
 
@@ -2904,6 +2798,59 @@ a.wire-t:hover{ color:var(--c); border-bottom-color:currentColor; }
   function siblingIndex(sib, d) {
     for (var i = 0; i < sib.length; i++) if (sib[i].slug === d.slug) return i;
     return -1;
+  }
+
+  function renderLayer(nd) {
+    var i = NODES.indexOf(nd);
+    document.getElementById("detail-loop").hidden = true;
+    detailEl.style.setProperty("--h", "var(--h-" + nd.key + ")");
+    detailEl.style.setProperty("--t", "var(--t-" + nd.key + ")");
+
+    dParent.textContent = "Physical layer " + nd.n;
+    dParent.setAttribute("data-parent", "");
+    dLane.textContent = nd.role;
+    dTitle.innerHTML = nd.name;
+    dLead.hidden = false;
+    dLead.innerHTML = "<span></span>";
+    dLead.firstChild.innerHTML = nd.line;
+
+    var what = dWhat.closest(".d-sec");
+    what.hidden = false;
+    what.querySelector(".sec-k").textContent = "What this layer is";
+    dWhat.innerHTML = nd.what +
+      '<span class="lay-with"><span class="lay-with-k">Produced with</span>' +
+        nd.builtWith.map(function (bw) {
+          var m = MODULE_BY_KEY[bw[0]];
+          return '<a class="mod-layer" href="#/m/' + bw[0] + '">' + (m ? m.name : bw[0]) + "</a>";
+        }).join("") +
+      "</span>";
+
+    var made = dSteps.closest(".d-sec");
+    made.hidden = false;
+    made.querySelector(".sec-k").textContent = "What this layer is made of";
+    dSteps.innerHTML = nd.comps.map(function (list, j) {
+      if (!list.length) return "";
+      return '<li class="mod-group" style="--c:' + TYPES[j].c + '">' +
+        '<span class="st-t">' + TYPES[j].key + "</span>" +
+        '<span class="st-d">' + list.map(function (c) { return compLabelHTML(c, nd.key); }).join(" &nbsp;·&nbsp; ") + "</span>" +
+      "</li>";
+    }).join("");
+
+    var prov = dBreaks.closest(".d-sec");
+    prov.hidden = false;
+    prov.querySelector(".sec-k").textContent = "What it provides";
+    dBreaks.innerHTML = nd.provides.map(function (pv) {
+      return "<li><b>" + pv[0] + "</b><span>" + pv[1] + "</span></li>";
+    }).join("") + '<li class="lay-out"><b>Output</b><span>' + nd.out + "</span></li>";
+
+    hopCap.closest(".d-sec").hidden = true;
+
+    var up = NODES[i - 1], down = NODES[i + 1];
+    dNav.innerHTML =
+      (down ? '<a href="#/l/' + down.key + '"><span class="dn-k">Below</span><span class="dn-t">' + down.n + " " + down.name + "</span></a>" : "") +
+      (up ? '<a href="#/l/' + up.key + '"><span class="dn-k">Above</span><span class="dn-t">' + up.n + " " + up.name + "</span></a>" : "");
+
+    document.title = nd.name.replace(/&amp;/g, "&") + " · " + baseTitle;
   }
 
   function renderModule(m) {
@@ -3230,10 +3177,7 @@ a.wire-t:hover{ color:var(--c); border-bottom-color:currentColor; }
   window.addEventListener("resize", function () { requestAnimationFrame(drawHop); }, { passive: true });
 
   function openNode(key) {
-    var node = grid.querySelector('.node[data-key="' + key + '"]');
-    if (!node) return null;
-    if (document.body.dataset.view === "exec" && !node.classList.contains("is-open")) toggleNode(node);
-    return node;
+    return grid.querySelector('.cell[data-key="' + key + '"]');
   }
 
   function route(opts) {
@@ -3242,6 +3186,7 @@ a.wire-t:hover{ color:var(--c); border-bottom-color:currentColor; }
       if (document.body.dataset.route !== "detail") indexScroll = window.scrollY;
       document.body.dataset.route = "detail";
       if (/^m\//.test(key)) renderModule(MODULE_BY_KEY[key.slice(2)]);
+      else if (/^l\//.test(key)) renderLayer(NODE_BY_KEY[key.slice(2)]);
       else renderDetail(key);
       window.scrollTo(0, 0);
       if (!opts || opts.focus !== false) dTitle.focus({ preventScroll: true });
