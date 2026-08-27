@@ -678,6 +678,67 @@ body[data-route="detail"] .detail{ display:block; }
   background:var(--accent); opacity:.55;
 }
 
+/* One hop out, drawn in the four domain columns */
+.hop{ position:relative; margin:2px 0 0; padding-left:30px; }
+.hop-cols{
+  position:relative; z-index:1;
+  display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:0 18px; align-items:start;
+}
+.hop-col{ display:flex; flex-direction:column; gap:10px; min-width:0; }
+.hop-h{
+  font-family:var(--mono); font-size:8.5px; letter-spacing:.14em; text-transform:uppercase;
+  color:var(--c); padding-bottom:6px; border-bottom:1px solid var(--rule-soft);
+}
+.hop-n[data-ctype="Context"]{  --c:var(--ty-ctx); }
+.hop-n[data-ctype="Agent"]{    --c:var(--ty-agent); }
+.hop-n[data-ctype="Logical"]{  --c:var(--ty-logic); }
+.hop-n[data-ctype="Physical"]{ --c:var(--ty-phys); }
+.hop-n{
+  display:block; text-decoration:none; color:var(--ink);
+  font-size:12.5px; line-height:1.35; padding:9px 10px; border-radius:3px;
+  background:var(--paper-card); border:1px solid var(--rule); border-left:2px solid var(--c);
+  transition:opacity .2s var(--ease), box-shadow .2s var(--ease), border-color .2s var(--ease);
+}
+a.hop-n:hover, a.hop-n:focus-visible{ border-color:var(--c); box-shadow:0 4px 14px -10px rgba(22,24,28,.6); outline:none; }
+.hop-n.is-focal{
+  background:var(--paper-sunk); border-style:solid; border-color:var(--c);
+  border-left-width:3px; font-weight:600;
+}
+.hop-n.dim{ opacity:.32; }
+
+.hop-wires{ position:absolute; inset:0; z-index:0; overflow:visible; pointer-events:none; }
+.hop-w{ fill:none; stroke:var(--ink-3); stroke-width:1.2; opacity:.5; transition:opacity .2s var(--ease), stroke-width .2s var(--ease); }
+.hop-a{ fill:none; stroke:var(--ink-3); stroke-width:1.2; stroke-linecap:round; stroke-linejoin:round; opacity:.6; transition:opacity .2s var(--ease); }
+.hop-w.govern, .hop-a.govern{ stroke-dasharray:4 3; }
+.hop-w.serve,  .hop-a.serve{ stroke-dasharray:1 3; stroke-linecap:round; }
+.hop-w.read{ stroke:var(--ink-2); }
+.hop-w.on, .hop-a.on{ opacity:1; stroke:var(--accent); stroke-width:1.8; }
+.hop-w.dim, .hop-a.dim{ opacity:.14; }
+
+.hop-cap{
+  min-height:3.2em; margin:18px 0 0; padding-top:14px; border-top:1px solid var(--rule-soft);
+  font-size:14px; line-height:1.55; color:var(--ink-2);
+}
+.hop-cap .cap-v{
+  display:inline-block; margin-right:9px;
+  font-family:var(--mono); font-size:9.5px; letter-spacing:.13em; text-transform:uppercase; color:var(--accent);
+}
+/* the verb and the note ride on the node, and only show where the wires cannot */
+.hop-v, .hop-note{ display:none; }
+@media (max-width:720px){
+  .hop{ padding-left:0; }
+  .hop-cols{ grid-template-columns:1fr; gap:22px; align-items:start; }
+  .hop-wires{ display:none; }
+  .hop-cap{ display:none; }
+  .hop-col:empty, .hop-col:not(:has(.hop-n)){ display:none; }
+  .hop-v{
+    display:block; margin-bottom:4px;
+    font-family:var(--mono); font-size:8.5px; letter-spacing:.13em; text-transform:uppercase; color:var(--c);
+  }
+  .hop-note{ display:block; margin-top:5px; font-size:12px; line-height:1.5; color:var(--ink-3); }
+  .hop-n{ padding:11px 12px; }
+}
+
 .d-wires{ list-style:none; margin:0; padding:0; }
 .wire{
   --c:var(--ink-3);
@@ -832,7 +893,11 @@ a.wire-t:hover{ color:var(--c); border-bottom-color:currentColor; }
         </section>
         <section class="d-sec">
           <span class="sec-k">How it meets the rest of the stack</span>
-          <ul class="d-wires" id="detail-wires"></ul>
+          <div class="hop" id="detail-hop">
+            <svg class="hop-wires" id="hop-wires" aria-hidden="true"></svg>
+            <div class="hop-cols" id="hop-cols"></div>
+          </div>
+          <p class="hop-cap" id="hop-cap"></p>
         </section>
       </div>
       <aside class="d-side">
@@ -2436,6 +2501,35 @@ a.wire-t:hover{ color:var(--c); border-bottom-color:currentColor; }
 
   /* A component links out when there is something to show: a written page,
      or interactions with the rest of the stack. */
+  var RELS = {
+    /* the focal component takes from the other one */
+    "reads":"in read", "checks against":"in read", "generated from":"in read",
+    "drafted by":"in read", "linked by":"in read", "prompted by":"in read",
+    "indexed by":"in read", "parsed by":"in read", "shaped by":"in read",
+    "queried by":"in read",
+    /* the focal component produces or hands on */
+    "writes":"out write", "produces":"out write", "feeds":"out write",
+    "hands to":"out write", "sets":"out write", "informs":"out write",
+    "explains":"out write", "recorded in":"out write", "stored in":"out write",
+    "raises":"out write", "mirrors":"out write", "escalates to":"out write",
+    "proposes to":"out write", "shapes":"out write", "propagates to":"out write",
+    "holds":"out write", "enables":"out write", "records":"out write",
+    /* a rule bounding something */
+    "governs":"out govern", "gates":"out govern", "constrains":"out govern",
+    "ranks by":"out govern", "enforces on":"out govern", "bounds":"out govern",
+    "overrides":"out govern", "demotes in":"out govern",
+    "bounded by":"in govern", "ranked by":"in govern", "checked by":"in govern",
+    "governed by":"in govern", "scoped by":"in govern", "constrained by":"in govern",
+    "enforced by":"in govern",
+    /* handed to a consumer */
+    "serves":"out serve", "grounds":"out serve"
+  };
+  function relParts(verb) {
+    var v = RELS[verb] || "out write";
+    var bits = v.split(" ");
+    return { dir: bits[0], kind: bits[1] };
+  }
+
   function compLabelHTML(label, parentKey) {
     var slug = SLUG_OF[parentKey] && SLUG_OF[parentKey][label];
     if (!slug) return label;
@@ -2655,7 +2749,9 @@ a.wire-t:hover{ color:var(--c); border-bottom-color:currentColor; }
   var dBreaks    = document.getElementById("detail-breaks");
   var dLane      = document.getElementById("detail-lane");
   var dParent    = document.getElementById("detail-parent");
-  var dWires     = document.getElementById("detail-wires");
+  var hopCols    = document.getElementById("hop-cols");
+  var hopWires   = document.getElementById("hop-wires");
+  var hopCap     = document.getElementById("hop-cap");
   var dNav       = document.getElementById("detail-nav");
   var dBack      = document.getElementById("detail-back");
   var baseTitle  = document.title;
@@ -2751,22 +2847,8 @@ a.wire-t:hover{ color:var(--c); border-bottom-color:currentColor; }
 
     /* how this component touches the rest of the stack */
     var edges = EDGES[id] || [];
-    dWires.closest(".d-sec").hidden = !edges.length;
-    dWires.innerHTML = edges.map(function (e) {
-      var t = COMPONENTS[e[1]] || { label: e[1], typeName: "", parent: "" };
-      var tp = PARENT_INFO[t.parent] || { label: t.parent };
-      var linked = DETAIL_BY_ROUTE[e[1]] || EDGES[e[1]];
-      var name = linked
-        ? '<a class="wire-t" href="#/' + e[1] + '">' + t.label + "</a>"
-        : '<span class="wire-t">' + t.label + "</span>";
-      return '<li class="wire" data-type="' + (t.type || "") + '">' +
-          '<span class="wire-rel">' + e[0] + "</span>" +
-          '<span class="wire-main">' + name +
-            '<span class="wire-where">' + tp.label + '<span class="wire-dot"></span>' + t.typeName + "</span>" +
-            '<span class="wire-d">' + e[2] + "</span>" +
-          "</span>" +
-        "</li>";
-    }).join("");
+    hopCap.closest(".d-sec").hidden = !edges.length;
+    buildHop(id, comp, edges);
 
     var sib = siblings(d.parent);
     var i = siblingIndex(sib, d);
@@ -2777,6 +2859,127 @@ a.wire-t:hover{ color:var(--c); border-bottom-color:currentColor; }
 
     document.title = d.label.replace(/&amp;/g, "&") + " · " + info.label.replace(/&amp;/g, "&") + " · " + baseTitle;
   }
+
+  /* One hop out from a component, laid out in the four domain columns so the
+     direction of a link is visible without reading it. */
+  /* A component sits in the column of whatever owns it: a physical layer puts
+     it in Physical, a concern puts it in that concern's domain. Its own type
+     stays as the colour, so position says where and colour says what. */
+  var DOMAIN_OF = {};
+  NODES.forEach(function (nd) { DOMAIN_OF[nd.key] = "physical"; });
+  MODULES.forEach(function (m) { DOMAIN_OF[m.key] = COL_OF[m.group]; });
+
+  var hopEdges = [];
+  function buildHop(id, comp, edges) {
+    hopEdges = [];
+    hopCols.innerHTML = "";
+    hopWires.innerHTML = "";
+    hopCap.textContent = "";
+    if (!edges.length) return;
+
+    var byType = {};
+    TYPES.forEach(function (t) { byType[t.slug] = []; });
+
+    var focalCol = DOMAIN_OF[comp.parent] || "physical";
+    byType[focalCol].push({ focal: true, id: id, label: comp.label || id, type: comp.type });
+
+    edges.forEach(function (e, i) {
+      var t = COMPONENTS[e[1]];
+      if (!t) return;
+      byType[DOMAIN_OF[t.parent] || "physical"].push({ id: e[1], label: t.label, type: t.type, edge: i,
+        verb: e[0], note: e[2], kind: relParts(e[0]).kind });
+      hopEdges.push({ i: i, verb: e[0], target: e[1], note: e[2], parts: relParts(e[0]) });
+    });
+
+    hopCols.innerHTML = TYPES.map(function (t) {
+      return '<div class="hop-col" data-type="' + t.slug + '" style="--c:' + t.c + '">' +
+        '<span class="hop-h">' + t.key + "</span>" +
+        byType[t.slug].map(function (nd) {
+          var cls = "hop-n" + (nd.focal ? " is-focal" : "");
+          var attrs = ' class="' + cls + '" data-id="' + nd.id + '" data-ctype="' + nd.type + '"' +
+            (nd.focal ? "" : ' data-edge="' + nd.edge + '"');
+          if (nd.focal) return "<span" + attrs + ">" + nd.label + "</span>";
+          return '<a href="#/' + nd.id + '"' + attrs + ">" +
+              '<span class="hop-v ' + nd.kind + '">' + nd.verb + "</span>" +
+              nd.label +
+              '<span class="hop-note">' + nd.note + "</span>" +
+            "</a>";
+        }).join("") +
+      "</div>";
+    }).join("");
+
+    requestAnimationFrame(drawHop);
+  }
+
+  function drawHop() {
+    if (!hopEdges.length) return;
+    var box = hopCols.getBoundingClientRect();
+    if (!box.width) return;
+    var focal = hopCols.querySelector(".hop-n.is-focal");
+    if (!focal) return;
+    var fr = focal.getBoundingClientRect();
+    hopWires.setAttribute("viewBox", "0 0 " + Math.round(box.width) + " " + Math.round(box.height));
+    hopWires.setAttribute("width", Math.round(box.width));
+    hopWires.setAttribute("height", Math.round(box.height));
+
+    var d = "";
+    hopEdges.forEach(function (e) {
+      var el = hopCols.querySelector('.hop-n[data-edge="' + e.i + '"]');
+      if (!el) return;
+      var r = el.getBoundingClientRect();
+      var sameCol = Math.abs(r.left - fr.left) < 4;
+      var y1 = fr.top + fr.height / 2 - box.top;
+      var y2 = r.top + r.height / 2 - box.top;
+      var x1, x2, mid, path, head;
+
+      if (sameCol) {
+        /* both in one column: bow out to the left and come back */
+        x1 = fr.left - box.left;
+        x2 = r.left - box.left;
+        var bow = x1 - 26;
+        path = "M" + x1 + " " + y1 + " C" + bow + " " + y1 + ", " + bow + " " + y2 + ", " + x2 + " " + y2;
+        head = e.parts.dir === "out" ? [x2, y2, -1] : [x1, y1, -1];
+      } else {
+        var fRight = fr.right < r.left;
+        x1 = (fRight ? fr.right : fr.left) - box.left;
+        x2 = (fRight ? r.left : r.right) - box.left;
+        mid = x1 + (x2 - x1) * 0.5;
+        path = "M" + x1 + " " + y1 + " C" + mid + " " + y1 + ", " + mid + " " + y2 + ", " + x2 + " " + y2;
+        head = e.parts.dir === "out" ? [x2, y2, fRight ? -1 : 1] : [x1, y1, fRight ? 1 : -1];
+      }
+
+      d += '<path class="hop-w ' + e.parts.kind + '" data-edge="' + e.i + '" d="' + path + '"/>' +
+           '<path class="hop-a ' + e.parts.kind + '" data-edge="' + e.i + '" d="M' +
+             (head[0] + head[2] * 7) + " " + (head[1] - 4) + " L" + head[0] + " " + head[1] +
+             " L" + (head[0] + head[2] * 7) + " " + (head[1] + 4) + '"/>';
+      void mid;
+    });
+    hopWires.innerHTML = d;
+  }
+
+  function hopFocus(i) {
+    hopCols.querySelectorAll(".hop-n[data-edge]").forEach(function (el) {
+      el.classList.toggle("dim", i !== null && +el.dataset.edge !== i);
+    });
+    hopWires.querySelectorAll("[data-edge]").forEach(function (el) {
+      el.classList.toggle("on", i !== null && +el.getAttribute("data-edge") === i);
+      el.classList.toggle("dim", i !== null && +el.getAttribute("data-edge") !== i);
+    });
+    if (i === null) { hopCap.innerHTML = ""; return; }
+    var e = hopEdges.filter(function (x) { return x.i === i; })[0];
+    if (e) hopCap.innerHTML = '<span class="cap-v ' + e.parts.kind + '">' + e.verb + "</span>" + e.note;
+  }
+
+  hopCols.addEventListener("mouseover", function (ev) {
+    var n = ev.target.closest(".hop-n[data-edge]");
+    if (n) hopFocus(+n.dataset.edge);
+  });
+  hopCols.addEventListener("mouseleave", function () { hopFocus(null); });
+  hopCols.addEventListener("focusin", function (ev) {
+    var n = ev.target.closest(".hop-n[data-edge]");
+    if (n) hopFocus(+n.dataset.edge);
+  });
+  window.addEventListener("resize", function () { requestAnimationFrame(drawHop); }, { passive: true });
 
   function openNode(key) {
     var node = grid.querySelector('.node[data-key="' + key + '"]');
