@@ -1453,9 +1453,9 @@ a.wire-t:hover{ color:var(--c); border-bottom-color:currentColor; }
       "key": "bk",
       "shape": "book",
       "name": "Business knowledge",
-      "tag": "Context · what it means here",
+      "tag": "Context · what only people know",
       "group": "ctx",
-      "line": "What the numbers mean in this business: the glossary, the KPI definitions, the targets and the calendar everything is read against.",
+      "line": "What the business knows and the data cannot show: monthly business reviews, reports, the analyses already done and the commentary stakeholders leave behind. Written by people, version-controlled like code.",
       "plugs": [
         "int",
         "lake",
@@ -1464,31 +1464,38 @@ a.wire-t:hover{ color:var(--c); border-bottom-color:currentColor; }
       ],
       "comps": [
         [
-          "Business glossary, one name per concept",
-          "KPI definitions with named owners",
-          "Plans, targets and policy documents"
+          "Monthly business reviews and the decisions in them",
+          "Board and investor reporting",
+          "Prior analyses, and what each one concluded",
+          "Stakeholder commentary against a metric and a period",
+          "Why the business does it this way, written down"
         ],
         [
-          "Grounding for natural-language questions",
-          "Context-aware anomaly narratives",
-          "Suggested next questions"
+          "Retrieval across the document corpus",
+          "Answers that cite the document they came from",
+          "Flags a trend that contradicts an earlier finding",
+          "Asks a stakeholder for commentary when a number moves",
+          "Drafts the recurring review from the numbers, for a person to correct"
         ],
         [
-          "Segment and hierarchy definitions",
-          "Fiscal calendar and period logic",
-          "Entitlement mapped to org structure"
+          "Every document versioned, with an author and a date",
+          "A finding linked to the metric and period it concerns",
+          "Superseded documents marked, never deleted",
+          "Review cadence and owner per document",
+          "What counts as a finding worth keeping"
         ],
         [
-          "Target and budget tables",
-          "Context store, versioned and indexed"
+          "The document repository, under version control",
+          "The commentary store, keyed to metric and period",
+          "Search index over both"
         ]
       ],
       "decisions": [
-        "Target setting and sign-off",
-        "Glossary ownership and review"
+        "Which findings are kept and which are retired",
+        "Who owns a document, and when it is reviewed next"
       ],
       "out": [
-        "A shared vocabulary, and answers phrased in business terms"
+        "The reasons behind the numbers, kept where they can be found and cited"
       ]
     },
     {
@@ -2262,10 +2269,46 @@ a.wire-t:hover{ color:var(--c); border-bottom-color:currentColor; }
      Written so far: 04 Data Lake.
      ============================================================ */
   var EDGES = {
+    "bk/monthly-business-reviews-and-the-decisions-in-th": [
+      ["reads", "agg/one-definition-per-metric-compiled-to-sql", "The review is written against the governed metric set, so the numbers in it are the numbers everywhere else."],
+      ["produces", "bk/prior-analyses-and-what-each-one-concluded", "Last month's review is next month's prior finding."],
+      ["explains", "agg/why-each-metric-is-defined-the-way-it-is", "When a review argues a number is measured wrong, that is where the change starts."],
+      ["drafted by", "bk/drafts-the-recurring-review-from-the-numbers-for", "The agent assembles the numbers and the deltas. A person writes what they mean."]
+    ],
+    "bk/prior-analyses-and-what-each-one-concluded": [
+      ["reads", "lake/automatic-lineage-capture", "An analysis records the tables and the run it was built on, so it can be reproduced or retired."],
+      ["feeds", "bk/flags-a-trend-that-contradicts-an-earlier-findin", "A conclusion is only useful if something notices when the data stops agreeing with it."],
+      ["linked by", "bk/a-finding-linked-to-the-metric-and-period-it-con", "A finding filed against a metric surfaces the next time anyone asks about that metric."],
+      ["grounds", "dash/grounding-served-to-the-agent-at-query-time", "What was already concluded is context the next answer should not contradict."]
+    ],
+    "bk/stakeholder-commentary-against-a-metric-and-a-pe": [
+      ["reads", "ev/narratives-written-from-the-actual-deltas", "The narrative says what moved. The commentary says why, and only a person knows that."],
+      ["prompted by", "bk/asks-a-stakeholder-for-commentary-when-a-number-", "Commentary is captured while the reason is still known, not reconstructed a quarter later."],
+      ["stored in", "bk/the-commentary-store-keyed-to-metric-and-period", "Keyed to a metric and a period so it comes back attached to the number it explains."],
+      ["grounds", "dash/business-glossary-and-kpi-definitions", "Repeated commentary on the same metric is usually a definition that needs fixing."]
+    ],
+    "bk/flags-a-trend-that-contradicts-an-earlier-findin": [
+      ["reads", "bk/prior-analyses-and-what-each-one-concluded", "It needs a written conclusion to contradict. This is what makes analyses worth keeping."],
+      ["reads", "agg/variance-explainer", "The variance says the number moved. This asks whether the move breaks something we believed."],
+      ["raises", "ev/which-events-matter-and-to-whom", "A contradicted finding is an event, routed to whoever owns the belief."],
+      ["proposes to", "bk/what-counts-as-a-finding-worth-keeping", "Findings that keep being contradicted are candidates for retirement."]
+    ],
+    "bk/every-document-versioned-with-an-author-and-a-da": [
+      ["governs", "bk/the-document-repository-under-version-control", "Same discipline as code: an author, a date, a diff, a review."],
+      ["governs", "bk/superseded-documents-marked-never-deleted", "A retired conclusion still explains a decision someone made at the time."],
+      ["feeds", "bk/answers-that-cite-the-document-they-came-from", "A citation is worth something only when the reader can open the exact version cited."],
+      ["mirrors", "sem/version-controlled-model-spec", "Definitions and the documents that argue for them move under the same review."]
+    ],
+    "bk/the-document-repository-under-version-control": [
+      ["indexed by", "bk/search-index-over-both", "Documents and commentary are searched together, since the answer is often split across them."],
+      ["read by", "bk/retrieval-across-the-document-corpus", "Retrieval runs over the repository, never over a summary of it."],
+      ["bounded by", "tl/guardrails-what-an-agent-may-never-write", "An agent proposes a document change as a diff. It does not commit one."],
+      ["scoped by", "lake/sensitivity-class-per-dataset", "A board document carries the same handling class as the numbers inside it."]
+    ],
     "lake/what-each-table-is-for-and-who-depends-on-it": [
       ["reads", "lake/automatic-lineage-capture", "The dependency half of the answer comes from the lineage graph, not from a hand-kept list."],
       ["feeds", "lake/lineage-q-and-a-over-the-catalog", "Gives the agent the purpose of a table, so an answer can say why it matters and not only what it joins to."],
-      ["feeds", "bk/business-glossary-one-name-per-concept", "Table purpose is part of the standing context every agent task starts from."],
+      ["feeds", "bk/why-the-business-does-it-this-way-written-down", "Table purpose is part of the standing context every agent task starts from."],
       ["constrains", "lake/cost-and-usage-scanner", "A table with no reads but a named dependant is a question, not a candidate for deletion."]
     ],
     "lake/sensitivity-class-per-dataset": [

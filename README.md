@@ -16,6 +16,15 @@ Context, agent and logical are layers in their own right, not details of a
 physical product. Each is a column of named concerns:
 
 - Context: Business knowledge, Skills, Tools, Events
+
+Business knowledge is the odd one: it is not assembled from other parts of the
+stack. It is the material only people can write. Monthly business reviews,
+board reporting, the analyses already done and what they concluded, and the
+commentary stakeholders leave against a metric and a period. The data informs
+it (a trend can contradict an earlier finding) and an agent can draft the
+recurring parts, but a person writes what it means. All of it is versioned with
+an author and a date, superseded documents are marked and never deleted, and a
+finding is filed against the metric it concerns.
 - Agent: Task, Domain expert, Process owner
 - Logical: Transformation SQL, DQ Module, Linting Model, Semantic Layer
 
