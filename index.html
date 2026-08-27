@@ -55,6 +55,7 @@
   --h-tk:   #B4533A;  --t-tk:   #F8EDE7;
   --h-de:   #A05A3C;  --t-de:   #F6EEE7;
   --h-po:   #8C4530;  --t-po:   #F5EAE4;
+  --h-rv:   #77392A;  --t-rv:   #F3E7E2;
   /* logical concerns */
   --h-sql:  #2F6B55;  --t-sql:  #E6F0EB;
 
@@ -1039,6 +1040,14 @@ a.wire-t:hover{ color:var(--c); border-bottom-color:currentColor; }
       '<circle class="dim" cx="22" cy="42" r="3"/><circle class="dim" cx="98" cy="42" r="3"/>' +
       '<path class="dimline" d="M52 42 H68"/>',
 
+    /* Reviewer: a proposal read a second time, against what it cites */
+    reviewer:
+      '<rect class="edge" x="14" y="12" width="62" height="60" rx="4"/>' +
+      '<path class="dimline" d="M26 28 H62 M26 40 H56 M26 52 H48"/>' +
+      '<circle class="face" cx="82" cy="42" r="17"/>' +
+      '<path class="hot" d="M74 42 l5 5 l10 -11"/>' +
+      '<path class="hot" d="M94 54 L104 66"/>',
+
     /* Process owner: a loop that is watched */
     owner:
       '<path class="hot" d="M84 30 A28 28 0 1 0 88 52"/>' +
@@ -1730,7 +1739,7 @@ a.wire-t:hover{ color:var(--c); border-bottom-color:currentColor; }
       "name": "Task",
       "tag": "Agent · one unit of work",
       "group": "agt",
-      "line": "A single piece of work with a definition of done: draft this model, explain this variance, propose these matches. Every task ends in a reviewable diff.",
+      "line": "A single piece of work with a definition of done: draft this model, explain this variance, propose these matches. Every task ends in a reviewable diff. A task that cannot finish inside its budget stops and says so.",
       "plugs": [
         "src",
         "ods",
@@ -1742,24 +1751,43 @@ a.wire-t:hover{ color:var(--c); border-bottom-color:currentColor; }
       "comps": [
         [
           "Why the task was raised",
-          "What a finished task looks like"
+          "What a finished task looks like",
+          "Who asked for it, and who has to live with the answer",
+          "What has already been tried, and what it cost",
+          "How urgent it is, against what else is queued",
+          "Which decisions are not the agent's to make",
+          "Worked examples of a task done well, and one done badly"
         ],
         [
           "Planning and decomposition",
           "Drafting the proposal with its evidence",
-          "Self-check before hand-off"
+          "Self-check before hand-off",
+          "Picks up the skills and tools the plan needs",
+          "Asks a question when the specification is ambiguous",
+          "Stops and escalates instead of guessing",
+          "Writes what it learned back where the next task will find it"
         ],
         [
           "Task specification and acceptance criteria",
           "Retry and escalation rules",
-          "Evaluation against the expected result"
+          "Evaluation against the expected result",
+          "A diff is the only output, never a direct write",
+          "Budget per task: time, calls and cost",
+          "One owner per task, named before it starts",
+          "Definition of done agreed before work begins"
         ],
         [
-          "Task queue, run logs and produced diffs"
+          "Task queue, run logs and produced diffs",
+          "The proposal store, with its evidence attached",
+          "Review threads and what was decided",
+          "Task history, searchable by what it touched",
+          "Cost and duration recorded per task"
         ]
       ],
       "decisions": [
-        "Accept, amend or reject the proposal"
+        "Accept, amend or reject the proposal",
+        "How much budget a class of task gets",
+        "Which tasks run unattended, and which wait for a person"
       ],
       "out": [
         "A reviewable diff with its evidence, never a silent write"
@@ -1841,6 +1869,56 @@ a.wire-t:hover{ color:var(--c); border-bottom-color:currentColor; }
       ],
       "out": [
         "A process that reports on itself and arrives with a fix attached"
+      ]
+    },
+    {
+      "key": "rv",
+      "shape": "reviewer",
+      "name": "Reviewer",
+      "tag": "Agent · the second read",
+      "group": "agt",
+      "line": "A separate agent that argues with a proposal before a person sees it: checks the evidence it cites, looks for the smaller change that would do, and says plainly when it cannot tell. It approves nothing. Its job is to make the human decision shorter.",
+      "plugs": [
+        "src",
+        "ods",
+        "int",
+        "lake",
+        "agg",
+        "dash"
+      ],
+      "comps": [
+        [
+          "What a good proposal looks like in this domain",
+          "Which mistakes this stack has made before",
+          "How much scrutiny a change of this size is worth",
+          "Who the reviewer is standing in for"
+        ],
+        [
+          "Reads the proposal against the evidence it cites",
+          "Argues the opposite case before agreeing",
+          "Checks the claim by running it, where running it is cheap",
+          "Looks for the simpler change that would do",
+          "Says plainly when it cannot tell"
+        ],
+        [
+          "The reviewer is never the author",
+          "A review states a position: accept, amend, reject",
+          "Every objection cites the evidence it rests on",
+          "Review depth scales with blast radius",
+          "A review never merges anything"
+        ],
+        [
+          "Review threads, kept with the proposal",
+          "The record of what was objected to, and what happened next",
+          "Reviewer prompts and their versions"
+        ]
+      ],
+      "decisions": [
+        "Whether a review is enough, or a person must look",
+        "How much scrutiny a class of change gets by default"
+      ],
+      "out": [
+        "A proposal that has already been argued with, and the objections attached"
       ]
     },
     {
@@ -2375,6 +2453,150 @@ a.wire-t:hover{ color:var(--c); border-bottom-color:currentColor; }
      Written so far: 04 Data Lake.
      ============================================================ */
   var EDGES = {
+    "tk/why-the-task-was-raised": [
+      ["reads","ev/event-triage-and-classification","Most tasks start as something that happened, classified into something worth doing."],
+      ["reads","bk/stakeholder-commentary-against-a-metric-and-a-pe","The other half start as a person saying a number looks wrong."],
+      ["hands to","tk/task-specification-and-acceptance-criteria","A reason becomes a specification, or it stays a complaint."],
+      ["informs","tk/how-urgent-it-is-against-what-else-is-queued","Why it was raised is most of the argument for where it sits in the queue."]
+    ],
+    "tk/who-asked-for-it-and-who-has-to-live-with-the-an": [
+      ["reads","sem/certified-or-draft-and-who-owns-it","Ownership of the definition is usually ownership of the task."],
+      ["informs","tk/one-owner-per-task-named-before-it-starts","A named owner at the start is what stops a finished proposal sitting unread."],
+      ["serves","rv/who-the-reviewer-is-standing-in-for","The reviewer stands in for whoever has to live with the answer."],
+      ["mirrors","src/who-owns-each-feed-and-who-to-call-when-it-break","The same question the feeds answer, asked one layer up."]
+    ],
+    "tk/what-has-already-been-tried-and-what-it-cost": [
+      ["reads","tk/task-history-searchable-by-what-it-touched","The history is the only place the last attempt is written down."],
+      ["reads","bk/prior-analyses-and-what-each-one-concluded","An analysis that already answered this is cheaper than repeating it."],
+      ["bounds","tk/planning-and-decomposition","A plan that repeats a failed approach was made without reading."],
+      ["informs","tk/budget-per-task-time-calls-and-cost","What it cost last time is the honest starting estimate."]
+    ],
+    "tk/which-decisions-are-not-the-agent-s-to-make": [
+      ["governs","tk/stops-and-escalates-instead-of-guessing","The list of decisions that are not the agent's is what escalation is for."],
+      ["reads","tl/guardrails-what-an-agent-may-never-write","Some of the line is technical. This is the rest of it, and it is longer."],
+      ["governs","tk/a-diff-is-the-only-output-never-a-direct-write","A diff instead of a write is how the boundary survives contact with a deadline."],
+      ["serves","po/escalation-path-when-a-fix-is-refused","The process owner inherits whatever the task was not allowed to settle."]
+    ],
+    "tk/planning-and-decomposition": [
+      ["reads","sk/selects-the-skill-that-fits-the-task","A plan is built from procedures that exist, and not from steps invented on the spot."],
+      ["reads","tl/tool-selection-and-argument-drafting","What the plan can call is decided before the plan is written, not after it fails."],
+      ["bounded by","tk/budget-per-task-time-calls-and-cost","A plan that cannot fit the budget is a plan that should have escalated instead."],
+      ["hands to","tk/drafting-the-proposal-with-its-evidence","Decomposition ends where drafting begins, and the hand-off is explicit."]
+    ],
+    "tk/drafting-the-proposal-with-its-evidence": [
+      ["reads","tl/retrieval-over-catalog-lineage-and-context","Evidence is retrieved and cited, so the reader checks a path instead of a claim."],
+      ["writes","tk/the-proposal-store-with-its-evidence-attached","The proposal and the evidence it rests on are stored as one thing."],
+      ["checked by","tk/self-check-before-hand-off","Nothing leaves the agent without the agent having read it back."],
+      ["serves","rv/reads-the-proposal-against-the-evidence-it-cites","Drafting for a reviewer is different from drafting for a merge button."]
+    ],
+    "tk/self-check-before-hand-off": [
+      ["reads","tk/evaluation-against-the-expected-result","The self-check is the acceptance criteria run against the actual output."],
+      ["reads","dq/assertion-suites-for-null-range-and-uniqueness","The same tests the data has to pass, run before a person is asked to look."],
+      ["reads","lint/naming-standard-enforced-in-ci","Conformance failures are cheap to find here and expensive to find in review."],
+      ["hands to","rv/reads-the-proposal-against-the-evidence-it-cites","A self-check is not a review. It only decides whether the review is worth anyone's time."]
+    ],
+    "tk/asks-a-question-when-the-specification-is-ambigu": [
+      ["reads","tk/task-specification-and-acceptance-criteria","Ambiguity is a property of the specification, and it is found by reading it closely."],
+      ["escalates to","tk/one-owner-per-task-named-before-it-starts","The question goes to the named owner, and not to whoever answers first."],
+      ["mirrors","bk/asks-a-stakeholder-for-commentary-when-a-number-","Asking early is the same instinct in both columns, and it is the cheap one."],
+      ["bounds","tk/planning-and-decomposition","Planning past an ambiguity is how a task produces confident nonsense."]
+    ],
+    "tk/stops-and-escalates-instead-of-guessing": [
+      ["reads","tk/retry-and-escalation-rules","When to stop is declared in advance, so stopping is not a judgment call under pressure."],
+      ["governed by","tl/guardrails-what-an-agent-may-never-write","Some stops are the guardrail refusing, and the task reports that plainly."],
+      ["writes","tk/review-threads-and-what-was-decided","A stop is a result. It gets written down like any other."],
+      ["serves","po/escalation-path-when-a-fix-is-refused","An escalated task and a refused fix arrive in the same place."]
+    ],
+    "tk/writes-what-it-learned-back-where-the-next-task-": [
+      ["writes","bk/agent-readable-context-store-chunked-and-embedde","What one task learned is only worth anything if the next one retrieves it."],
+      ["raises","sk/writes-a-new-skill-when-a-procedure-keeps-being-","A step improvised across several tasks is a missing skill, and this is where it gets noticed."],
+      ["raises","tl/drafts-a-tool-definition-when-a-step-keeps-being","The same signal, pointed at the tool layer instead of the procedure."],
+      ["writes","tk/task-history-searchable-by-what-it-touched","History is what makes the third attempt cheaper than the second."]
+    ],
+    "tk/task-specification-and-acceptance-criteria": [
+      ["governs","tk/evaluation-against-the-expected-result","Evaluation is the criteria run as a test. Writing them apart is how they disagree."],
+      ["governs","tk/planning-and-decomposition","The specification bounds the plan, and a plan that exceeds it is out of scope by definition."],
+      ["reads","tk/what-a-finished-task-looks-like","Acceptance criteria are the plain sentence about done, written so a machine can check it."],
+      ["mirrors","src/signed-data-contracts-schema-grain-cadence","A task contract and a data contract do the same job at different scales."]
+    ],
+    "tk/a-diff-is-the-only-output-never-a-direct-write": [
+      ["governs","tk/task-queue-run-logs-and-produced-diffs","The queue holds diffs. There is no path in it that writes to a table."],
+      ["enforced by","tl/guardrails-what-an-agent-may-never-write","The rule is stated here and made true one column over."],
+      ["serves","sql/version-control-and-code-review","A diff arrives where changes already get reviewed, and needs no second process."],
+      ["mirrors","sk/drafts-a-skill-change-as-a-pull-request","Skills, scopes and tasks all end in something a person can read and refuse."]
+    ],
+    "tk/budget-per-task-time-calls-and-cost": [
+      ["reads","tl/rate-and-cost-limits-per-tool","A task budget that ignores the tool limits is a budget that gets discovered at runtime."],
+      ["constrains","tk/planning-and-decomposition","The budget is an input to planning, and not a surprise that arrives at step nine."],
+      ["reads","tl/cost-and-usage-metering-per-tool-and-per-agent","Actual spend per agent is what makes the next budget honest."],
+      ["mirrors","lake/cost-and-usage-scanner","The lake asks which tables earn their storage. This asks which tasks earn their run."]
+    ],
+    "tk/evaluation-against-the-expected-result": [
+      ["reads","tk/what-a-finished-task-looks-like","The expected result has to exist before the work does, or evaluation is a rewrite of the outcome."],
+      ["checked by","rv/a-review-states-a-position-accept-amend-reject","A passing evaluation and an accepted review are different claims."],
+      ["reads","dq/check-results-and-run-history","Where the task touched data, the data tests are part of the verdict."],
+      ["mirrors","sk/evaluation-suite-per-skill-run-before-merge","Same discipline, one column over: nothing merges on a promise."]
+    ],
+    "tk/task-queue-run-logs-and-produced-diffs": [
+      ["governed by","tk/a-diff-is-the-only-output-never-a-direct-write","What the queue is allowed to contain is the whole safety argument."],
+      ["feeds","tk/task-history-searchable-by-what-it-touched","Today's queue is tomorrow's history, with no extra step."],
+      ["read by","tl/every-call-carries-the-task-it-was-made-for","The task id is the join between what an agent did and why."],
+      ["serves","sql/version-control-and-code-review","The produced diff goes where diffs go."]
+    ],
+    "tk/the-proposal-store-with-its-evidence-attached": [
+      ["holds","tk/review-threads-and-what-was-decided","A proposal and the argument about it are one record, and not two systems."],
+      ["read by","rv/reads-the-proposal-against-the-evidence-it-cites","The reviewer reads the stored evidence, and not a summary of it."],
+      ["mirrors","bk/the-document-repository-under-version-control","Proposals get versioned for the reason documents do: superseded is not deleted."],
+      ["serves","sem/impact-analysis-before-a-change","A proposal with its evidence attached is what impact analysis runs against."]
+    ],
+    "rv/reads-the-proposal-against-the-evidence-it-cites": [
+      ["reads","tk/the-proposal-store-with-its-evidence-attached","It reads the stored proposal and the evidence, in that order."],
+      ["reads","bk/veracity-checks-and-the-confidence-a-source-carr","A citation to an unverified source is an objection, not a supporting fact."],
+      ["hands to","rv/a-review-states-a-position-accept-amend-reject","Reading ends in a stated position. A review with no position is a delay."],
+      ["bounded by","rv/the-reviewer-is-never-the-author","The agent that wrote it cannot be the agent that clears it."]
+    ],
+    "rv/argues-the-opposite-case-before-agreeing": [
+      ["reads","rv/which-mistakes-this-stack-has-made-before","The best source of objections is what this stack already got wrong once."],
+      ["reads","sem/overlapping-metric-detection","A new definition that overlaps an old one is the most common quiet mistake."],
+      ["feeds","rv/every-objection-cites-the-evidence-it-rests-on","An argument that cites nothing is a preference, and gets marked as one."],
+      ["serves","tk/drafting-the-proposal-with-its-evidence","Knowing the opposite case will be argued changes how the proposal is drafted."]
+    ],
+    "rv/checks-the-claim-by-running-it-where-running-it-": [
+      ["reads","tl/sandbox-environments-where-a-write-is-safe","Running the claim is only allowed where running it cannot break anything."],
+      ["reads","dq/assertion-suites-for-null-range-and-uniqueness","Where a claim is testable, testing it beats arguing about it."],
+      ["writes","rv/review-threads-kept-with-the-proposal","The run and its output land in the thread, so the objection is checkable."],
+      ["bounded by","tl/tool-definitions-and-their-permitted-scope","A reviewer calls through the same bounded surface as everything else."]
+    ],
+    "rv/looks-for-the-simpler-change-that-would-do": [
+      ["reads","sql/refactor-and-dedup-suggestions-across-models","The simpler change is often one that already exists somewhere in the models."],
+      ["reads","sem/impact-analysis-before-a-change","Smaller blast radius is the argument, and impact analysis is where it is measured."],
+      ["serves","tk/planning-and-decomposition","The next plan starts from the smaller change, and not from the first one drafted."],
+      ["serves","agg/model-drafter-from-plain-language","A drafter that keeps being told to simplify eventually drafts simpler."]
+    ],
+    "rv/says-plainly-when-it-cannot-tell": [
+      ["escalates to","po/escalation-path-when-a-fix-is-refused","An undecidable review is a decision that belongs to a person, and it is routed as one."],
+      ["reads","rv/how-much-scrutiny-a-change-of-this-size-is-worth","How hard to push before admitting the limit is a scrutiny question, not a confidence one."],
+      ["writes","rv/review-threads-kept-with-the-proposal","Saying so in the thread is the output. Silence reads as agreement."],
+      ["mirrors","lake/lineage-q-and-a-over-the-catalog","Both stop at the edge of what they can evidence, and say where the edge was."]
+    ],
+    "rv/the-reviewer-is-never-the-author": [
+      ["governs","rv/reads-the-proposal-against-the-evidence-it-cites","A second read by the same model that wrote it is not a second read."],
+      ["governs","rv/a-review-states-a-position-accept-amend-reject","The position carries weight only because the reviewer had nothing to defend."],
+      ["mirrors","sk/a-person-approves-every-skill-change","Separation of author and approver, one column over and one level up."],
+      ["bounds","tk/self-check-before-hand-off","The self-check is the author checking itself, and it is counted as such."]
+    ],
+    "rv/review-depth-scales-with-blast-radius": [
+      ["reads","sem/impact-analysis-before-a-change","Blast radius is measured, and not estimated from how large the diff looks."],
+      ["reads","lake/what-each-table-is-for-and-who-depends-on-it","Who depends on it decides how hard the proposal gets pushed."],
+      ["governs","rv/checks-the-claim-by-running-it-where-running-it-","A cheap change is argued about. An expensive one is run."],
+      ["reads","dq/which-datasets-matter-most-and-to-whom","The datasets that matter most get the reviews that take longest."]
+    ],
+    "rv/a-review-states-a-position-accept-amend-reject": [
+      ["writes","rv/the-record-of-what-was-objected-to-and-what-happ","Positions are kept, so a pattern of the same objection becomes visible."],
+      ["serves","tk/review-threads-and-what-was-decided","The review lands on the proposal, where the decision will be made."],
+      ["bounded by","rv/a-review-never-merges-anything","Accept is a recommendation. It is never a merge."],
+      ["serves","sk/a-person-approves-every-skill-change","A person reading an argued proposal decides faster than one reading a raw diff."]
+    ],
     "tl/what-each-tool-is-for-in-plain-language": [
       ["reads","tl/tool-definitions-and-their-permitted-scope","The plain sentence is written from the definition it describes, so the two cannot drift apart."],
       ["serves","tl/tool-selection-and-argument-drafting","Selection is only ever as good as the description an agent reads before it chooses."],
@@ -3128,6 +3350,25 @@ a.wire-t:hover{ color:var(--c); border-bottom-color:currentColor; }
         ids: [
           "tl/requests-a-scope-it-does-not-have-with-the-task-",
           "tl/grants-expire-and-are-renewed-deliberately"
+        ]
+      }
+    },
+    tk: {
+      note: "A task is raised, bounded, worked and argued with. Nothing merges inside the loop; it ends at a person holding a diff.",
+      stages: [
+        { t:"Raise",    id:"tk/why-the-task-was-raised", by:"context" },
+        { t:"Spec",     id:"tk/task-specification-and-acceptance-criteria", by:"logical" },
+        { t:"Plan",     id:"tk/planning-and-decomposition", by:"agent" },
+        { t:"Draft",    id:"tk/drafting-the-proposal-with-its-evidence", by:"agent" },
+        { t:"Check",    id:"tk/self-check-before-hand-off", by:"agent" },
+        { t:"Review",   id:"rv/reads-the-proposal-against-the-evidence-it-cites", by:"agent" },
+        { t:"Decide",   id:"tk/review-threads-and-what-was-decided", by:"physical" }
+      ],
+      back: {
+        label: "What comes back",
+        ids: [
+          "tk/writes-what-it-learned-back-where-the-next-task-",
+          "tk/stops-and-escalates-instead-of-guessing"
         ]
       }
     }
